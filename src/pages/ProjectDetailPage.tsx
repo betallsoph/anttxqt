@@ -55,14 +55,24 @@ export function ProjectDetailPage() {
                     <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                 </div>
 
-                {/* Placeholder Image */}
-                <div className="w-full h-40 sm:h-56 bg-gradient-to-br from-blue-100 to-blue-200 border-b-2 border-black flex items-center justify-center">
-                    <div className="text-center">
-                        <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
-                            <span className="text-blue-400 text-2xl sm:text-3xl">📷</span>
+                {/* Project Image */}
+                <div className="w-full h-40 sm:h-56 border-b-2 border-black overflow-hidden">
+                    {project.imageUrl ? (
+                        <img
+                            src={project.imageUrl}
+                            alt={project.title}
+                            className="w-full h-full object-cover object-center"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                            <div className="text-center">
+                                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
+                                    <span className="text-blue-400 text-2xl sm:text-3xl">📷</span>
+                                </div>
+                                <p className="text-sm sm:text-base text-blue-400 font-medium">Project Image Coming Soon</p>
+                            </div>
                         </div>
-                        <p className="text-sm sm:text-base text-blue-400 font-medium">Project Image Coming Soon</p>
-                    </div>
+                    )}
                 </div>
 
                 <div className="p-4 sm:p-6">

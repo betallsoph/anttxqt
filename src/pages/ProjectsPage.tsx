@@ -13,6 +13,7 @@ export interface Project {
     tags: string[];
     githubUrl?: string;
     liveUrl?: string;
+    imageUrl?: string; // Project screenshot/thumbnail
 }
 
 const statusStyles: Record<ProjectStatus, string> = {
@@ -162,14 +163,24 @@ export function ProjectsPage() {
                                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                             </div>
 
-                            {/* Placeholder Image */}
-                            <div className="w-full h-32 sm:h-40 bg-gradient-to-br from-blue-100 to-blue-200 border-b-2 border-black flex items-center justify-center">
-                                <div className="text-center">
-                                    <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
-                                        <span className="text-blue-400 text-xl sm:text-2xl">📷</span>
+                            {/* Project Image */}
+                            <div className="w-full h-32 sm:h-40 border-b-2 border-black overflow-hidden">
+                                {project.imageUrl ? (
+                                    <img
+                                        src={project.imageUrl}
+                                        alt={project.title}
+                                        className="w-full h-full object-cover object-center"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                                        <div className="text-center">
+                                            <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
+                                                <span className="text-blue-400 text-xl sm:text-2xl">📷</span>
+                                            </div>
+                                            <p className="text-xs sm:text-sm text-blue-400 font-medium">Image Coming Soon</p>
+                                        </div>
                                     </div>
-                                    <p className="text-xs sm:text-sm text-blue-400 font-medium">Image Coming Soon</p>
-                                </div>
+                                )}
                             </div>
 
                             <div className="p-4 sm:p-6">
