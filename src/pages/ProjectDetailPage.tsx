@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
 import { projects } from "./ProjectsPage";
 
 const statusStyles: Record<string, string> = {
@@ -56,18 +56,18 @@ export function ProjectDetailPage() {
                 </div>
 
                 {/* Project Image */}
-                <div className="w-full h-40 sm:h-56 border-b-2 border-black overflow-hidden">
+                <div className="w-full h-40 sm:h-56 border-b-2 border-black overflow-hidden bg-zinc-50">
                     {project.imageUrl ? (
                         <img
                             src={project.imageUrl}
                             alt={project.title}
-                            className="w-full h-full object-cover object-center"
+                            className="w-full h-full object-contain"
                         />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                             <div className="text-center">
                                 <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
-                                    <span className="text-blue-400 text-2xl sm:text-3xl">📷</span>
+                                    <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" />
                                 </div>
                                 <p className="text-sm sm:text-base text-blue-400 font-medium">Project Image Coming Soon</p>
                             </div>

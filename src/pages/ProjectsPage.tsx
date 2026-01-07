@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { DelayedLink } from "@/components/ui/delayed-link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ImageIcon } from "lucide-react";
 
 type ProjectStatus = "Production" | "In Development" | "Concept";
 
@@ -164,18 +164,18 @@ export function ProjectsPage() {
                             </div>
 
                             {/* Project Image */}
-                            <div className="w-full h-32 sm:h-40 border-b-2 border-black overflow-hidden">
+                            <div className="w-full h-32 sm:h-40 border-b-2 border-black overflow-hidden bg-zinc-50">
                                 {project.imageUrl ? (
                                     <img
                                         src={project.imageUrl}
                                         alt={project.title}
-                                        className="w-full h-full object-cover object-center"
+                                        className="w-full h-full object-contain"
                                     />
                                 ) : (
                                     <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
                                         <div className="text-center">
                                             <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
-                                                <span className="text-blue-400 text-xl sm:text-2xl">📷</span>
+                                                <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
                                             </div>
                                             <p className="text-xs sm:text-sm text-blue-400 font-medium">Image Coming Soon</p>
                                         </div>
