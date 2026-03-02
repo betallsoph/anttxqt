@@ -7,18 +7,34 @@ import {
     saveHomepageData,
 } from "@/hooks/useHomepageData";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 
 const inputClass =
     "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
 
+function SaveButton({ saving, message, onSave }: { saving: boolean; message: string; onSave: () => void }) {
+    return (
+        <div className="flex items-center gap-3">
+            <Button onClick={onSave} disabled={saving} size="sm">
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                {saving ? "Đang lưu..." : "Lưu"}
+            </Button>
+            {message && (
+                <span className={`text-sm font-bold ${message.includes("thành công") ? "text-green-600" : "text-red-500"}`}>
+                    {message}
+                </span>
+            )}
+        </div>
+    );
+}
+
 export function AdminHomePage() {
     const [data, setData] = useState<HomepageData>(defaultHomepageData);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState("");
+    const [saving, setSaving] = useState<string | null>(null);
+    const [message, setMessage] = useState<Record<string, string>>({});
 
     useEffect(() => {
         getDoc(doc(db, "siteConfig", "homepage"))
@@ -33,18 +49,18 @@ export function AdminHomePage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const handleSave = async () => {
-        setSaving(true);
-        setMessage("");
+    const handleSave = async (section: string) => {
+        setSaving(section);
+        setMessage((prev) => ({ ...prev, [section]: "" }));
         try {
             await saveHomepageData(data);
-            setMessage("Đã lưu thành công!");
+            setMessage((prev) => ({ ...prev, [section]: "Đã lưu thành công!" }));
         } catch (err) {
             console.error(err);
-            setMessage("Lỗi khi lưu. Vui lòng thử lại.");
+            setMessage((prev) => ({ ...prev, [section]: "Lỗi khi lưu." }));
         } finally {
-            setSaving(false);
-            setTimeout(() => setMessage(""), 3000);
+            setSaving(null);
+            setTimeout(() => setMessage((prev) => ({ ...prev, [section]: "" })), 3000);
         }
     };
 
@@ -145,6 +161,9 @@ export function AdminHomePage() {
                         </Button>
                     </div>
                 </CardContent>
+                <CardFooter>
+                    <SaveButton saving={saving === "hero"} message={message.hero || ""} onSave={() => handleSave("hero")} />
+                </CardFooter>
             </Card>
 
             {/* Products Section */}
@@ -255,6 +274,9 @@ export function AdminHomePage() {
                         Thêm product
                     </Button>
                 </CardContent>
+                <CardFooter>
+                    <SaveButton saving={saving === "products"} message={message.products || ""} onSave={() => handleSave("products")} />
+                </CardFooter>
             </Card>
 
             {/* Skills Section */}
@@ -307,6 +329,9 @@ export function AdminHomePage() {
                         Thêm skill
                     </Button>
                 </CardContent>
+                <CardFooter>
+                    <SaveButton saving={saving === "skills"} message={message.skills || ""} onSave={() => handleSave("skills")} />
+                </CardFooter>
             </Card>
 
             {/* Links Section */}
@@ -373,20 +398,10 @@ export function AdminHomePage() {
                         Thêm link
                     </Button>
                 </CardContent>
+                <CardFooter>
+                    <SaveButton saving={saving === "links"} message={message.links || ""} onSave={() => handleSave("links")} />
+                </CardFooter>
             </Card>
-
-            {/* Save Button */}
-            <div className="sticky bottom-4 flex items-center gap-3">
-                <Button onClick={handleSave} disabled={saving} className="flex-1">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                </Button>
-                {message && (
-                    <span className={`text-sm font-bold ${message.includes("thành công") ? "text-green-600" : "text-red-500"}`}>
-                        {message}
-                    </span>
-                )}
-            </div>
         </div>
     );
 }

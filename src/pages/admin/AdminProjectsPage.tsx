@@ -8,7 +8,7 @@ import {
     saveProjectsData,
 } from "@/hooks/useProjectsData";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Trash2, Save, Loader2, X } from "lucide-react";
 
@@ -28,8 +28,8 @@ function generateId(title: string): string {
 export function AdminProjectsPage() {
     const [projects, setProjects] = useState<Project[]>(defaultProjects);
     const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState("");
+    const [savingIndex, setSavingIndex] = useState<number | null>(null);
+    const [messages, setMessages] = useState<Record<number, string>>({});
 
     useEffect(() => {
         getDoc(doc(db, "siteConfig", "projects"))
@@ -47,18 +47,18 @@ export function AdminProjectsPage() {
             .finally(() => setLoading(false));
     }, []);
 
-    const handleSave = async () => {
-        setSaving(true);
-        setMessage("");
+    const handleSave = async (index: number) => {
+        setSavingIndex(index);
+        setMessages((prev) => ({ ...prev, [index]: "" }));
         try {
             await saveProjectsData(projects);
-            setMessage("Đã lưu thành công!");
+            setMessages((prev) => ({ ...prev, [index]: "Đã lưu!" }));
         } catch (err) {
             console.error(err);
-            setMessage("Lỗi khi lưu. Vui lòng thử lại.");
+            setMessages((prev) => ({ ...prev, [index]: "Lỗi!" }));
         } finally {
-            setSaving(false);
-            setTimeout(() => setMessage(""), 3000);
+            setSavingIndex(null);
+            setTimeout(() => setMessages((prev) => ({ ...prev, [index]: "" })), 3000);
         }
     };
 
@@ -251,6 +251,19 @@ export function AdminProjectsPage() {
                             </div>
                         </div>
                     </CardContent>
+                    <CardFooter>
+                        <div className="flex items-center gap-3">
+                            <Button onClick={() => handleSave(index)} disabled={savingIndex === index} size="sm">
+                                {savingIndex === index ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                {savingIndex === index ? "Đang lưu..." : "Lưu"}
+                            </Button>
+                            {messages[index] && (
+                                <span className={`text-sm font-bold ${messages[index].includes("lưu") ? "text-green-600" : "text-red-500"}`}>
+                                    {messages[index]}
+                                </span>
+                            )}
+                        </div>
+                    </CardFooter>
                 </Card>
             ))}
 
@@ -272,19 +285,6 @@ export function AdminProjectsPage() {
                 <Plus className="w-4 h-4" />
                 Thêm project
             </Button>
-
-            {/* Save Button */}
-            <div className="sticky bottom-4 flex items-center gap-3">
-                <Button onClick={handleSave} disabled={saving} className="flex-1">
-                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    {saving ? "Đang lưu..." : "Lưu thay đổi"}
-                </Button>
-                {message && (
-                    <span className={`text-sm font-bold ${message.includes("thành công") ? "text-green-600" : "text-red-500"}`}>
-                        {message}
-                    </span>
-                )}
-            </div>
         </div>
     );
 }
