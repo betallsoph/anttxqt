@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
+import { motion } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -44,7 +45,12 @@ function LoginForm() {
     };
 
     return (
-        <div className="max-w-sm mx-auto mt-12">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="max-w-sm mx-auto"
+        >
             <Card>
                 <CardHeader>
                     <CardTitle>Admin Login</CardTitle>
@@ -71,14 +77,14 @@ function LoginForm() {
                                 required
                             />
                         </div>
-                        {error && <p className="text-red-500 text-sm">{error}</p>}
+                        {error && <p className="text-red-500 text-sm font-bold">{error}</p>}
                         <Button type="submit" className="w-full" disabled={loading}>
                             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Đăng nhập"}
                         </Button>
                     </form>
                 </CardContent>
             </Card>
-        </div>
+        </motion.div>
     );
 }
 
@@ -99,44 +105,64 @@ export function AdminLayout() {
 
     if (!ALLOWED_EMAILS.includes(user.email || "")) {
         return (
-            <div className="max-w-sm mx-auto mt-12 text-center space-y-4">
-                <ShieldX className="w-12 h-12 mx-auto text-red-500" />
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className="max-w-sm mx-auto text-center space-y-4"
+            >
+                <div className="w-16 h-16 mx-auto bg-red-100 border-2 border-black rounded-lg flex items-center justify-center">
+                    <ShieldX className="w-8 h-8 text-red-500" />
+                </div>
                 <h2 className="text-xl font-bold">Không có quyền truy cập</h2>
                 <p className="text-sm text-zinc-600">
                     Tài khoản của bạn không được phép truy cập trang admin.
                 </p>
-                <Button variant="ghost" size="sm" onClick={signOut}>
+                <Button variant="noShadow" size="sm" onClick={signOut}>
                     <LogOut className="w-4 h-4" />
                     Đăng xuất
                 </Button>
-            </div>
+            </motion.div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 sm:space-y-8">
             {/* Admin Header */}
-            <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-bold">Admin Panel</h1>
-                <div className="flex items-center gap-3">
-                    <span className="text-xs text-zinc-500 hidden sm:inline">{user.email}</span>
-                    <Button variant="ghost" size="sm" onClick={signOut}>
-                        <LogOut className="w-4 h-4" />
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+            >
+                <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Admin Panel</h2>
+                <div className="flex items-center gap-2 text-sm text-zinc-600">
+                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                    <span>{user.email}</span>
+                    <span className="text-zinc-300">|</span>
+                    <button
+                        onClick={signOut}
+                        className="text-blue-500 font-medium hover:underline"
+                    >
                         Đăng xuất
-                    </Button>
+                    </button>
                 </div>
-            </div>
+            </motion.section>
 
-            {/* Admin Nav */}
-            <nav className="flex gap-2">
+            {/* Admin Nav — styled like skill items */}
+            <motion.nav
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="flex gap-2 sm:gap-3"
+            >
                 {navItems.map(({ to, label, icon: Icon }) => (
                     <NavLink
                         key={to}
                         to={to}
                         className={({ isActive }) =>
-                            `flex items-center gap-2 px-4 py-2 text-sm font-bold border-2 border-black rounded-lg transition-all ${
+                            `flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-sm font-bold border-2 border-black rounded-lg transition-all duration-150 ${
                                 isActive
-                                    ? "bg-blue-300 shadow-secondary"
+                                    ? "bg-blue-300 shadow-secondary active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
                                     : "bg-white hover:bg-blue-100"
                             }`
                         }
@@ -145,7 +171,10 @@ export function AdminLayout() {
                         {label}
                     </NavLink>
                 ))}
-            </nav>
+            </motion.nav>
+
+            {/* Section Divider */}
+            <div className="border-t-2 border-black"></div>
 
             {/* Page Content */}
             <Outlet />
