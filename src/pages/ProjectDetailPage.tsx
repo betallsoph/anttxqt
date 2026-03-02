@@ -5,6 +5,7 @@ import { useProjectsData } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<string, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
+    Staging: "bg-sky-200 text-sky-800 border-sky-400",
     "In Development": "bg-amber-200 text-amber-800 border-amber-400",
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
 };

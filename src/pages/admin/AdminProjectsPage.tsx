@@ -15,10 +15,11 @@ import { Plus, Trash2, Save, Loader2, X } from "lucide-react";
 const inputClass =
     "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
 
-const statusOptions: ProjectStatus[] = ["Production", "In Development", "Concept"];
+const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Concept"];
 
 const statusStyles: Record<ProjectStatus, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
+    Staging: "bg-sky-200 text-sky-800 border-sky-400",
     "In Development": "bg-amber-200 text-amber-800 border-amber-400",
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
 };

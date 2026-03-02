@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-export type ProjectStatus = "Production" | "In Development" | "Concept";
+export type ProjectStatus = "Production" | "Staging" | "In Development" | "Concept";
 
 export interface Project {
     id: string;

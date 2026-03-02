@@ -1,4 +1,4 @@
-# Design Language — Neobrutalism System
+# Design Language — anttkn
 
 > Template design cho toàn bộ UI của anttxqt portfolio.
 > Áp dụng cho trang chính, admin, và bất kỳ trang mới nào.
@@ -7,7 +7,7 @@
 
 ## 1. Philosophy
 
-**Neobrutalism** — Bold, honest, playful.
+**anttkn** — Bold, honest, playful.
 
 - Viền đen dày, rõ ràng
 - Shadow offset tạo chiều sâu giả 3D
@@ -44,6 +44,7 @@
 | Token          | Background  | Text         | Border       |
 |----------------|-------------|--------------|--------------|
 | Production     | `green-200` | `green-800`  | `green-400`  |
+| Staging        | `sky-200`   | `sky-800`    | `sky-400`    |
 | In Development | `amber-200` | `amber-800`  | `amber-400`  |
 | Concept        | `purple-200`| `purple-800` | `purple-400` |
 

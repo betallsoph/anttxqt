@@ -1,27 +1,8 @@
 import { motion } from "motion/react";
-import {
-    Rocket,
-    CheckCircle,
-    Star,
-    Zap,
-    Heart,
-    Code,
-    ArrowRight,
-    Loader2,
-} from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DelayedLink } from "@/components/ui/delayed-link";
 import { useHomepageData } from "@/hooks/useHomepageData";
-import type { LucideIcon } from "lucide-react";
-
-const iconMap: Record<string, LucideIcon> = {
-    Rocket,
-    CheckCircle,
-    Star,
-    Zap,
-    Heart,
-    Code,
-};
 
 export function HomePage() {
     const { data, loading } = useHomepageData();
@@ -96,31 +77,24 @@ export function HomePage() {
                     to see more.
                 </p>
 
-                <div className="space-y-3 sm:space-y-4">
-                    {data.products.map((product, index) => {
-                        const IconComponent =
-                            iconMap[product.icon] || Rocket;
-                        return (
-                            <DelayedLink
-                                key={index}
-                                to={product.link}
-                                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-2 border-black rounded-lg bg-white shadow-secondary active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all duration-150 group"
-                            >
-                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-200 border-2 border-black rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <IconComponent className="w-5 h-5 sm:w-6 sm:h-6" />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-bold text-sm sm:text-base">
-                                        {product.title}
-                                    </h3>
-                                    <p className="text-xs sm:text-sm text-zinc-600 truncate">
-                                        {product.description}
-                                    </p>
-                                </div>
-                                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0" />
-                            </DelayedLink>
-                        );
-                    })}
+                <div className="space-y-2 sm:space-y-3">
+                    {data.products.map((product, index) => (
+                        <DelayedLink
+                            key={index}
+                            to={product.link}
+                            className="flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group"
+                        >
+                            <div className="min-w-0">
+                                <h3 className="font-bold text-sm sm:text-base">
+                                    {product.title}
+                                </h3>
+                                <p className="text-xs sm:text-sm text-zinc-500 truncate">
+                                    {product.description}
+                                </p>
+                            </div>
+                            <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0 ml-3" />
+                        </DelayedLink>
+                    ))}
                 </div>
             </motion.section>
 
