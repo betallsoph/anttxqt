@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
-import { projects } from "./ProjectsPage";
+import { ArrowLeft, ExternalLink, Github, ImageIcon, Loader2 } from "lucide-react";
+import { useProjectsData } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<string, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
@@ -11,7 +11,16 @@ const statusStyles: Record<string, string> = {
 
 export function ProjectDetailPage() {
     const { id } = useParams<{ id: string }>();
+    const { projects, loading } = useProjectsData();
     const project = projects.find((p) => p.id === id);
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-6 h-6 animate-spin" />
+            </div>
+        );
+    }
 
     if (!project) {
         return (
