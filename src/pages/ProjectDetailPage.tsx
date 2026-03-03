@@ -122,33 +122,82 @@ export function ProjectDetailPage() {
 
                     {/* Links */}
                     {(project.githubUrl || project.liveUrl) && (
-                        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-4 border-t-2 border-zinc-200">
-                            {project.githubUrl && (
-                                <a
-                                    href={project.githubUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
-                                >
-                                    <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                    View on GitHub
-                                </a>
-                            )}
-                            {project.liveUrl && (
-                                <a
-                                    href={project.liveUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-blue-300 border-2 border-black rounded-md hover:bg-blue-400 transition-colors"
-                                >
-                                    <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                    Visit Website
-                                </a>
-                            )}
+                        <div className="pt-4 border-t-2 border-zinc-200">
+                            <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-2">Explore</h3>
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                                {project.githubUrl && (
+                                    <a
+                                        href={project.githubUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
+                                    >
+                                        <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        View on GitHub
+                                    </a>
+                                )}
+                                {project.liveUrl && (
+                                    <a
+                                        href={project.liveUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
+                                    >
+                                        <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                        Visit Website
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Topics */}
+                    {project.topics && project.topics.length > 0 && (
+                        <div className="pt-4 border-t-2 border-zinc-200 mt-4 sm:mt-6">
+                            <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-2">Topic</h3>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                {project.topics.map((topic) => (
+                                    <span
+                                        key={topic}
+                                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
+                                    >
+                                        {topic}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>
             </motion.article>
+
+            {/* Gallery */}
+            {project.images && project.images.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="border-t-2 border-black pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                    <div className="space-y-3 sm:space-y-4">
+                        {project.images.map((img, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5, delay: 0.1 * index }}
+                                className="border-2 border-black rounded-lg overflow-hidden bg-white"
+                            >
+                                <img
+                                    src={img}
+                                    alt={`${project.title} screenshot ${index + 1}`}
+                                    className="w-full h-auto"
+                                />
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.section>
+            )}
         </div>
     );
 }

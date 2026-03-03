@@ -242,6 +242,46 @@ export function AdminProjectsPage() {
                                 </select>
                             </div>
 
+                            {/* Topics */}
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Topics</label>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
+                                    {(project.topics || []).map((topic, topicIndex) => (
+                                        <span
+                                            key={topicIndex}
+                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded-full"
+                                        >
+                                            {topic}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
+                                                    updateProject(index, { topics: newTopics });
+                                                }}
+                                                className="hover:text-red-500 transition-colors"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Nhập topic rồi Enter"
+                                    className={inputClass}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const val = e.currentTarget.value.trim();
+                                            if (val) {
+                                                updateProject(index, { topics: [...(project.topics || []), val] });
+                                                e.currentTarget.value = "";
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+
                             {/* Tags */}
                             <div>
                                 <label className="block text-sm font-bold mb-1">Tags</label>
@@ -298,6 +338,50 @@ export function AdminProjectsPage() {
                                         placeholder="https://..."
                                     />
                                 </div>
+                            </div>
+
+                            {/* Gallery Images */}
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Gallery Images</label>
+                                <div className="space-y-2">
+                                    {(project.images || []).map((_, imgIndex) => (
+                                        <div key={imgIndex} className="border-2 border-black rounded-lg bg-white p-3">
+                                            <div className="flex justify-between items-center mb-1">
+                                                <span className="text-xs font-bold text-zinc-500">Ảnh {imgIndex + 1}</span>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => {
+                                                        const newImages = (project.images || []).filter((__, i) => i !== imgIndex);
+                                                        updateProject(index, { images: newImages });
+                                                    }}
+                                                >
+                                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                                </Button>
+                                            </div>
+                                            <ImageUpload
+                                                value={(project.images || [])[imgIndex] || ""}
+                                                onChange={(url) => {
+                                                    const newImages = [...(project.images || [])];
+                                                    newImages[imgIndex] = url;
+                                                    updateProject(index, { images: newImages });
+                                                }}
+                                                folder="projects"
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="mt-2"
+                                    onClick={() => {
+                                        updateProject(index, { images: [...(project.images || []), ""] });
+                                    }}
+                                >
+                                    <Plus className="w-4 h-4" />
+                                    Thêm ảnh
+                                </Button>
                             </div>
 
                             {/* Save */}

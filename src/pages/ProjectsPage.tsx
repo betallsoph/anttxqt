@@ -96,6 +96,14 @@ export function ProjectsPage() {
                                             {tag}
                                         </span>
                                     ))}
+                                    {project.topics?.map((topic) => (
+                                        <span
+                                            key={topic}
+                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded-full"
+                                        >
+                                            {topic}
+                                        </span>
+                                    ))}
                                 </div>
 
                                 {/* Status */}

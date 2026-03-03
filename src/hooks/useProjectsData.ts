@@ -11,9 +11,11 @@ export interface Project {
     fullDescription?: string;
     status: ProjectStatus;
     tags: string[];
+    topics?: string[];
     githubUrl?: string;
     liveUrl?: string;
     imageUrl?: string;
+    images?: string[];
 }
 
 export const defaultProjects: Project[] = [
