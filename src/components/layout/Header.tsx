@@ -15,7 +15,9 @@ export function Header() {
                 <div className="mb-4 sm:mb-6 flex justify-center">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-[3px] sm:border-[4px] border-black overflow-hidden bg-blue-200">
                         <div className="w-full h-full flex items-center justify-center text-3xl sm:text-4xl font-black">
-                            AT
+                            <span role="img" aria-label="Pear">
+                                🍐
+                            </span>
                         </div>
                     </div>
                 </div>

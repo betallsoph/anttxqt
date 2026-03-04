@@ -8,6 +8,7 @@ import {
     saveExploreData,
 } from "@/hooks/useExploreData";
 import { Button } from "@/components/ui/button";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
 
 const inputClass =
@@ -185,6 +186,26 @@ export function AdminExplorePage() {
                                     >
                                         <Trash2 className="w-4 h-4 text-red-500" />
                                     </Button>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">
+                                        Image
+                                    </label>
+                                    <ImageUpload
+                                        value={item.imageUrl || ""}
+                                        onChange={(url) => {
+                                            const a = [...data.achievements];
+                                            a[index] = {
+                                                ...item,
+                                                imageUrl: url,
+                                            };
+                                            setData({
+                                                ...data,
+                                                achievements: a,
+                                            });
+                                        }}
+                                        folder="achievements"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold mb-1">

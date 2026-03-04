@@ -13,6 +13,7 @@ export interface ExploreData {
         date: string;
         description?: string;
         url?: string;
+        imageUrl?: string;
     }[];
     currently: {
         label: string;
