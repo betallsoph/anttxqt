@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Trophy, Sparkles, X, ExternalLink, Loader2 } from "lucide-react";
+import { X, ExternalLink, Loader2 } from "lucide-react";
 import { useExploreData, type ExploreData } from "@/hooks/useExploreData";
 
 type Achievement = ExploreData["achievements"][number];
@@ -129,12 +129,9 @@ export function ExplorePage() {
                     transition={{ duration: 0.6, delay: 0.2 }}
                     className="border-t-2 border-black pt-6 sm:pt-8"
                 >
-                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <Trophy className="w-5 h-5" />
-                        <h2 className="text-lg sm:text-xl font-bold">
-                            Achievements
-                        </h2>
-                    </div>
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Achievements
+                    </h2>
                     <div className="space-y-2 sm:space-y-3">
                         {data.achievements.map((item, index) => (
                             <motion.button
@@ -177,12 +174,9 @@ export function ExplorePage() {
                     transition={{ duration: 0.6, delay: 0.4 }}
                     className="border-t-2 border-black pt-6 sm:pt-8"
                 >
-                    <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                        <Sparkles className="w-5 h-5" />
-                        <h2 className="text-lg sm:text-xl font-bold">
-                            Currently
-                        </h2>
-                    </div>
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Currently
+                    </h2>
                     <div className="space-y-2 sm:space-y-3">
                         {data.currently.map((item, index) => (
                             <div
