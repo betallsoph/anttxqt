@@ -121,6 +121,40 @@ export function ExplorePage() {
                 </p>
             </motion.section>
 
+            {/* Favourites Section */}
+            {data.favourites && data.favourites.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.15 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Favourites
+                    </h2>
+                    <div className="space-y-2 sm:space-y-3">
+                        {data.favourites.map((item, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                            >
+                                <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                                <div className="min-w-0">
+                                    <span className="font-medium text-sm sm:text-base">
+                                        {item.label}
+                                    </span>
+                                    {item.description && (
+                                        <span className="text-zinc-500 text-xs sm:text-sm hidden sm:inline">
+                                            {" "}— {item.description}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </motion.section>
+            )}
+
             {/* Achievements */}
             {data.achievements.length > 0 && (
                 <motion.section
@@ -187,6 +221,8 @@ export function ExplorePage() {
                     </div>
                 </motion.section>
             )}
+
+
 
             {/* Stories */}
             {data.stories && data.stories.length > 0 && (

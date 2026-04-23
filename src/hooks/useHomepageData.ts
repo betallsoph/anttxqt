@@ -14,10 +14,6 @@ export interface HomepageData {
         name: string;
         items: string[];
     }[];
-    favourites: {
-        label: string;
-        description?: string;
-    }[];
     links: {
         label: string;
         url: string;
@@ -48,12 +44,6 @@ export const defaultHomepageData: HomepageData = {
             name: "Design & Tools",
             items: ["Figma", "Git", "Docker", "Vercel"],
         },
-    ],
-    favourites: [
-        { label: "Rust", description: "Systems programming & performance" },
-        { label: "Design Systems", description: "Typography, spacing, consistency" },
-        { label: "Cloud Native", description: "Serverless, edge computing" },
-        { label: "Open Source", description: "Building in public" },
     ],
     links: [
         { label: "Email", url: "mailto:hello@anttxqt.dev" },

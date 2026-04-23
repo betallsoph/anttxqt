@@ -268,69 +268,7 @@ export function AdminHomePage() {
                 </div>
             </motion.section>
 
-            {/* Favourites Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
-                    <div className="space-y-2 sm:space-y-3">
-                        {data.favourites.map((item, index) => (
-                            <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
-                                <MoveButtons
-                                    index={index}
-                                    total={data.favourites.length}
-                                    onMove={(from, to) => setData({ ...data, favourites: swap(data.favourites, from, to) })}
-                                />
-                                <div className="flex-1 grid grid-cols-2 gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Label"
-                                        value={item.label}
-                                        onChange={(e) => {
-                                            const f = [...data.favourites];
-                                            f[index] = { ...item, label: e.target.value };
-                                            setData({ ...data, favourites: f });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Description (optional)"
-                                        value={item.description || ""}
-                                        onChange={(e) => {
-                                            const f = [...data.favourites];
-                                            f[index] = { ...item, description: e.target.value };
-                                            setData({ ...data, favourites: f });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setData({ ...data, favourites: data.favourites.filter((_, i) => i !== index) })}
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() => setData({ ...data, favourites: [...data.favourites, { label: "", description: "" }] })}
-                    >
-                        <Plus className="w-4 h-4" />
-                        Thêm favourite
-                    </Button>
-                    <SaveButton saving={saving === "favourites"} message={message.favourites || ""} onSave={() => handleSave("favourites")} />
-                </div>
-            </motion.section>
+
 
             {/* Links Section */}
             <motion.section

@@ -19,6 +19,10 @@ export interface ExploreData {
         label: string;
         value: string;
     }[];
+    favourites: {
+        label: string;
+        description?: string;
+    }[];
     stories: {
         title: string;
         content: string;
@@ -66,9 +70,15 @@ export const defaultExploreData: ExploreData = {
         },
     ],
     currently: [
-        { label: "Learning", value: "Rust & Systems Programming" },
-        { label: "Reading", value: "Designing Data-Intensive Applications" },
-        { label: "Building", value: "This portfolio site" },
+        { label: "Learning", value: "Golang Programming, DevOps" },
+        { label: "Reading", value: "None" },
+        { label: "Building", value: "This portfolio site, roomieVerse" },
+    ],
+    favourites: [
+        { label: "Rust", description: "Systems programming & performance" },
+        { label: "Design Systems", description: "Typography, spacing, consistency" },
+        { label: "Cloud Native", description: "Serverless, edge computing" },
+        { label: "Open Source", description: "Building in public" },
     ],
     stories: [
         {
