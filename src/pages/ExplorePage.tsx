@@ -146,13 +146,6 @@ export function ExplorePage() {
                                 className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
                             >
                                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                                    {item.imageUrl && (
-                                        <img
-                                            src={item.imageUrl}
-                                            alt={item.title}
-                                            className="w-8 h-8 sm:w-9 sm:h-9 rounded object-cover border border-black flex-shrink-0"
-                                        />
-                                    )}
                                     <h3 className="font-bold text-sm sm:text-base truncate">
                                         {item.title}
                                     </h3>

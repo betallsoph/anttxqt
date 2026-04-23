@@ -163,7 +163,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     onMove={(from, to) => setProjects(swap(projects, from, to))}
                                 />
                                 <h3 className="text-base sm:text-lg font-bold">
-                                    {project.title || `Project ${index + 1}`}
+                                    {project.title || `${title} ${index + 1}`}
                                 </h3>
                                 {project.status && (
                                     <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded-full ${statusStyles[project.status]}`}>
