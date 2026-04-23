@@ -195,6 +195,87 @@ export function ExplorePage() {
                 </motion.section>
             )}
 
+            {/* Stories */}
+            {data.stories && data.stories.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.5 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+                    <div className="space-y-4">
+                        {data.stories.map((story, index) => (
+                            <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
+                                <div className="flex justify-between items-center mb-2">
+                                    <h3 className="font-bold text-lg">{story.title}</h3>
+                                    {story.date && <span className="text-xs text-zinc-500 font-medium">{story.date}</span>}
+                                </div>
+                                <p className="text-sm sm:text-base text-zinc-700 whitespace-pre-wrap">{story.content}</p>
+                            </div>
+                        ))}
+                    </div>
+                </motion.section>
+            )}
+
+            {/* What's Next */}
+            {data.whatsNext && data.whatsNext.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.6 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {data.whatsNext.map((item, index) => (
+                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                                <div className="flex justify-between items-start mb-1">
+                                    <h3 className="font-bold text-sm sm:text-base">{item.title}</h3>
+                                    <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 border rounded-full ${
+                                        item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
+                                        item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
+                                        'bg-zinc-100 border-zinc-300 text-zinc-600'
+                                    }`}>
+                                        {item.status}
+                                    </span>
+                                </div>
+                                {item.description && <p className="text-xs sm:text-sm text-zinc-500">{item.description}</p>}
+                            </div>
+                        ))}
+                    </div>
+                </motion.section>
+            )}
+
+            {/* More & More */}
+            {data.moreAndMore && data.moreAndMore.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.7 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                    <div className="space-y-2 sm:space-y-3">
+                        {data.moreAndMore.map((item, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                            >
+                                <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                    {item.label}
+                                </span>
+                                {item.description && (
+                                    <span className="text-sm sm:text-base text-zinc-700">
+                                        {item.description}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </motion.section>
+            )}
+
             {/* Achievement Detail Modal */}
             {selectedAchievement && (
                 <AchievementModal

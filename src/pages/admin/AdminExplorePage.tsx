@@ -456,6 +456,237 @@ export function AdminExplorePage() {
                     />
                 </div>
             </motion.section>
+
+            {/* Stories Section */}
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                    <div className="space-y-3 sm:space-y-4">
+                        {(data.stories || []).map((item, index) => (
+                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
+                                <div className="flex justify-between items-center gap-2">
+                                    <MoveButtons
+                                        index={index}
+                                        total={(data.stories || []).length}
+                                        onMove={(from, to) => setData({ ...data, stories: swap(data.stories || [], from, to) })}
+                                    />
+                                    <span className="font-bold text-sm">Story {index + 1}</span>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setData({ ...data, stories: (data.stories || []).filter((_, i) => i !== index) })}
+                                    >
+                                        <Trash2 className="w-4 h-4 text-red-500" />
+                                    </Button>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">Title</label>
+                                    <input
+                                        type="text"
+                                        value={item.title}
+                                        onChange={(e) => {
+                                            const s = [...(data.stories || [])];
+                                            s[index] = { ...item, title: e.target.value };
+                                            setData({ ...data, stories: s });
+                                        }}
+                                        className={inputClass}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">Date (optional)</label>
+                                    <input
+                                        type="text"
+                                        value={item.date || ""}
+                                        onChange={(e) => {
+                                            const s = [...(data.stories || [])];
+                                            s[index] = { ...item, date: e.target.value };
+                                            setData({ ...data, stories: s });
+                                        }}
+                                        className={inputClass}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">Content</label>
+                                    <textarea
+                                        value={item.content}
+                                        onChange={(e) => {
+                                            const s = [...(data.stories || [])];
+                                            s[index] = { ...item, content: e.target.value };
+                                            setData({ ...data, stories: s });
+                                        }}
+                                        className={`${inputClass} min-h-[100px]`}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", date: "" }] })}
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm story
+                    </Button>
+                    <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
+                </div>
+            </motion.section>
+
+            {/* What's Next Section */}
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
+                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                    <div className="space-y-3 sm:space-y-4">
+                        {(data.whatsNext || []).map((item, index) => (
+                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
+                                <div className="flex justify-between items-center gap-2">
+                                    <MoveButtons
+                                        index={index}
+                                        total={(data.whatsNext || []).length}
+                                        onMove={(from, to) => setData({ ...data, whatsNext: swap(data.whatsNext || [], from, to) })}
+                                    />
+                                    <div className="flex-1">
+                                        <input
+                                            type="text"
+                                            placeholder="Title"
+                                            value={item.title}
+                                            onChange={(e) => {
+                                                const w = [...(data.whatsNext || [])];
+                                                w[index] = { ...item, title: e.target.value };
+                                                setData({ ...data, whatsNext: w });
+                                            }}
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => setData({ ...data, whatsNext: (data.whatsNext || []).filter((_, i) => i !== index) })}
+                                    >
+                                        <Trash2 className="w-4 h-4 text-red-500" />
+                                    </Button>
+                                </div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-xs font-bold mb-1 text-zinc-500">Status</label>
+                                        <select
+                                            value={item.status}
+                                            onChange={(e) => {
+                                                const w = [...(data.whatsNext || [])];
+                                                w[index] = { ...item, status: e.target.value as any };
+                                                setData({ ...data, whatsNext: w });
+                                            }}
+                                            className={inputClass}
+                                        >
+                                            <option value="Planning">Planning</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Done">Done</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold mb-1 text-zinc-500">Description (optional)</label>
+                                        <input
+                                            type="text"
+                                            value={item.description || ""}
+                                            onChange={(e) => {
+                                                const w = [...(data.whatsNext || [])];
+                                                w[index] = { ...item, description: e.target.value };
+                                                setData({ ...data, whatsNext: w });
+                                            }}
+                                            className={inputClass}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => setData({ ...data, whatsNext: [...(data.whatsNext || []), { title: "", status: "Planning", description: "" }] })}
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm kế hoạch
+                    </Button>
+                    <SaveButton saving={saving === "whatsNext"} message={message.whatsNext || ""} onSave={() => handleSave("whatsNext")} />
+                </div>
+            </motion.section>
+
+            {/* More & More Section */}
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                    <div className="space-y-2 sm:space-y-3">
+                        {(data.moreAndMore || []).map((item, index) => (
+                            <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
+                                <MoveButtons
+                                    index={index}
+                                    total={(data.moreAndMore || []).length}
+                                    onMove={(from, to) => setData({ ...data, moreAndMore: swap(data.moreAndMore || [], from, to) })}
+                                />
+                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="Label (e.g. Font)"
+                                        value={item.label}
+                                        onChange={(e) => {
+                                            const m = [...(data.moreAndMore || [])];
+                                            m[index] = { ...item, label: e.target.value };
+                                            setData({ ...data, moreAndMore: m });
+                                        }}
+                                        className={inputClass}
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Description (e.g. Inter)"
+                                        value={item.description || ""}
+                                        onChange={(e) => {
+                                            const m = [...(data.moreAndMore || [])];
+                                            m[index] = { ...item, description: e.target.value };
+                                            setData({ ...data, moreAndMore: m });
+                                        }}
+                                        className={inputClass}
+                                    />
+                                </div>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setData({ ...data, moreAndMore: (data.moreAndMore || []).filter((_, i) => i !== index) })}
+                                >
+                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="mt-3"
+                        onClick={() => setData({ ...data, moreAndMore: [...(data.moreAndMore || []), { label: "", description: "" }] })}
+                    >
+                        <Plus className="w-4 h-4" />
+                        Thêm mục
+                    </Button>
+                    <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
+                </div>
+            </motion.section>
         </div>
     );
 }

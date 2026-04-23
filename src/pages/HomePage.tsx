@@ -67,7 +67,7 @@ export function HomePage() {
                 <div className="space-y-3 sm:space-y-4">
                     {data.skillCategories.map((category, index) => (
                         <div key={index}>
-                            <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-1.5 sm:mb-2">
+                            <h3 className="text-xs sm:text-sm font-bold text-blue-500 mb-1.5 sm:mb-2">
                                 {category.name}
                             </h3>
                             <div className="flex flex-wrap gap-1.5 sm:gap-2">
