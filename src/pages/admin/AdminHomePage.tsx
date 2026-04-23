@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
+import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
     "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
@@ -40,7 +41,7 @@ export function AdminHomePage() {
         getDoc(doc(db, "siteConfig", "homepage"))
             .then((snapshot) => {
                 if (snapshot.exists()) {
-                    setData(snapshot.data() as HomepageData);
+                    setData({ ...defaultHomepageData, ...snapshot.data() } as HomepageData);
                 }
             })
             .catch((err) => {
@@ -169,101 +170,82 @@ export function AdminHomePage() {
                 </div>
             </motion.section>
 
-            {/* Products Section */}
+            {/* Skills Categories Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Featured Products</h2>
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Skills</h2>
                 <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
                     <div className="space-y-3 sm:space-y-4">
-                        {data.products.map((product, index) => (
-                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="font-bold text-sm">Product {index + 1}</span>
+                        {data.skillCategories.map((category, catIndex) => (
+                            <div key={catIndex} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
+                                <div className="flex justify-between items-center gap-2">
+                                    <MoveButtons
+                                        index={catIndex}
+                                        total={data.skillCategories.length}
+                                        onMove={(from, to) => setData({ ...data, skillCategories: swap(data.skillCategories, from, to) })}
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Category name"
+                                        value={category.name}
+                                        onChange={(e) => {
+                                            const cats = [...data.skillCategories];
+                                            cats[catIndex] = { ...category, name: e.target.value };
+                                            setData({ ...data, skillCategories: cats });
+                                        }}
+                                        className={`${inputClass} font-bold`}
+                                    />
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => {
-                                            setData({ ...data, products: data.products.filter((_, i) => i !== index) });
-                                        }}
+                                        onClick={() => setData({ ...data, skillCategories: data.skillCategories.filter((_, i) => i !== catIndex) })}
                                     >
                                         <Trash2 className="w-4 h-4 text-red-500" />
                                     </Button>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">Image</label>
-                                    <ImageUpload
-                                        value={product.imageUrl || ""}
-                                        onChange={(url) => {
-                                            const p = [...data.products];
-                                            p[index] = { ...product, imageUrl: url };
-                                            setData({ ...data, products: p });
+                                <div className="flex flex-wrap gap-2">
+                                    {category.items.map((skill, skillIndex) => (
+                                        <div key={skillIndex} className="flex items-center gap-1 px-2 py-1 bg-zinc-100 border border-black rounded-lg text-sm">
+                                            <input
+                                                type="text"
+                                                value={skill}
+                                                onChange={(e) => {
+                                                    const cats = [...data.skillCategories];
+                                                    const items = [...category.items];
+                                                    items[skillIndex] = e.target.value;
+                                                    cats[catIndex] = { ...category, items };
+                                                    setData({ ...data, skillCategories: cats });
+                                                }}
+                                                className="bg-transparent border-none outline-none w-20 text-sm"
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const cats = [...data.skillCategories];
+                                                    cats[catIndex] = { ...category, items: category.items.filter((_, i) => i !== skillIndex) };
+                                                    setData({ ...data, skillCategories: cats });
+                                                }}
+                                                className="text-red-400 hover:text-red-600"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                            const cats = [...data.skillCategories];
+                                            cats[catIndex] = { ...category, items: [...category.items, ""] };
+                                            setData({ ...data, skillCategories: cats });
                                         }}
-                                        folder="products"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">Title</label>
-                                    <input
-                                        type="text"
-                                        value={product.title}
-                                        onChange={(e) => {
-                                            const p = [...data.products];
-                                            p[index] = { ...product, title: e.target.value };
-                                            setData({ ...data, products: p });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">Description</label>
-                                    <input
-                                        type="text"
-                                        value={product.description}
-                                        onChange={(e) => {
-                                            const p = [...data.products];
-                                            p[index] = { ...product, description: e.target.value };
-                                            setData({ ...data, products: p });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-sm font-bold mb-1">Icon</label>
-                                        <select
-                                            value={product.icon}
-                                            onChange={(e) => {
-                                                const p = [...data.products];
-                                                p[index] = { ...product, icon: e.target.value };
-                                                setData({ ...data, products: p });
-                                            }}
-                                            className={inputClass}
-                                        >
-                                            <option value="Rocket">Rocket</option>
-                                            <option value="CheckCircle">CheckCircle</option>
-                                            <option value="Star">Star</option>
-                                            <option value="Zap">Zap</option>
-                                            <option value="Heart">Heart</option>
-                                            <option value="Code">Code</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold mb-1">Link</label>
-                                        <input
-                                            type="text"
-                                            value={product.link}
-                                            onChange={(e) => {
-                                                const p = [...data.products];
-                                                p[index] = { ...product, link: e.target.value };
-                                                setData({ ...data, products: p });
-                                            }}
-                                            className={inputClass}
-                                        />
-                                    </div>
+                                    >
+                                        <Plus className="w-3 h-3" />
+                                        Tag
+                                    </Button>
                                 </div>
                             </div>
                         ))}
@@ -275,50 +257,54 @@ export function AdminHomePage() {
                         onClick={() =>
                             setData({
                                 ...data,
-                                products: [...data.products, { title: "", description: "", icon: "Rocket", link: "/projects" }],
+                                skillCategories: [...data.skillCategories, { name: "", items: [] }],
                             })
                         }
                     >
                         <Plus className="w-4 h-4" />
-                        Thêm product
+                        Thêm category
                     </Button>
-                    <SaveButton saving={saving === "products"} message={message.products || ""} onSave={() => handleSave("products")} />
+                    <SaveButton saving={saving === "skills"} message={message.skills || ""} onSave={() => handleSave("skills")} />
                 </div>
             </motion.section>
 
-            {/* Skills Section */}
+            {/* Favourites Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What I Offer</h2>
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
                 <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
                     <div className="space-y-2 sm:space-y-3">
-                        {data.skills.map((skill, index) => (
+                        {data.favourites.map((item, index) => (
                             <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
-                                <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                                <MoveButtons
+                                    index={index}
+                                    total={data.favourites.length}
+                                    onMove={(from, to) => setData({ ...data, favourites: swap(data.favourites, from, to) })}
+                                />
                                 <div className="flex-1 grid grid-cols-2 gap-2">
                                     <input
                                         type="text"
-                                        placeholder="Skill name"
-                                        value={skill.name}
+                                        placeholder="Label"
+                                        value={item.label}
                                         onChange={(e) => {
-                                            const s = [...data.skills];
-                                            s[index] = { ...skill, name: e.target.value };
-                                            setData({ ...data, skills: s });
+                                            const f = [...data.favourites];
+                                            f[index] = { ...item, label: e.target.value };
+                                            setData({ ...data, favourites: f });
                                         }}
                                         className={inputClass}
                                     />
                                     <input
                                         type="text"
-                                        placeholder="Detail"
-                                        value={skill.detail}
+                                        placeholder="Description (optional)"
+                                        value={item.description || ""}
                                         onChange={(e) => {
-                                            const s = [...data.skills];
-                                            s[index] = { ...skill, detail: e.target.value };
-                                            setData({ ...data, skills: s });
+                                            const f = [...data.favourites];
+                                            f[index] = { ...item, description: e.target.value };
+                                            setData({ ...data, favourites: f });
                                         }}
                                         className={inputClass}
                                     />
@@ -326,7 +312,7 @@ export function AdminHomePage() {
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    onClick={() => setData({ ...data, skills: data.skills.filter((_, i) => i !== index) })}
+                                    onClick={() => setData({ ...data, favourites: data.favourites.filter((_, i) => i !== index) })}
                                 >
                                     <Trash2 className="w-4 h-4 text-red-500" />
                                 </Button>
@@ -337,12 +323,12 @@ export function AdminHomePage() {
                         variant="ghost"
                         size="sm"
                         className="mt-3"
-                        onClick={() => setData({ ...data, skills: [...data.skills, { name: "", detail: "" }] })}
+                        onClick={() => setData({ ...data, favourites: [...data.favourites, { label: "", description: "" }] })}
                     >
                         <Plus className="w-4 h-4" />
-                        Thêm skill
+                        Thêm favourite
                     </Button>
-                    <SaveButton saving={saving === "skills"} message={message.skills || ""} onSave={() => handleSave("skills")} />
+                    <SaveButton saving={saving === "favourites"} message={message.favourites || ""} onSave={() => handleSave("favourites")} />
                 </div>
             </motion.section>
 
@@ -351,7 +337,7 @@ export function AdminHomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Links</h2>
                 <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
@@ -359,7 +345,11 @@ export function AdminHomePage() {
                         {data.links.map((link, index) => (
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 space-y-2">
                                 <div className="flex gap-2 items-start">
-                                    <div className="flex-1 grid grid-cols-2 gap-2">
+                                    <MoveButtons
+                                        index={index}
+                                        total={data.links.length}
+                                        onMove={(from, to) => setData({ ...data, links: swap(data.links, from, to) })}
+                                    />                                    <div className="flex-1 grid grid-cols-2 gap-2">
                                         <input
                                             type="text"
                                             placeholder="Label"

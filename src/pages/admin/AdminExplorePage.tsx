@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Trash2, Save, Loader2 } from "lucide-react";
+import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
     "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
@@ -155,7 +156,7 @@ export function AdminExplorePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Achievements
@@ -167,7 +168,12 @@ export function AdminExplorePage() {
                                 key={index}
                                 className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3"
                             >
-                                <div className="flex justify-between items-center">
+                                <div className="flex justify-between items-center gap-2">
+                                    <MoveButtons
+                                        index={index}
+                                        total={data.achievements.length}
+                                        onMove={(from, to) => setData({ ...data, achievements: swap(data.achievements, from, to) })}
+                                    />
                                     <span className="font-bold text-sm">
                                         Achievement {index + 1}
                                     </span>
@@ -357,7 +363,7 @@ export function AdminExplorePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Currently
@@ -369,7 +375,11 @@ export function AdminExplorePage() {
                                 key={index}
                                 className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3"
                             >
-                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                <MoveButtons
+                                    index={index}
+                                    total={data.currently.length}
+                                    onMove={(from, to) => setData({ ...data, currently: swap(data.currently, from, to) })}
+                                />                                <div className="flex-1 grid grid-cols-2 gap-2">
                                     <input
                                         type="text"
                                         placeholder="Label (e.g. Learning)"

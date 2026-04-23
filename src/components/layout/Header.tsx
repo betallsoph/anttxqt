@@ -23,7 +23,7 @@ export function Header() {
                 </div>
 
                 {/* Name - centered */}
-                <h1 className="text-3xl sm:text-4xl font-black mb-3 sm:mb-4 text-center">An Tran</h1>
+                <h1 className="text-3xl sm:text-4xl font-black mb-3 sm:mb-4 text-center">An T. Tran</h1>
 
                 {/* Navigation - centered */}
                 <nav className="flex items-center justify-center gap-3 sm:gap-4">

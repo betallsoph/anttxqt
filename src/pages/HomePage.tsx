@@ -1,7 +1,5 @@
 import { motion } from "motion/react";
-import { ArrowRight, Loader2 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { DelayedLink } from "@/components/ui/delayed-link";
+import { Loader2 } from "lucide-react";
 import { useHomepageData } from "@/hooks/useHomepageData";
 
 export function HomePage() {
@@ -56,71 +54,64 @@ export function HomePage() {
                 </p>
             </motion.section>
 
-            {/* Featured Section */}
+            {/* Skills Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Products
+                    Skills
                 </h2>
-                <p className="text-sm sm:text-base text-zinc-600 mb-3 sm:mb-4">
-                    Here are some of my production projects. Visit the{" "}
-                    <Link
-                        to="/projects"
-                        className="text-blue-500 font-semibold hover:underline"
-                    >
-                        projects page
-                    </Link>{" "}
-                    to see more.
-                </p>
-
-                <div className="space-y-2 sm:space-y-3">
-                    {data.products.map((product, index) => (
-                        <DelayedLink
-                            key={index}
-                            to={product.link}
-                            className="flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group"
-                        >
-                            <div className="min-w-0">
-                                <h3 className="font-bold text-sm sm:text-base">
-                                    {product.title}
-                                </h3>
-                                <p className="text-xs sm:text-sm text-zinc-500 truncate">
-                                    {product.description}
-                                </p>
+                <div className="space-y-3 sm:space-y-4">
+                    {data.skillCategories.map((category, index) => (
+                        <div key={index}>
+                            <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-1.5 sm:mb-2">
+                                {category.name}
+                            </h3>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                {category.items.map((skill) => (
+                                    <span
+                                        key={skill}
+                                        className="px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-semibold bg-white border-2 border-black rounded-lg"
+                                    >
+                                        {skill}
+                                    </span>
+                                ))}
                             </div>
-                            <ArrowRight className="w-4 h-4 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0 ml-3" />
-                        </DelayedLink>
+                        </div>
                     ))}
                 </div>
             </motion.section>
 
-            {/* What I Offer Section */}
+            {/* Favourites Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    What I Offer
+                    Favourites
                 </h2>
                 <div className="space-y-2 sm:space-y-3">
-                    {data.skills.map((skill, index) => (
+                    {data.favourites.map((item, index) => (
                         <div
                             key={index}
                             className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
                         >
                             <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
-                            <span className="font-medium text-sm sm:text-base">
-                                {skill.name}
-                            </span>
-                            <span className="text-zinc-500 text-xs sm:text-sm hidden sm:inline">
-                                — {skill.detail}
-                            </span>
+                            <div className="min-w-0">
+                                <span className="font-medium text-sm sm:text-base">
+                                    {item.label}
+                                </span>
+                                {item.description && (
+                                    <span className="text-zinc-500 text-xs sm:text-sm hidden sm:inline">
+                                        {" "}— {item.description}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -131,7 +122,7 @@ export function HomePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Links

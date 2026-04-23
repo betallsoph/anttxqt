@@ -10,16 +10,13 @@ export interface HomepageData {
         email: string;
         avatarUrl?: string;
     };
-    products: {
-        title: string;
-        description: string;
-        icon: string;
-        link: string;
-        imageUrl?: string;
-    }[];
-    skills: {
+    skillCategories: {
         name: string;
-        detail: string;
+        items: string[];
+    }[];
+    favourites: {
+        label: string;
+        description?: string;
     }[];
     links: {
         label: string;
@@ -31,37 +28,32 @@ export interface HomepageData {
 export const defaultHomepageData: HomepageData = {
     hero: {
         greeting: "Hello!",
-        name: "An Tran",
+        name: "An T. Tran",
         bio: [
             "I'm a software developer focused on building reliable and user-focused applications.",
             "Alongside development, I'm interested in media and digital communication—exploring how content, visuals, and storytelling can enhance the way products are presented and experienced.",
         ],
         email: "hello@anttxqt.dev",
     },
-    products: [
+    skillCategories: [
         {
-            title: "roomieVerse",
-            description: "A platform connecting roommates and managing shared living spaces.",
-            icon: "Rocket",
-            link: "/projects",
+            name: "Frontend",
+            items: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
         },
         {
-            title: "ourWarmth",
-            description: "A digital platform fostering meaningful connections through shared stories.",
-            icon: "CheckCircle",
-            link: "/projects",
+            name: "Backend",
+            items: ["Node.js", "PostgreSQL", "Firebase", "REST APIs"],
         },
         {
-            title: "Rooming House Management",
-            description: "Comprehensive rooming house management for landlords.",
-            icon: "Rocket",
-            link: "/projects",
+            name: "Design & Tools",
+            items: ["Figma", "Git", "Docker", "Vercel"],
         },
     ],
-    skills: [
-        { name: "Web Development", detail: "React, Next.js, TypeScript" },
-        { name: "UI/UX Design", detail: "Figma, Design Systems" },
-        { name: "Consulting", detail: "Architecture, Code Review" },
+    favourites: [
+        { label: "Rust", description: "Systems programming & performance" },
+        { label: "Design Systems", description: "Typography, spacing, consistency" },
+        { label: "Cloud Native", description: "Serverless, edge computing" },
+        { label: "Open Source", description: "Building in public" },
     ],
     links: [
         { label: "Email", url: "mailto:hello@anttxqt.dev" },
@@ -82,7 +74,7 @@ export function useHomepageData() {
         getDoc(DOCUMENT_REF)
             .then((snapshot) => {
                 if (snapshot.exists()) {
-                    setData(snapshot.data() as HomepageData);
+                    setData({ ...defaultHomepageData, ...snapshot.data() } as HomepageData);
                 }
             })
             .catch((err) => {

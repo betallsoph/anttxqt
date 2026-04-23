@@ -19,6 +19,20 @@ export interface ExploreData {
         label: string;
         value: string;
     }[];
+    stories: {
+        title: string;
+        content: string;
+        date?: string;
+    }[];
+    whatsNext: {
+        title: string;
+        description?: string;
+        status: "Planning" | "In Progress" | "Done";
+    }[];
+    moreAndMore: {
+        label: string;
+        description?: string;
+    }[];
 }
 
 export const defaultExploreData: ExploreData = {
@@ -56,6 +70,24 @@ export const defaultExploreData: ExploreData = {
         { label: "Reading", value: "Designing Data-Intensive Applications" },
         { label: "Building", value: "This portfolio site" },
     ],
+    stories: [
+        {
+            title: "How I got into programming",
+            content: "It all started with a curiosity about how websites work. I remember spending hours inspecting page sources and trying to understand HTML tags. That curiosity eventually turned into a passion that shapes my everyday life.",
+            date: "2024",
+        },
+    ],
+    whatsNext: [
+        { title: "Learn Rust deeply", description: "Systems programming & building CLI tools", status: "In Progress" },
+        { title: "Contribute to open source", description: "Give back to the community", status: "Planning" },
+        { title: "Launch roomieVerse v2", description: "Complete redesign with new features", status: "Planning" },
+    ],
+    moreAndMore: [
+        { label: "Favourite font", description: "Inter — clean, modern, versatile" },
+        { label: "Coffee order", description: "Iced oat latte, no sugar" },
+        { label: "IDE", description: "VS Code with Catppuccin theme" },
+        { label: "Keyboard", description: "Still looking for the perfect one" },
+    ],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");
@@ -69,7 +101,7 @@ export function useExploreData() {
         getDoc(DOCUMENT_REF)
             .then((snapshot) => {
                 if (snapshot.exists()) {
-                    setData(snapshot.data() as ExploreData);
+                    setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
                 }
             })
             .catch((err) => {

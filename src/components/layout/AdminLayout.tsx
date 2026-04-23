@@ -174,7 +174,7 @@ export function AdminLayout() {
             </motion.nav>
 
             {/* Section Divider */}
-            <div className="border-t-2 border-black"></div>
+            <div className="border-t-2 border-black/20"></div>
 
             {/* Page Content */}
             <Outlet />

@@ -176,7 +176,7 @@ export function ProjectDetailPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="border-t-2 border-black pt-6 sm:pt-8"
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
                     <div className="space-y-3 sm:space-y-4">

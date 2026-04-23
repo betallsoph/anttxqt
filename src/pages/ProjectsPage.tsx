@@ -125,7 +125,7 @@ export function ProjectsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
-                className="text-center py-6 border-t-2 border-black mt-8"
+                className="text-center py-6 border-t-2 border-black/20 mt-8"
             >
                 <p className="text-zinc-600">
                     More projects available on{" "}

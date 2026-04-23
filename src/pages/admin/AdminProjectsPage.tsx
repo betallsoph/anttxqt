@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
 import { Plus, Trash2, Save, Loader2, X } from "lucide-react";
+import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
     "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
@@ -147,6 +148,11 @@ export function AdminProjectsPage() {
                         {/* Card Header */}
                         <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
                             <div className="flex items-center gap-2 sm:gap-3">
+                                <MoveButtons
+                                    index={index}
+                                    total={projects.length}
+                                    onMove={(from, to) => setProjects(swap(projects, from, to))}
+                                />
                                 <h3 className="text-base sm:text-lg font-bold">
                                     {project.title || `Project ${index + 1}`}
                                 </h3>
@@ -406,7 +412,7 @@ export function AdminProjectsPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="border-t-2 border-black pt-6 sm:pt-8"
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <Button
                     variant="noShadow"
