@@ -5,7 +5,9 @@ import { db } from "@/lib/firebase";
 import {
     type Project,
     type ProjectStatus,
-    defaultProjects,
+    type CollectionType,
+    defaultProducts,
+    defaultProjectsList,
     saveProjectsData,
 } from "@/hooks/useProjectsData";
 import { Button } from "@/components/ui/button";
@@ -33,33 +35,40 @@ function generateId(title: string): string {
         .slice(0, 50);
 }
 
-export function AdminProjectsPage() {
-    const [projects, setProjects] = useState<Project[]>(defaultProjects);
+export function AdminProjectsPage({ type }: { type: CollectionType }) {
+    const defaultData = type === "products" ? defaultProducts : defaultProjectsList;
+    const [projects, setProjects] = useState<Project[]>(defaultData);
     const [loading, setLoading] = useState(true);
     const [savingIndex, setSavingIndex] = useState<number | null>(null);
     const [messages, setMessages] = useState<Record<number, string>>({});
+    const title = type === "products" ? "Products" : "Projects";
+    const itemLabel = type === "products" ? "product" : "project";
 
     useEffect(() => {
-        getDoc(doc(db, "siteConfig", "projects"))
+        getDoc(doc(db, "siteConfig", type))
             .then((snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.data();
                     if (data.items) {
                         setProjects(data.items as Project[]);
+                    } else {
+                        setProjects(defaultData);
                     }
+                } else {
+                    setProjects(defaultData);
                 }
             })
             .catch((err) => {
-                console.error("Failed to load projects:", err);
+                console.error(`Failed to load ${type}:`, err);
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [type]);
 
     const handleSave = async (index: number) => {
         setSavingIndex(index);
         setMessages((prev) => ({ ...prev, [index]: "" }));
         try {
-            await saveProjectsData(projects);
+            await saveProjectsData(type, projects);
             setMessages((prev) => ({ ...prev, [index]: "Đã lưu!" }));
         } catch (err) {
             console.error(err);
@@ -113,7 +122,7 @@ export function AdminProjectsPage() {
                 className="flex items-center justify-between"
             >
                 <p className="text-sm text-zinc-600">
-                    <span className="font-bold">{projects.length}</span> projects
+                    <span className="font-bold">{projects.length}</span> {itemLabel}s
                 </p>
                 <Button
                     variant="noShadow"
@@ -132,7 +141,7 @@ export function AdminProjectsPage() {
                     }
                 >
                     <Plus className="w-4 h-4" />
-                    Thêm project
+                    Thêm {itemLabel}
                 </Button>
             </motion.div>
 
@@ -173,14 +182,26 @@ export function AdminProjectsPage() {
 
                         {/* Card Content */}
                         <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4">
-                            {/* Image */}
-                            <div className="border-2 border-black rounded-lg bg-white p-3">
-                                <label className="block text-sm font-bold mb-1">Image</label>
-                                <ImageUpload
-                                    value={project.imageUrl || ""}
-                                    onChange={(url) => updateProject(index, { imageUrl: url })}
-                                    folder="projects"
-                                />
+                            {/* Images */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="border-2 border-black rounded-lg bg-white p-3">
+                                    <label className="block text-sm font-bold mb-1">App Icon / Logo</label>
+                                    <ImageUpload
+                                        value={project.iconUrl || ""}
+                                        onChange={(url) => updateProject(index, { iconUrl: url })}
+                                        folder="projects"
+                                    />
+                                    <p className="text-xs text-zinc-500 mt-2">Dùng cho thẻ {itemLabel} ở trang chủ</p>
+                                </div>
+                                <div className="border-2 border-black rounded-lg bg-white p-3">
+                                    <label className="block text-sm font-bold mb-1">Banner Image</label>
+                                    <ImageUpload
+                                        value={project.imageUrl || ""}
+                                        onChange={(url) => updateProject(index, { imageUrl: url })}
+                                        folder="projects"
+                                    />
+                                    <p className="text-xs text-zinc-500 mt-2">Dùng cho ảnh bìa ở trang chi tiết</p>
+                                </div>
                             </div>
 
                             {/* ID + Title */}

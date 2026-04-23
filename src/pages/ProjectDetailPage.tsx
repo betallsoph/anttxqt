@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, ImageIcon, Loader2 } from "lucide-react";
-import { useProjectsData } from "@/hooks/useProjectsData";
+import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<string, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
@@ -10,10 +10,13 @@ const statusStyles: Record<string, string> = {
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
 };
 
-export function ProjectDetailPage() {
+export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const { id } = useParams<{ id: string }>();
-    const { projects, loading } = useProjectsData();
+    const { projects, loading } = useProjectsData(type);
     const project = projects.find((p) => p.id === id);
+    const title = type === "products" ? "Product" : "Project";
+    const backLink = type === "products" ? "/products" : "/projects";
+    const backLabel = type === "products" ? "products" : "projects";
 
     if (loading) {
         return (
@@ -26,9 +29,9 @@ export function ProjectDetailPage() {
     if (!project) {
         return (
             <div className="text-center py-20">
-                <h2 className="text-2xl font-bold mb-4">Project not found</h2>
-                <Link to="/projects" className="text-blue-500 hover:underline">
-                    Back to projects
+                <h2 className="text-2xl font-bold mb-4">{title} not found</h2>
+                <Link to={backLink} className="text-blue-500 hover:underline">
+                    Back to {backLabel}
                 </Link>
             </div>
         );
@@ -43,11 +46,11 @@ export function ProjectDetailPage() {
                 transition={{ duration: 0.4 }}
             >
                 <Link
-                    to="/projects"
+                    to={backLink}
                     className="inline-flex items-center gap-2 text-zinc-600 hover:text-black transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    Back to projects
+                    Back to {backLabel}
                 </Link>
             </motion.div>
 
@@ -79,7 +82,7 @@ export function ProjectDetailPage() {
                                 <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
                                     <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" />
                                 </div>
-                                <p className="text-sm sm:text-base text-blue-400 font-medium">Project Image Coming Soon</p>
+                                <p className="text-sm sm:text-base text-blue-400 font-medium">{title} Image Coming Soon</p>
                             </div>
                         </div>
                     )}

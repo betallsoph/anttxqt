@@ -14,6 +14,7 @@ const ALLOWED_EMAILS = [
 
 const navItems = [
     { to: "/admin/home", label: "Home", icon: Home },
+    { to: "/admin/products", label: "Products", icon: FolderOpen },
     { to: "/admin/projects", label: "Projects", icon: FolderOpen },
     { to: "/admin/explore", label: "Explore", icon: Compass },
 ];

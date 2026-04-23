@@ -22,13 +22,16 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="projects" element={<ProjectsPage />} />
-          <Route path="projects/:id" element={<ProjectDetailPage />} />
+          <Route path="products" element={<ProjectsPage type="products" />} />
+          <Route path="products/:id" element={<ProjectDetailPage type="products" />} />
+          <Route path="projects" element={<ProjectsPage type="projects" />} />
+          <Route path="projects/:id" element={<ProjectDetailPage type="projects" />} />
           <Route path="explore" element={<ExplorePage />} />
           <Route path="admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="/admin/home" replace />} />
             <Route path="home" element={<AdminHomePage />} />
-            <Route path="projects" element={<AdminProjectsPage />} />
+            <Route path="products" element={<AdminProjectsPage type="products" />} />
+            <Route path="projects" element={<AdminProjectsPage type="projects" />} />
             <Route path="explore" element={<AdminExplorePage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />

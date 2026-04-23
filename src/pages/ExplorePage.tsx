@@ -31,21 +31,21 @@ function AchievementModal({
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
                     transition={{ duration: 0.2 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="relative w-full max-w-md bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                    className="relative w-auto max-w-3xl min-w-[300px] sm:min-w-[500px] max-h-[90vh] flex flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
                 >
                     {/* Image */}
                     {item.imageUrl && (
-                        <div className="w-full h-48 sm:h-56 border-b-2 border-black overflow-hidden">
+                        <div className="flex-1 shrink min-h-0 w-full border-b-2 border-black bg-white flex items-center justify-center">
                             <img
                                 src={item.imageUrl}
                                 alt={item.title}
-                                className="w-full h-full object-cover"
+                                className="max-w-full h-full max-h-[70vh] object-contain"
                             />
                         </div>
                     )}
 
                     {/* Content */}
-                    <div className="p-4 sm:p-6 space-y-3">
+                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[50vh]">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">

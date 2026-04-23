@@ -14,11 +14,14 @@ export interface Project {
     topics?: string[];
     githubUrl?: string;
     liveUrl?: string;
-    imageUrl?: string;
-    images?: string[];
+    iconUrl?: string; // Small app icon or logo
+    imageUrl?: string; // Wide banner image
+    images?: string[]; // Gallery images
 }
 
-export const defaultProjects: Project[] = [
+export type CollectionType = "products" | "projects";
+
+export const defaultProducts: Project[] = [
     {
         id: "roomieverse",
         title: "roomieVerse",
@@ -44,22 +47,6 @@ export const defaultProjects: Project[] = [
         fullDescription: "ecoPoint is a concept app that gamifies sustainability. Users can track their eco-friendly behaviors, earn points, and compete with friends to make positive environmental impact. The goal is to make sustainability fun and accessible to everyone.",
         status: "Concept",
         tags: ["Mobile", "Sustainability", "Gamification"],
-    },
-    {
-        id: "he-thong-quan-ly-nha-tro",
-        title: "rooming house Management",
-        description: "A comprehensive rooming house management system for landlords to manage rooms, tenants, contracts, and payments efficiently.",
-        fullDescription: "This system helps landlords digitize their rooming house operations. Features include room management, tenant information tracking, contract management, utility billing, payment tracking, and financial reporting. Built to simplify the daily operations of running a rooming house business.",
-        status: "In Development",
-        tags: ["React", "Node.js", "PostgreSQL"],
-    },
-    {
-        id: "room-management-system",
-        title: "The Room Management System",
-        description: "An enterprise-grade room booking and management solution for offices, co-working spaces, and educational institutions.",
-        fullDescription: "The Room Management System is designed for organizations that need to manage multiple rooms and spaces. It features real-time availability checking, booking management, resource allocation, and usage analytics. Perfect for offices, universities, and co-working spaces.",
-        status: "Concept",
-        tags: ["Enterprise", "SaaS", "Booking System"],
     },
     {
         id: "hindsight",
@@ -103,33 +90,69 @@ export const defaultProjects: Project[] = [
     },
 ];
 
-const DOCUMENT_REF = doc(db, "siteConfig", "projects");
+export const defaultProjectsList: Project[] = [
+    {
+        id: "he-thong-quan-ly-nha-tro",
+        title: "rooming house Management",
+        description: "A comprehensive rooming house management system for landlords to manage rooms, tenants, contracts, and payments efficiently.",
+        fullDescription: "This system helps landlords digitize their rooming house operations. Features include room management, tenant information tracking, contract management, utility billing, payment tracking, and financial reporting. Built to simplify the daily operations of running a rooming house business.",
+        status: "In Development",
+        tags: ["React", "Node.js", "PostgreSQL"],
+    },
+    {
+        id: "room-management-system",
+        title: "The Room Management System",
+        description: "An enterprise-grade room booking and management solution for offices, co-working spaces, and educational institutions.",
+        fullDescription: "The Room Management System is designed for organizations that need to manage multiple rooms and spaces. It features real-time availability checking, booking management, resource allocation, and usage analytics. Perfect for offices, universities, and co-working spaces.",
+        status: "Concept",
+        tags: ["Enterprise", "SaaS", "Booking System"],
+    },
+];
 
-export function useProjectsData() {
-    const [projects, setProjects] = useState<Project[]>(defaultProjects);
+export function useProjectsData(type: CollectionType) {
+    const defaultData = type === "products" ? defaultProducts : defaultProjectsList;
+    const [projects, setProjects] = useState<Project[]>(defaultData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        getDoc(DOCUMENT_REF)
+        setLoading(true);
+        const docRef = doc(db, "siteConfig", type);
+        getDoc(docRef)
             .then((snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.data();
                     if (data.items) {
-                        setProjects(data.items as Project[]);
+                        const items = data.items as Project[];
+                        // Automatic migration to clean up old mixed data
+                        if (type === "projects" && items.some(i => i.id === "roomieverse")) {
+                            console.log("Migrating old projects data...");
+                            setProjects(defaultProjectsList);
+                            setDoc(docRef, { items: defaultProjectsList });
+                        } else if (type === "products" && items.length === 0) {
+                            setProjects(defaultProducts);
+                            setDoc(docRef, { items: defaultProducts });
+                        } else {
+                            setProjects(items);
+                        }
+                    } else {
+                        setProjects(defaultData);
                     }
+                } else {
+                    setProjects(defaultData);
                 }
             })
             .catch((err) => {
-                console.error("Failed to fetch projects:", err);
+                console.error(`Failed to fetch ${type}:`, err);
                 setError(err.message);
+                setProjects(defaultData);
             })
             .finally(() => setLoading(false));
-    }, []);
+    }, [type]);
 
     return { projects, loading, error };
 }
 
-export async function saveProjectsData(projects: Project[]) {
-    await setDoc(DOCUMENT_REF, { items: projects });
+export async function saveProjectsData(type: CollectionType, projects: Project[]) {
+    await setDoc(doc(db, "siteConfig", type), { items: projects });
 }

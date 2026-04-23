@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { DelayedLink } from "@/components/ui/delayed-link";
 import { ArrowRight, ImageIcon, Loader2 } from "lucide-react";
-import { useProjectsData, type ProjectStatus } from "@/hooks/useProjectsData";
+import { useProjectsData, type ProjectStatus, type CollectionType } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<ProjectStatus, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
@@ -10,8 +10,10 @@ const statusStyles: Record<ProjectStatus, string> = {
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
 };
 
-export function ProjectsPage() {
-    const { projects, loading } = useProjectsData();
+export function ProjectsPage({ type }: { type: CollectionType }) {
+    const { projects, loading } = useProjectsData(type);
+    const title = type === "products" ? "Products" : "Projects";
+    const itemLabel = type === "products" ? "products" : "projects";
 
     if (loading) {
         return (
@@ -29,9 +31,9 @@ export function ProjectsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
             >
-                <h2 className="text-3xl font-bold mb-4">Projects</h2>
+                <h2 className="text-3xl font-bold mb-4">{title}</h2>
                 <p className="text-zinc-600">
-                    Here are some of the projects I've worked on. Each one represents a
+                    Here are some of the {itemLabel} I've worked on. Each one represents a
                     unique challenge and learning experience.
                 </p>
             </motion.section>
@@ -56,31 +58,23 @@ export function ProjectsPage() {
                                 <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                             </div>
 
-                            {/* Project Image */}
-                            <div className="w-full h-32 sm:h-40 border-b-2 border-black overflow-hidden bg-zinc-50">
-                                {project.imageUrl ? (
-                                    <img
-                                        src={project.imageUrl}
-                                        alt={project.title}
-                                        className="w-full h-full object-contain"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                                        <div className="text-center">
-                                            <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
-                                                <ImageIcon className="w-6 h-6 sm:w-8 sm:h-8 text-blue-400" />
-                                            </div>
-                                            <p className="text-xs sm:text-sm text-blue-400 font-medium">Image Coming Soon</p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
                             <div className="p-4 sm:p-6">
-                                {/* Title */}
-                                <div className="flex items-center justify-between mb-2 sm:mb-3">
-                                    <h3 className="text-lg sm:text-xl font-bold">{project.title}</h3>
-                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0" />
+                                {/* Header: Icon + Title */}
+                                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                                    <div className="flex items-center gap-3 sm:gap-4">
+                                        {/* Icon */}
+                                        {project.iconUrl ? (
+                                            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-white border-2 border-black rounded-xl overflow-hidden p-1 sm:p-1.5 shadow-sm">
+                                                <img src={project.iconUrl} alt={project.title} className="w-full h-full object-contain" />
+                                            </div>
+                                        ) : (
+                                            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-blue-50 border-2 border-blue-200 border-dashed rounded-xl flex items-center justify-center">
+                                                <ImageIcon className="w-5 h-5 text-blue-400" />
+                                            </div>
+                                        )}
+                                        <h3 className="text-lg sm:text-xl font-bold">{project.title}</h3>
+                                    </div>
+                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 mt-2 sm:mt-3 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0" />
                                 </div>
 
                                 {/* Description */}
@@ -128,7 +122,7 @@ export function ProjectsPage() {
                 className="text-center py-6 border-t-2 border-black/20 mt-8"
             >
                 <p className="text-zinc-600">
-                    More projects available on{" "}
+                    More {itemLabel} available on{" "}
                     <a
                         href="https://github.com/anttxqt"
                         target="_blank"
