@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
@@ -18,6 +18,16 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const title = type === "products" ? "Product" : "Project";
     const backLink = type === "products" ? "/products" : "/projects";
     const backLabel = type === "products" ? "products" : "projects";
+    const navigate = useNavigate();
+
+    const handleBack = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (window.history.length > 2) {
+            navigate(-1);
+        } else {
+            navigate(backLink);
+        }
+    };
 
     if (loading) {
         return (
@@ -44,13 +54,13 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4 }}
             >
-                <Link
-                    to={backLink}
+                <button
+                    onClick={handleBack}
                     className="inline-flex items-center gap-2 text-zinc-600 hover:text-black transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4" />
                     Back to {backLabel}
-                </Link>
+                </button>
             </motion.div>
 
             {/* Project Card */}
@@ -220,6 +230,22 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     </div>
                 </motion.section>
             )}
+
+            {/* Bottom Back Button */}
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.2 }}
+                className="pt-4 pb-8 flex justify-center"
+            >
+                <button
+                    onClick={handleBack}
+                    className="inline-flex items-center gap-2 px-6 py-3 font-bold text-black border-2 border-black rounded-lg bg-blue-300 hover:bg-blue-400 hover:-translate-y-1 hover:shadow-primary transition-all duration-200"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                    Back to {backLabel}
+                </button>
+            </motion.div>
         </div>
     );
 }
