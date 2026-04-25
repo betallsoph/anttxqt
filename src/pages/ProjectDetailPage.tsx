@@ -240,7 +240,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
             >
                 <button
                     onClick={handleBack}
-                    className="group inline-flex items-center gap-2 px-6 py-3 font-bold text-black border-2 border-black rounded-lg bg-blue-300 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:bg-blue-400 active:translate-y-[4px] active:translate-x-[4px] active:shadow-none transition-all duration-200"
+                    className="group inline-flex items-center gap-2 px-6 py-3 font-bold text-black border-2 border-black rounded-lg bg-blue-300 shadow-secondary active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all duration-200"
                 >
                     <ArrowLeft className="w-5 h-5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:-translate-x-1" />
                     Back to {backLabel}
