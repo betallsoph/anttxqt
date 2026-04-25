@@ -343,6 +343,21 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 />
                             </div>
 
+                            {/* Key Features */}
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Key Features</label>
+                                <textarea
+                                    value={(project.keyFeatures || []).join("\n")}
+                                    onChange={(e) => {
+                                        const features = e.target.value.split("\n").filter(f => f.trim() !== "");
+                                        updateProject(index, { keyFeatures: features });
+                                    }}
+                                    className={`${inputClass} min-h-[80px] leading-relaxed`}
+                                    rows={4}
+                                    placeholder="Mỗi dòng là một tính năng nổi bật..."
+                                />
+                            </div>
+
                             {/* URLs */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
@@ -446,6 +461,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 description: "",
                                 status: "Concept",
                                 tags: [],
+                                keyFeatures: [],
                             },
                         ])
                     }

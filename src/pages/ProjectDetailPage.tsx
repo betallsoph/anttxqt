@@ -102,74 +102,93 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     </div>
 
                     {/* Description */}
-                    <div className="prose max-w-none mb-4 sm:mb-6">
+                    <div className="prose max-w-none mb-6 sm:mb-8">
+                        <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Description - The Story Behind</h3>
                         <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                             {project.fullDescription || project.description}
                         </p>
                     </div>
 
-                    {/* Tags */}
-                    <div className="mb-4 sm:mb-6">
-                        <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-2">Tech Stack</h3>
-                        <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                            {project.tags.map((tag) => (
-                                <span
-                                    key={tag}
-                                    className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
-                                >
-                                    {tag}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Links */}
-                    {(project.githubUrl || project.liveUrl) && (
-                        <div className="pt-4 border-t-2 border-zinc-200">
-                            <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-2">Explore</h3>
-                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
-                                {project.githubUrl && (
-                                    <a
-                                        href={project.githubUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
-                                    >
-                                        <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                        View on GitHub
-                                    </a>
-                                )}
-                                {project.liveUrl && (
-                                    <a
-                                        href={project.liveUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
-                                    >
-                                        <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                                        Visit Website
-                                    </a>
-                                )}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Topics */}
-                    {project.topics && project.topics.length > 0 && (
-                        <div className="pt-4 border-t-2 border-zinc-200 mt-4 sm:mt-6">
-                            <h3 className="text-xs sm:text-sm font-bold text-zinc-500 mb-2">Topic</h3>
-                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                {project.topics.map((topic) => (
-                                    <span
-                                        key={topic}
-                                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
-                                    >
-                                        {topic}
-                                    </span>
+                    {/* Key Features */}
+                    {project.keyFeatures && project.keyFeatures.length > 0 && (
+                        <div className="mb-6 sm:mb-8">
+                            <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Key Features</h3>
+                            <div className="space-y-2 sm:space-y-3">
+                                {project.keyFeatures.map((feature, index) => (
+                                    <div key={index} className="flex items-start gap-3">
+                                        <div className="w-2 h-2 mt-2.5 bg-blue-500 rounded-sm flex-shrink-0 border border-black"></div>
+                                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">{feature}</p>
+                                    </div>
                                 ))}
                             </div>
                         </div>
                     )}
+
+                    {/* Meta Section (Tech Stack, Links, Topics) */}
+                    <div className="pt-6 sm:pt-8 border-t-2 border-zinc-200 mt-6 sm:mt-8 space-y-6">
+                        {/* Tech Stack */}
+                        <div>
+                            <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Tech Stack</h3>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                {project.tags.map((tag) => (
+                                    <span
+                                        key={tag}
+                                        className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Links */}
+                        {(project.githubUrl || project.liveUrl) && (
+                            <div>
+                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Explore</h3>
+                                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                                    {project.githubUrl && (
+                                        <a
+                                            href={project.githubUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
+                                        >
+                                            <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            View on GitHub
+                                        </a>
+                                    )}
+                                    {project.liveUrl && (
+                                        <a
+                                            href={project.liveUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
+                                        >
+                                            <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                            Visit Website
+                                        </a>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Topics */}
+                        {project.topics && project.topics.length > 0 && (
+                            <div>
+                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Topic</h3>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                    {project.topics.map((topic) => (
+                                        <span
+                                            key={topic}
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
+                                        >
+                                            {topic}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </motion.article>
 

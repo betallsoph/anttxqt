@@ -77,16 +77,13 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                 {/* Description */}
                                 <p className="text-sm sm:text-base text-zinc-600 mb-3 sm:mb-4 whitespace-pre-wrap">{project.description}</p>
 
-                                {/* Tags */}
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
-                                    {project.tags.map((tag) => (
-                                        <span
-                                            key={tag}
-                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
+                                {/* Status & Topics */}
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-auto">
+                                    <span
+                                        className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
+                                    >
+                                        {project.status}
+                                    </span>
                                     {project.topics?.map((topic) => (
                                         <span
                                             key={topic}
@@ -95,15 +92,6 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                             {topic}
                                         </span>
                                     ))}
-                                </div>
-
-                                {/* Status */}
-                                <div>
-                                    <span
-                                        className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
-                                    >
-                                        {project.status}
-                                    </span>
                                 </div>
                             </div>
                         </DelayedLink>

@@ -12,6 +12,7 @@ export interface Project {
     status: ProjectStatus;
     tags: string[];
     topics?: string[];
+    keyFeatures?: string[];
     githubUrl?: string;
     liveUrl?: string;
     iconUrl?: string; // Small app icon or logo
