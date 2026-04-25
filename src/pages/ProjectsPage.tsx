@@ -104,7 +104,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.35, delay: 0.08 }}
-                className="text-center py-6 border-t-2 border-black/20 mt-8"
+                className="text-center py-6 mt-8"
             >
                 <p className="text-zinc-600">
                     More {itemLabel} available on{" "}
