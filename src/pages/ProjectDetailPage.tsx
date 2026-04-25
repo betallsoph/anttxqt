@@ -1,7 +1,7 @@
 import { motion } from "motion/react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
-import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<string, string> = {
@@ -70,10 +70,11 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 {/* Project Image */}
                 <div className="w-full h-40 sm:h-56 border-b-2 border-black overflow-hidden bg-zinc-50">
                     {project.imageUrl ? (
-                        <img
+                        <ImageWithLoader
                             src={project.imageUrl}
                             alt={project.title}
-                            className="w-full h-full object-contain"
+                            className="w-full h-full"
+                            imgClassName="object-contain"
                         />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
@@ -102,7 +103,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                     {/* Description */}
                     <div className="prose max-w-none mb-4 sm:mb-6">
-                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">
+                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                             {project.fullDescription || project.description}
                         </p>
                     </div>
@@ -190,10 +191,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 transition={{ duration: 0.3, delay: 0.05 * index }}
                                 className="border-2 border-black rounded-lg overflow-hidden bg-white"
                             >
-                                <img
+                                <ImageWithLoader
                                     src={img}
                                     alt={`${project.title} screenshot ${index + 1}`}
-                                    className="w-full h-auto"
+                                    className="w-full h-auto min-h-[200px]"
                                 />
                             </motion.div>
                         ))}

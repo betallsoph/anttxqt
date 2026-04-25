@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ExternalLink } from "lucide-react";
-import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData } from "@/hooks/useExploreData";
 
 type Achievement = ExploreData["achievements"][number];
@@ -37,10 +37,11 @@ function AchievementModal({
                     {/* Image */}
                     {item.imageUrl && (
                         <div className="flex-1 shrink min-h-0 w-full border-b-2 border-black bg-white flex items-center justify-center">
-                            <img
+                            <ImageWithLoader
                                 src={item.imageUrl}
                                 alt={item.title}
-                                className="max-w-full h-full max-h-[70vh] object-contain"
+                                className="w-full h-full max-h-[70vh]"
+                                imgClassName="object-contain"
                             />
                         </div>
                     )}
@@ -70,7 +71,7 @@ function AchievementModal({
                         </div>
 
                         {item.description && (
-                            <p className="text-sm text-zinc-600 leading-relaxed">
+                            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
                                 {item.description}
                             </p>
                         )}
@@ -115,7 +116,7 @@ export function ExplorePage() {
                 <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">
                     {data.intro.title}
                 </h2>
-                <p className="text-sm sm:text-base text-zinc-600">
+                <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap">
                     {data.intro.description}
                 </p>
             </motion.section>
@@ -262,7 +263,7 @@ export function ExplorePage() {
                                         {item.status}
                                     </span>
                                 </div>
-                                {item.description && <p className="text-xs sm:text-sm text-zinc-500">{item.description}</p>}
+                                {item.description && <p className="text-xs sm:text-sm text-zinc-500 whitespace-pre-wrap">{item.description}</p>}
                             </div>
                         ))}
                     </div>

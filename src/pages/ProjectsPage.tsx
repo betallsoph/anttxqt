@@ -75,7 +75,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                 </div>
 
                                 {/* Description */}
-                                <p className="text-sm sm:text-base text-zinc-600 mb-3 sm:mb-4 line-clamp-2">{project.description}</p>
+                                <p className="text-sm sm:text-base text-zinc-600 mb-3 sm:mb-4 whitespace-pre-wrap">{project.description}</p>
 
                                 {/* Tags */}
                                 <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 sm:mb-3">
