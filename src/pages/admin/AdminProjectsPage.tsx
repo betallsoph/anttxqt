@@ -166,7 +166,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     {project.title || `${title} ${index + 1}`}
                                 </h3>
                                 {project.status && (
-                                    <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded-full ${statusStyles[project.status]}`}>
+                                    <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}>
                                         {project.status}
                                     </span>
                                 )}
@@ -276,7 +276,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     {(project.topics || []).map((topic, topicIndex) => (
                                         <span
                                             key={topicIndex}
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded-full"
+                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
                                         >
                                             {topic}
                                             <button
@@ -316,7 +316,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     {project.tags.map((tag, tagIndex) => (
                                         <span
                                             key={tagIndex}
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded-full"
+                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
                                         >
                                             {tag}
                                             <button

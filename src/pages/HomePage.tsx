@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { Loader2 } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useHomepageData } from "@/hooks/useHomepageData";
 
 export function HomePage() {
@@ -7,9 +7,7 @@ export function HomePage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin" />
-            </div>
+            <LoadingScreen />
         );
     }
 
@@ -19,7 +17,7 @@ export function HomePage() {
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.35 }}
             >
                 <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
                     {data.hero.greeting}
@@ -58,7 +56,7 @@ export function HomePage() {
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
@@ -90,7 +88,7 @@ export function HomePage() {
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">

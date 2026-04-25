@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { DelayedLink } from "@/components/ui/delayed-link";
-import { ArrowRight, ImageIcon, Loader2 } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type ProjectStatus, type CollectionType } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<ProjectStatus, string> = {
@@ -17,9 +18,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin" />
-            </div>
+            <LoadingScreen />
         );
     }
 
@@ -29,7 +28,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.35 }}
             >
                 <h2 className="text-3xl font-bold mb-4">{title}</h2>
                 <p className="text-zinc-600">
@@ -39,16 +38,18 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
             </motion.section>
 
             {/* Projects Grid */}
-            <div className="space-y-6">
-                {projects.map((project, index) => (
-                    <motion.div
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.2 }}
+                className="space-y-6"
+            >
+                {projects.map((project) => (
+                    <div
                         key={project.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 * index }}
                     >
                         <DelayedLink
-                            to={`/projects/${project.id}`}
+                            to={`/${type}/${project.id}`}
                             className="block border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary active:shadow-none active:translate-x-[3px] active:translate-y-[3px] transition-all duration-150 group"
                         >
                             {/* macOS Window Header */}
@@ -62,14 +63,10 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                 {/* Header: Icon + Title */}
                                 <div className="flex items-start justify-between mb-3 sm:mb-4">
                                     <div className="flex items-center gap-3 sm:gap-4">
-                                        {/* Icon */}
-                                        {project.iconUrl ? (
+                                        {/* Icon — only shown when set */}
+                                        {project.iconUrl && (
                                             <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-white border-2 border-black rounded-xl overflow-hidden p-1 sm:p-1.5 shadow-sm">
                                                 <img src={project.iconUrl} alt={project.title} className="w-full h-full object-contain" />
-                                            </div>
-                                        ) : (
-                                            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-blue-50 border-2 border-blue-200 border-dashed rounded-xl flex items-center justify-center">
-                                                <ImageIcon className="w-5 h-5 text-blue-400" />
                                             </div>
                                         )}
                                         <h3 className="text-lg sm:text-xl font-bold">{project.title}</h3>
@@ -85,7 +82,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                     {project.tags.map((tag) => (
                                         <span
                                             key={tag}
-                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded-full"
+                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
                                         >
                                             {tag}
                                         </span>
@@ -93,7 +90,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                     {project.topics?.map((topic) => (
                                         <span
                                             key={topic}
-                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded-full"
+                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
                                         >
                                             {topic}
                                         </span>
@@ -103,22 +100,22 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                 {/* Status */}
                                 <div>
                                     <span
-                                        className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded-full ${statusStyles[project.status]}`}
+                                        className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
                                     >
                                         {project.status}
                                     </span>
                                 </div>
                             </div>
                         </DelayedLink>
-                    </motion.div>
+                    </div>
                 ))}
-            </div>
+            </motion.div>
 
             {/* More Projects */}
             <motion.section
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+                transition={{ duration: 0.35, delay: 0.08 }}
                 className="text-center py-6 border-t-2 border-black/20 mt-8"
             >
                 <p className="text-zinc-600">

@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github, ImageIcon, Loader2 } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<string, string> = {
@@ -20,9 +21,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin" />
-            </div>
+            <LoadingScreen />
         );
     }
 
@@ -58,7 +57,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
             <motion.article
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.35 }}
                 className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary"
             >
                 {/* macOS Window Header */}
@@ -95,7 +94,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* Status */}
                     <div className="mb-4 sm:mb-6">
                         <span
-                            className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded-full ${statusStyles[project.status]}`}
+                            className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded ${statusStyles[project.status]}`}
                         >
                             {project.status}
                         </span>
@@ -178,7 +177,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
@@ -188,7 +187,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.5, delay: 0.1 * index }}
+                                transition={{ duration: 0.3, delay: 0.05 * index }}
                                 className="border-2 border-black rounded-lg overflow-hidden bg-white"
                             >
                                 <img

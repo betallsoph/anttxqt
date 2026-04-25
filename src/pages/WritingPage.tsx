@@ -61,7 +61,7 @@ export function WritingPage() {
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.35 }}
             >
                 <h2 className="text-3xl font-bold mb-4">Writing</h2>
                 <p className="text-zinc-600">
@@ -77,13 +77,13 @@ export function WritingPage() {
                         key={post.slug}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.1 * index }}
+                        transition={{ duration: 0.3, delay: 0.05 * index }}
                         className="group border-2 border-black rounded-lg bg-white p-6 shadow-secondary hover:shadow-none hover:translate-x-[3px] hover:translate-y-[3px] transition-all duration-200 cursor-pointer"
                     >
                         {/* Category */}
                         <div className="mb-3">
                             <span
-                                className={`inline-block px-3 py-1 text-xs font-bold ${post.categoryColor} border-2 border-black rounded-full`}
+                                className={`inline-block px-3 py-1 text-xs font-bold ${post.categoryColor} border-2 border-black rounded`}
                             >
                                 {post.category}
                             </span>
@@ -123,7 +123,7 @@ export function WritingPage() {
             <motion.section
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.6 }}
+                transition={{ duration: 0.35, delay: 0.08 }}
                 className="border-2 border-black rounded-lg bg-blue-100 p-6 shadow-secondary"
             >
                 <h3 className="text-xl font-bold mb-2">Subscribe to Updates</h3>

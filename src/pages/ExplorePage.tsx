@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, ExternalLink, Loader2 } from "lucide-react";
+import { X, ExternalLink } from "lucide-react";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData } from "@/hooks/useExploreData";
 
 type Achievement = ExploreData["achievements"][number];
@@ -52,7 +53,7 @@ function AchievementModal({
                                     <h3 className="font-bold text-base sm:text-lg">
                                         {item.title}
                                     </h3>
-                                    <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full border border-blue-300 font-medium">
+                                    <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
                                         {item.date}
                                     </span>
                                 </div>
@@ -99,9 +100,7 @@ export function ExplorePage() {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin" />
-            </div>
+            <LoadingScreen />
         );
     }
 
@@ -111,7 +110,7 @@ export function ExplorePage() {
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
+                transition={{ duration: 0.35 }}
             >
                 <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">
                     {data.intro.title}
@@ -126,7 +125,7 @@ export function ExplorePage() {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.15 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
@@ -160,7 +159,7 @@ export function ExplorePage() {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
@@ -168,14 +167,8 @@ export function ExplorePage() {
                     </h2>
                     <div className="space-y-2 sm:space-y-3">
                         {data.achievements.map((item, index) => (
-                            <motion.button
+                            <button
                                 key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{
-                                    duration: 0.5,
-                                    delay: 0.3 + 0.1 * index,
-                                }}
                                 onClick={() => setSelectedAchievement(item)}
                                 className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
                             >
@@ -187,7 +180,7 @@ export function ExplorePage() {
                                 <span className="text-xs text-zinc-400 flex-shrink-0 ml-3">
                                     {item.date}
                                 </span>
-                            </motion.button>
+                            </button>
                         ))}
                     </div>
                 </motion.section>
@@ -198,7 +191,7 @@ export function ExplorePage() {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
@@ -229,7 +222,7 @@ export function ExplorePage() {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.5 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
@@ -252,7 +245,7 @@ export function ExplorePage() {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
@@ -261,7 +254,7 @@ export function ExplorePage() {
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
                                 <div className="flex justify-between items-start mb-1">
                                     <h3 className="font-bold text-sm sm:text-base">{item.title}</h3>
-                                    <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 border rounded-full ${
+                                    <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 border rounded ${
                                         item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
                                         item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
                                         'bg-zinc-100 border-zinc-300 text-zinc-600'
@@ -281,7 +274,7 @@ export function ExplorePage() {
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.7 }}
+                    transition={{ duration: 0.35, delay: 0.085 }}
                     className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>

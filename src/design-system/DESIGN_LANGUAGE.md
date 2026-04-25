@@ -8,6 +8,7 @@
 ## 1. Philosophy
 
 **anttkn** — Bold, honest, playful.
+*(Note từ tác giả: Xin nhắc lại là tôi không hề thích "Neobrutalism" nhé. Chẳng qua cái web vô tình trông giống thế thôi! Dùng từ này thì AI dễ hiểu mà làm cho lẹ chứ không phải gu tui!)*
 
 - Viền đen dày, rõ ràng
 - Shadow offset tạo chiều sâu giả 3D
