@@ -16,6 +16,7 @@
 - Tương tác rõ ràng: bấm vào = shadow biến mất, element "lún xuống"
 - Typography đậm, dễ đọc
 - Không gradient text, không blur, không glass morphism
+- **QUY TẮC ICON NÚT:** Tuyệt đối KHÔNG đặt icon phía TRƯỚC text trong nút bấm (ví dụ: `<ArrowLeft /> Back`). Icon phải nằm phía SAU text hoặc lược bỏ hoàn toàn. (Tác giả cực kỳ ghét icon trước nút).
 
 ---
 
@@ -161,6 +162,11 @@ transition-all
 | `ghost`            | transparent | `black`      | none                | none             | `bg-blue-100` (300ms)                       |
 | `link`             | transparent | `blue-500`   | none                | none             | `underline`                                 |
 
+**Quy tắc Icon trong Button:**
+1. Tuyệt đối KHÔNG để icon trước dòng chữ. Nếu cần, hãy để icon phía sau.
+2. Icon mũi tên (khi ở trạng thái hover) nên có hiệu ứng `scale-110` và rotate nhẹ (ví dụ `-rotate-12` hoặc `-translate-x-1`) để tạo cảm giác tương tác "mời gọi", thay vì làm cả nút nổi lên.
+3. Khi active (nhấn), nút lõm xuống đúng bằng độ dày của shadow (ví dụ `active:translate-y-[3px] active:translate-x-[3px] active:shadow-none`).
+
 Sizes: `default` (h-10 px-4), `sm` (h-9 px-3), `lg` (h-12 px-8), `icon` (size-10)
 
 ### Card
@@ -175,6 +181,11 @@ Sub-components:
 - **CardDescription:** `text-sm text-zinc-600`
 - **CardContent:** unstyled wrapper
 - **CardFooter:** `flex items-center pt-4`
+
+**Quy tắc hiển thị Chip/Tag trên List Card (Trang Projects/Products):**
+- KHÔNG hiển thị các thẻ Tech Stack (React, Tailwind, v.v.) ở ngoài trang danh sách để tránh rối mắt.
+- CHỈ hiển thị thẻ **Status** (Shipped, Concept...) và thẻ **Topic / Thể loại** (Web, Mobile...).
+- Hai loại thẻ này phải được gom lại ngang hàng với nhau ở vị trí dưới cùng của card (`mt-auto`).
 
 ### Product Link Item
 
