@@ -6,6 +6,14 @@ import { useExploreData, type ExploreData } from "@/hooks/useExploreData";
 
 type Achievement = ExploreData["achievements"][number];
 
+function ComingSoon() {
+    return (
+        <div className="border-2 border-dashed border-zinc-300 rounded-lg p-6 sm:p-8 text-center">
+            <p className="text-sm sm:text-base text-zinc-400 font-medium">Coming soon</p>
+        </div>
+    );
+}
+
 function AchievementModal({
     item,
     onClose,
@@ -188,16 +196,16 @@ export function ExplorePage() {
             )}
 
             {/* Currently */}
-            {data.currently.length > 0 && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.1 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Currently
-                    </h2>
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.1 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                    Currently
+                </h2>
+                {data.currently.length > 0 ? (
                     <div className="space-y-2 sm:space-y-3">
                         {data.currently.map((item, index) => (
                             <div
@@ -213,20 +221,22 @@ export function ExplorePage() {
                             </div>
                         ))}
                     </div>
-                </motion.section>
-            )}
+                ) : (
+                    <ComingSoon />
+                )}
+            </motion.section>
 
 
 
             {/* Stories */}
-            {data.stories && data.stories.length > 0 && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.08 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.08 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+                {data.stories && data.stories.length > 0 ? (
                     <div className="space-y-4">
                         {data.stories.map((story, index) => (
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
@@ -238,18 +248,20 @@ export function ExplorePage() {
                             </div>
                         ))}
                     </div>
-                </motion.section>
-            )}
+                ) : (
+                    <ComingSoon />
+                )}
+            </motion.section>
 
             {/* What's Next */}
-            {data.whatsNext && data.whatsNext.length > 0 && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.08 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.08 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
+                {data.whatsNext && data.whatsNext.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {data.whatsNext.map((item, index) => (
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
@@ -267,18 +279,20 @@ export function ExplorePage() {
                             </div>
                         ))}
                     </div>
-                </motion.section>
-            )}
+                ) : (
+                    <ComingSoon />
+                )}
+            </motion.section>
 
             {/* More & More */}
-            {data.moreAndMore && data.moreAndMore.length > 0 && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.085 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, delay: 0.085 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                {data.moreAndMore && data.moreAndMore.length > 0 ? (
                     <div className="space-y-2 sm:space-y-3">
                         {data.moreAndMore.map((item, index) => (
                             <div
@@ -296,8 +310,10 @@ export function ExplorePage() {
                             </div>
                         ))}
                     </div>
-                </motion.section>
-            )}
+                ) : (
+                    <ComingSoon />
+                )}
+            </motion.section>
 
             {/* Achievement Detail Modal */}
             {selectedAchievement && (

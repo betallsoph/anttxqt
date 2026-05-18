@@ -69,35 +69,16 @@ export const defaultExploreData: ExploreData = {
             url: "https://aws.amazon.com/certification/",
         },
     ],
-    currently: [
-        { label: "Learning", value: "Golang Programming, DevOps" },
-        { label: "Reading", value: "None" },
-        { label: "Building", value: "This portfolio site, roomieVerse" },
-    ],
+    currently: [],
     favourites: [
         { label: "Rust", description: "Systems programming & performance" },
         { label: "Design Systems", description: "Typography, spacing, consistency" },
         { label: "Cloud Native", description: "Serverless, edge computing" },
         { label: "Open Source", description: "Building in public" },
     ],
-    stories: [
-        {
-            title: "How I got into programming",
-            content: "It all started with a curiosity about how websites work. I remember spending hours inspecting page sources and trying to understand HTML tags. That curiosity eventually turned into a passion that shapes my everyday life.",
-            date: "2024",
-        },
-    ],
-    whatsNext: [
-        { title: "Learn Rust deeply", description: "Systems programming & building CLI tools", status: "In Progress" },
-        { title: "Contribute to open source", description: "Give back to the community", status: "Planning" },
-        { title: "Launch roomieVerse v2", description: "Complete redesign with new features", status: "Planning" },
-    ],
-    moreAndMore: [
-        { label: "Favourite font", description: "Inter — clean, modern, versatile" },
-        { label: "Coffee order", description: "Iced oat latte, no sugar" },
-        { label: "IDE", description: "VS Code with Catppuccin theme" },
-        { label: "Keyboard", description: "Still looking for the perfect one" },
-    ],
+    stories: [],
+    whatsNext: [],
+    moreAndMore: [],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");
