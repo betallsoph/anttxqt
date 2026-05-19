@@ -4,12 +4,13 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import {
     type ExploreData,
+    type ExploreItem,
     defaultExploreData,
     saveExploreData,
 } from "@/hooks/useExploreData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Trash2, Save, Loader2 } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, X } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
@@ -41,6 +42,167 @@ function SaveButton({
                     {message}
                 </span>
             )}
+        </div>
+    );
+}
+
+function ExploreItemListEditor({
+    items,
+    onChange,
+    folder,
+    itemLabel,
+}: {
+    items: ExploreItem[];
+    onChange: (items: ExploreItem[]) => void;
+    folder: string;
+    itemLabel: string;
+}) {
+    const updateItem = (index: number, updates: Partial<ExploreItem>) => {
+        const next = [...items];
+        next[index] = { ...next[index], ...updates };
+        onChange(next);
+    };
+
+    return (
+        <div>
+            <div className="space-y-3 sm:space-y-4">
+                {items.map((item, index) => (
+                    <div
+                        key={index}
+                        className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3"
+                    >
+                        <div className="flex justify-between items-center gap-2">
+                            <MoveButtons
+                                index={index}
+                                total={items.length}
+                                onMove={(from, to) => onChange(swap(items, from, to))}
+                            />
+                            <span className="font-bold text-sm">
+                                {itemLabel} {index + 1}
+                            </span>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => onChange(items.filter((_, i) => i !== index))}
+                            >
+                                <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-1">Image (optional)</label>
+                            <ImageUpload
+                                value={item.imageUrl || ""}
+                                onChange={(url) => updateItem(index, { imageUrl: url })}
+                                folder={folder}
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-1">Title</label>
+                            <input
+                                type="text"
+                                value={item.title}
+                                onChange={(e) => updateItem(index, { title: e.target.value })}
+                                className={inputClass}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Summary</label>
+                                <input
+                                    type="text"
+                                    value={item.summary}
+                                    onChange={(e) => updateItem(index, { summary: e.target.value })}
+                                    className={inputClass}
+                                    placeholder="1 dòng tóm tắt"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold mb-1">
+                                    Since (optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    value={item.since || ""}
+                                    onChange={(e) => updateItem(index, { since: e.target.value })}
+                                    className={inputClass}
+                                    placeholder="2020, Grade 10..."
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-1">Content</label>
+                            <textarea
+                                value={item.content}
+                                onChange={(e) => updateItem(index, { content: e.target.value })}
+                                className={`${inputClass} min-h-[120px]`}
+                                rows={5}
+                                placeholder="Câu chuyện đầy đủ..."
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-1">Tags (optional)</label>
+                            <div className="flex flex-wrap gap-1.5 mb-2">
+                                {(item.tags || []).map((tag, tagIndex) => (
+                                    <span
+                                        key={tagIndex}
+                                        className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
+                                    >
+                                        {tag}
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newTags = (item.tags || []).filter(
+                                                    (_, i) => i !== tagIndex
+                                                );
+                                                updateItem(index, { tags: newTags });
+                                            }}
+                                            className="hover:text-red-500 transition-colors"
+                                        >
+                                            <X className="w-3 h-3" />
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                            <input
+                                type="text"
+                                placeholder="Nhập tag rồi Enter"
+                                className={inputClass}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        const val = e.currentTarget.value.trim();
+                                        if (val) {
+                                            updateItem(index, {
+                                                tags: [...(item.tags || []), val],
+                                            });
+                                            e.currentTarget.value = "";
+                                        }
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <Button
+                variant="ghost"
+                size="sm"
+                className="mt-3"
+                onClick={() =>
+                    onChange([
+                        ...items,
+                        { title: "", summary: "", content: "" },
+                    ])
+                }
+            >
+                <Plus className="w-4 h-4" />
+                Thêm {itemLabel.toLowerCase()}
+            </Button>
         </div>
     );
 }
@@ -421,6 +583,31 @@ export function AdminExplorePage() {
                 </div>
             </motion.section>
 
+            {/* Beyond Code Section */}
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.15 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                    Beyond Code
+                </h2>
+                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                    <ExploreItemListEditor
+                        items={data.beyondCode || []}
+                        onChange={(items) => setData({ ...data, beyondCode: items })}
+                        folder="beyond-code"
+                        itemLabel="Item"
+                    />
+                    <SaveButton
+                        saving={saving === "beyondCode"}
+                        message={message.beyondCode || ""}
+                        onSave={() => handleSave("beyondCode")}
+                    />
+                </div>
+            </motion.section>
+
             {/* Currently Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
@@ -687,6 +874,76 @@ export function AdminExplorePage() {
                         Thêm kế hoạch
                     </Button>
                     <SaveButton saving={saving === "whatsNext"} message={message.whatsNext || ""} onSave={() => handleSave("whatsNext")} />
+                </div>
+            </motion.section>
+
+            {/* If You're Reading Closely Section */}
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.45 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                    If You're Reading Closely
+                </h2>
+                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6 space-y-5 sm:space-y-6">
+                    <div>
+                        <label className="block text-sm font-bold mb-1">
+                            Lead paragraph (optional)
+                        </label>
+                        <textarea
+                            value={data.readingCloselyIntro || ""}
+                            onChange={(e) =>
+                                setData({ ...data, readingCloselyIntro: e.target.value })
+                            }
+                            className={`${inputClass} min-h-[80px]`}
+                            rows={3}
+                            placeholder="2-3 câu giới thiệu cho người đọc kỹ..."
+                        />
+                    </div>
+
+                    <div className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
+                            Impact / People
+                        </h3>
+                        <ExploreItemListEditor
+                            items={data.impactPeople || []}
+                            onChange={(items) => setData({ ...data, impactPeople: items })}
+                            folder="impact-people"
+                            itemLabel="Story"
+                        />
+                    </div>
+
+                    <div className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
+                            Lessons / Failed
+                        </h3>
+                        <ExploreItemListEditor
+                            items={data.lessonsFailed || []}
+                            onChange={(items) => setData({ ...data, lessonsFailed: items })}
+                            folder="lessons-failed"
+                            itemLabel="Lesson"
+                        />
+                    </div>
+
+                    <div className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
+                            Off the Record
+                        </h3>
+                        <ExploreItemListEditor
+                            items={data.offTheRecord || []}
+                            onChange={(items) => setData({ ...data, offTheRecord: items })}
+                            folder="off-the-record"
+                            itemLabel="Note"
+                        />
+                    </div>
+
+                    <SaveButton
+                        saving={saving === "readingClosely"}
+                        message={message.readingClosely || ""}
+                        onSave={() => handleSave("readingClosely")}
+                    />
                 </div>
             </motion.section>
 

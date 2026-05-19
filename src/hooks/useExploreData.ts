@@ -2,6 +2,15 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+export interface ExploreItem {
+    title: string;
+    summary: string;
+    content: string;
+    since?: string;
+    imageUrl?: string;
+    tags?: string[];
+}
+
 export interface ExploreData {
     intro: {
         title: string;
@@ -23,6 +32,7 @@ export interface ExploreData {
         label: string;
         description?: string;
     }[];
+    beyondCode: ExploreItem[];
     stories: {
         title: string;
         content: string;
@@ -33,6 +43,10 @@ export interface ExploreData {
         description?: string;
         status: "Planning" | "In Progress" | "Done";
     }[];
+    readingCloselyIntro?: string;
+    impactPeople: ExploreItem[];
+    lessonsFailed: ExploreItem[];
+    offTheRecord: ExploreItem[];
     moreAndMore: {
         label: string;
         description?: string;
@@ -76,8 +90,12 @@ export const defaultExploreData: ExploreData = {
         { label: "Cloud Native", description: "Serverless, edge computing" },
         { label: "Open Source", description: "Building in public" },
     ],
+    beyondCode: [],
     stories: [],
     whatsNext: [],
+    impactPeople: [],
+    lessonsFailed: [],
+    offTheRecord: [],
     moreAndMore: [],
 };
 
