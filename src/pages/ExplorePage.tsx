@@ -411,7 +411,7 @@ export function ExplorePage() {
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
                                 <div className="flex justify-between items-start mb-1">
                                     <h3 className="font-bold text-sm sm:text-base">{item.title}</h3>
-                                    <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 border rounded ${
+                                    <span className={`inline-flex items-center text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 border rounded ${
                                         item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
                                         item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
                                         'bg-zinc-100 border-zinc-300 text-zinc-600'

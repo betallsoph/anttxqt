@@ -18,13 +18,14 @@ import { MoveButtons, swap } from "@/components/ui/move-buttons";
 const inputClass =
     "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
 
-const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Concept"];
+const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Concept", "Retired"];
 
 const statusStyles: Record<ProjectStatus, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
     Staging: "bg-sky-200 text-sky-800 border-sky-400",
     "In Development": "bg-amber-200 text-amber-800 border-amber-400",
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
+    Retired: "bg-zinc-200 text-zinc-800 border-zinc-400",
 };
 
 function generateId(title: string): string {
@@ -153,7 +154,13 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 * Math.min(index, 5) }}
                 >
-                    <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary overflow-hidden">
+                    <div className="border-2 border-black rounded-lg bg-white shadow-secondary overflow-hidden">
+                        {/* macOS Window Header */}
+                        <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
                         {/* Card Header */}
                         <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
                             <div className="flex items-center gap-2 sm:gap-3">
@@ -166,8 +173,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     {project.title || `${title} ${index + 1}`}
                                 </h3>
                                 {project.status && (
-                                    <span className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}>
-                                        {project.status}
+                                    <span className={`inline-flex items-center px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}>
+                                        {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
                                     </span>
                                 )}
                             </div>
@@ -235,24 +242,24 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                             {/* Description */}
                             <div>
-                                <label className="block text-sm font-bold mb-1">Description</label>
+                                <label className="block text-sm font-bold mb-1">Description (Hiển thị ở trang danh sách)</label>
                                 <textarea
                                     value={project.description}
                                     onChange={(e) => updateProject(index, { description: e.target.value })}
                                     className={`${inputClass} min-h-[60px]`}
                                     rows={2}
-                                />
+                                  />
                             </div>
 
                             {/* Full Description */}
                             <div>
-                                <label className="block text-sm font-bold mb-1">Full Description</label>
+                                <label className="block text-sm font-bold mb-1">Full Description (Hiển thị ở trang chi tiết)</label>
                                 <textarea
                                     value={project.fullDescription || ""}
                                     onChange={(e) => updateProject(index, { fullDescription: e.target.value })}
                                     className={`${inputClass} min-h-[80px]`}
                                     rows={3}
-                                />
+                                  />
                             </div>
 
                             {/* Status */}
@@ -264,7 +271,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     className={inputClass}
                                 >
                                     {statusOptions.map((s) => (
-                                        <option key={s} value={s}>{s}</option>
+                                        <option key={s} value={s}>{s === "Retired" ? "Sunsetting - Retired" : s}</option>
                                     ))}
                                 </select>
                             </div>

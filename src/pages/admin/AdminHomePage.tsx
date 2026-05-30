@@ -82,7 +82,14 @@ export function AdminHomePage() {
                 transition={{ duration: 0.6 }}
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Hero Section</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6 space-y-4">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div>
                         <label className="block text-sm font-bold mb-1">Avatar</label>
                         <ImageUpload
@@ -168,6 +175,7 @@ export function AdminHomePage() {
                     </div>
                     <SaveButton saving={saving === "hero"} message={message.hero || ""} onSave={() => handleSave("hero")} />
                 </div>
+            </div>
             </motion.section>
 
             {/* Skills Categories Section */}
@@ -178,7 +186,14 @@ export function AdminHomePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Skills</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
                         {data.skillCategories.map((category, catIndex) => (
                             <div key={catIndex} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
@@ -266,6 +281,7 @@ export function AdminHomePage() {
                     </Button>
                     <SaveButton saving={saving === "skills"} message={message.skills || ""} onSave={() => handleSave("skills")} />
                 </div>
+            </div>
             </motion.section>
 
 
@@ -278,7 +294,14 @@ export function AdminHomePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Links</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">
                         {data.links.map((link, index) => (
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 space-y-2">
@@ -345,6 +368,7 @@ export function AdminHomePage() {
                     </Button>
                     <SaveButton saving={saving === "links"} message={message.links || ""} onSave={() => handleSave("links")} />
                 </div>
+            </div>
             </motion.section>
         </div>
     );

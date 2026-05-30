@@ -217,7 +217,7 @@ export function AdminExplorePage() {
         getDoc(doc(db, "siteConfig", "explore"))
             .then((snapshot) => {
                 if (snapshot.exists()) {
-                    setData(snapshot.data() as ExploreData);
+                    setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
                 }
             })
             .catch((err) => {
@@ -266,7 +266,14 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Explore Editor
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6 space-y-4">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div>
                         <label className="block text-sm font-bold mb-1">
                             Title
@@ -311,6 +318,7 @@ export function AdminExplorePage() {
                         onSave={() => handleSave("intro")}
                     />
                 </div>
+            </div>
             </motion.section>
             {/* Favourites Section */}
             <motion.section
@@ -320,7 +328,14 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">
                         {(data.favourites || []).map((item, index) => (
                             <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
@@ -374,6 +389,7 @@ export function AdminExplorePage() {
                     </Button>
                     <SaveButton saving={saving === "favourites"} message={message.favourites || ""} onSave={() => handleSave("favourites")} />
                 </div>
+            </div>
             </motion.section>
 
             {/* Achievements Section */}
@@ -386,7 +402,14 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Achievements
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
                         {data.achievements.map((item, index) => (
                             <div
@@ -581,6 +604,7 @@ export function AdminExplorePage() {
                         onSave={() => handleSave("achievements")}
                     />
                 </div>
+            </div>
             </motion.section>
 
             {/* Beyond Code Section */}
@@ -593,7 +617,14 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Beyond Code
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <ExploreItemListEditor
                         items={data.beyondCode || []}
                         onChange={(items) => setData({ ...data, beyondCode: items })}
@@ -606,6 +637,7 @@ export function AdminExplorePage() {
                         onSave={() => handleSave("beyondCode")}
                     />
                 </div>
+            </div>
             </motion.section>
 
             {/* Currently Section */}
@@ -618,7 +650,14 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Currently
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">
                         {data.currently.map((item, index) => (
                             <div
@@ -705,6 +744,7 @@ export function AdminExplorePage() {
                         onSave={() => handleSave("currently")}
                     />
                 </div>
+            </div>
             </motion.section>
 
 
@@ -718,7 +758,14 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
                         {(data.stories || []).map((item, index) => (
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
@@ -789,6 +836,7 @@ export function AdminExplorePage() {
                     </Button>
                     <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
                 </div>
+            </div>
             </motion.section>
 
             {/* What's Next Section */}
@@ -799,7 +847,14 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
                         {(data.whatsNext || []).map((item, index) => (
                             <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
@@ -875,6 +930,7 @@ export function AdminExplorePage() {
                     </Button>
                     <SaveButton saving={saving === "whatsNext"} message={message.whatsNext || ""} onSave={() => handleSave("whatsNext")} />
                 </div>
+            </div>
             </motion.section>
 
             {/* If You're Reading Closely Section */}
@@ -887,7 +943,14 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     If You're Reading Closely
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6 space-y-5 sm:space-y-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
                     <div>
                         <label className="block text-sm font-bold mb-1">
                             Lead paragraph (optional)
@@ -945,6 +1008,7 @@ export function AdminExplorePage() {
                         onSave={() => handleSave("readingClosely")}
                     />
                 </div>
+            </div>
             </motion.section>
 
             {/* More & More Section */}
@@ -955,7 +1019,14 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
-                <div className="border-2 border-black rounded-lg bg-blue-100 shadow-secondary p-4 sm:p-6">
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">
                         {(data.moreAndMore || []).map((item, index) => (
                             <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
@@ -1009,6 +1080,7 @@ export function AdminExplorePage() {
                     </Button>
                     <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
                 </div>
+            </div>
             </motion.section>
         </div>
     );

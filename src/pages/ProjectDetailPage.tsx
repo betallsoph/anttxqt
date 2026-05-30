@@ -9,6 +9,7 @@ const statusStyles: Record<string, string> = {
     Staging: "bg-sky-200 text-sky-800 border-sky-400",
     "In Development": "bg-amber-200 text-amber-800 border-amber-400",
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
+    Retired: "bg-zinc-200 text-zinc-800 border-zinc-400",
 };
 
 export function ProjectDetailPage({ type }: { type: CollectionType }) {
@@ -105,9 +106,9 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* Status */}
                     <div className="mb-4 sm:mb-6">
                         <span
-                            className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded ${statusStyles[project.status]}`}
+                            className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded ${statusStyles[project.status]}`}
                         >
-                            {project.status}
+                            {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
                         </span>
                     </div>
 

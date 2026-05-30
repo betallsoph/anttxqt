@@ -9,12 +9,26 @@ const statusStyles: Record<ProjectStatus, string> = {
     Staging: "bg-sky-200 text-sky-800 border-sky-400",
     "In Development": "bg-amber-200 text-amber-800 border-amber-400",
     Concept: "bg-purple-200 text-purple-800 border-purple-400",
+    Retired: "bg-zinc-200 text-zinc-800 border-zinc-400",
+};
+
+const ROLE_KEYWORDS = [
+    "web", "mobile", "devops", "cloud", "ai", "frontend", "backend", 
+    "fullstack", "ui/ux", "system", "data science", "machine learning", 
+    "embedded", "game dev", "security"
+];
+
+const isRoleType = (val: string) => {
+    return ROLE_KEYWORDS.includes(val.toLowerCase().trim());
 };
 
 export function ProjectsPage({ type }: { type: CollectionType }) {
     const { projects, loading } = useProjectsData(type);
     const title = type === "products" ? "Products" : "Projects";
     const itemLabel = type === "products" ? "products" : "projects";
+    const subtitle = type === "products"
+        ? "Personal software products designed, engineered, and shipped from scratch by myself."
+        : "Collaborative projects, team efforts, and organizational works where I contributed my engineering expertise alongside others.";
 
     if (loading) {
         return (
@@ -32,8 +46,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
             >
                 <h2 className="text-3xl font-bold mb-4">{title}</h2>
                 <p className="text-zinc-600">
-                    Here are some of the {itemLabel} I've worked on. Each one represents a
-                    unique challenge and learning experience.
+                    {subtitle}
                 </p>
             </motion.section>
 
@@ -77,21 +90,51 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                 {/* Description */}
                                 <p className="text-sm sm:text-base text-zinc-600 mb-3 sm:mb-4 whitespace-pre-wrap">{project.description}</p>
 
-                                {/* Status & Topics */}
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-auto">
-                                    <span
-                                        className={`px-2 py-0.5 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
-                                    >
-                                        {project.status}
-                                    </span>
-                                    {project.topics?.map((topic) => (
+                                {/* Status & Topics (Left: Status Centered, Right: Roles + Hashtags Stacked) */}
+                                <div className="mt-auto pt-4 sm:pt-6 border-t border-black/10 flex items-center justify-between gap-4">
+                                    {/* Left Column: Status Badge (Vertically Centered) */}
+                                    <div className="flex-shrink-0 flex items-center">
                                         <span
-                                            key={topic}
-                                            className="px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
+                                            className={`inline-flex items-center px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
                                         >
-                                            {topic}
+                                            {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
                                         </span>
-                                    ))}
+                                    </div>
+
+                                    {/* Right Column: Roles & Topic Hashtags stacked vertically and right-aligned */}
+                                    <div className="flex flex-col gap-1.5 sm:gap-2 items-end min-w-0">
+                                        {/* Row 1: Role Badges */}
+                                        {(project.topics || []).filter((topic) => isRoleType(topic)).length > 0 && (
+                                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end">
+                                                {(project.topics || [])
+                                                    .filter((topic) => isRoleType(topic))
+                                                    .map((topic) => (
+                                                        <span
+                                                            key={topic}
+                                                            className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
+                                                        >
+                                                            {topic}
+                                                        </span>
+                                                    ))}
+                                            </div>
+                                        )}
+
+                                        {/* Row 2: Topic Hashtags */}
+                                        {(project.topics || []).filter((topic) => !isRoleType(topic)).length > 0 && (
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
+                                                {(project.topics || [])
+                                                    .filter((topic) => !isRoleType(topic))
+                                                    .map((topic) => (
+                                                        <span
+                                                            key={topic}
+                                                            className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200"
+                                                        >
+                                                            #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                                        </span>
+                                                    ))}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </DelayedLink>
