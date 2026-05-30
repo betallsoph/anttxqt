@@ -101,7 +101,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                                 {(project.roles || []).map((role) => (
                                                     <span
                                                         key={role}
-                                                        className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
+                                                        className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded break-words"
                                                     >
                                                         {role}
                                                     </span>
@@ -115,7 +115,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                                 {(project.topics || []).map((topic) => (
                                                     <span
                                                         key={topic}
-                                                        className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200"
+                                                        className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200 break-words"
                                                     >
                                                         #{topic.toLowerCase().replace(/\s+/g, "-")}
                                                     </span>
