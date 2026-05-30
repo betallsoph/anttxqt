@@ -9,7 +9,7 @@ import {
 } from "@/hooks/useHomepageData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Trash2, Save, Loader2 } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
@@ -369,6 +369,181 @@ export function AdminHomePage() {
                     <SaveButton saving={saving === "links"} message={message.links || ""} onSave={() => handleSave("links")} />
                 </div>
             </div>
+            </motion.section>
+
+            {/* Experience Section */}
+            <motion.section
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            >
+                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Experience</h2>
+                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                    {/* macOS Window Header */}
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    </div>
+                    <div className="p-4 sm:p-6 space-y-4">
+                        <div className="space-y-4">
+                            {(data.experiences || []).map((exp, index) => (
+                                <div
+                                    key={index}
+                                    className={`border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3 transition-all duration-200 ${exp.hidden ? "opacity-75 bg-zinc-50" : ""}`}
+                                >
+                                    <div className="flex justify-between items-center gap-2">
+                                        <MoveButtons
+                                            index={index}
+                                            total={(data.experiences || []).length}
+                                            onMove={(from, to) =>
+                                                setData({
+                                                    ...data,
+                                                    experiences: swap(data.experiences || [], from, to),
+                                                })
+                                            }
+                                        />
+                                        <span className="font-bold text-sm">
+                                            Kinh nghiệm {index + 1}
+                                        </span>
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const list = [...(data.experiences || [])];
+                                                    list[index] = { ...exp, hidden: !exp.hidden };
+                                                    setData({ ...data, experiences: list });
+                                                }}
+                                                title={exp.hidden ? "Hiển thị công việc này" : "Tạm ẩn công việc này"}
+                                            >
+                                                {exp.hidden ? (
+                                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                                ) : (
+                                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                                )}
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    setData({
+                                                        ...data,
+                                                        experiences: (data.experiences || []).filter((_, i) => i !== index),
+                                                    })
+                                                }
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Vị trí (Role)</label>
+                                            <input
+                                                type="text"
+                                                value={exp.role}
+                                                onChange={(e) => {
+                                                    const list = [...(data.experiences || [])];
+                                                    list[index] = { ...exp, role: e.target.value };
+                                                    setData({ ...data, experiences: list });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Công ty (Company)</label>
+                                            <input
+                                                type="text"
+                                                value={exp.company}
+                                                onChange={(e) => {
+                                                    const list = [...(data.experiences || [])];
+                                                    list[index] = { ...exp, company: e.target.value };
+                                                    setData({ ...data, experiences: list });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Thời gian (Period)</label>
+                                            <input
+                                                type="text"
+                                                value={exp.period}
+                                                onChange={(e) => {
+                                                    const list = [...(data.experiences || [])];
+                                                    list[index] = { ...exp, period: e.target.value };
+                                                    setData({ ...data, experiences: list });
+                                                }}
+                                                className={inputClass}
+                                                placeholder="e.g. 2024 - Present"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Địa điểm (Location - Tùy chọn)</label>
+                                            <input
+                                                type="text"
+                                                value={exp.location || ""}
+                                                onChange={(e) => {
+                                                    const list = [...(data.experiences || [])];
+                                                    list[index] = { ...exp, location: e.target.value };
+                                                    setData({ ...data, experiences: list });
+                                                }}
+                                                className={inputClass}
+                                                placeholder="e.g. Ho Chi Minh City, Vietnam"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Mô tả đóng góp (Mỗi dòng một ý)</label>
+                                        <textarea
+                                            value={(exp.description || []).join("\n")}
+                                            onChange={(e) => {
+                                                const list = [...(data.experiences || [])];
+                                                list[index] = {
+                                                    ...exp,
+                                                    description: e.target.value.split("\n").filter((line) => line.trim() !== ""),
+                                                };
+                                                setData({ ...data, experiences: list });
+                                            }}
+                                            className={`${inputClass} min-h-[80px]`}
+                                            rows={3}
+                                            placeholder="Đóng góp kỹ thuật chính..."
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="mt-3"
+                            onClick={() =>
+                                setData({
+                                    ...data,
+                                    experiences: [
+                                        ...(data.experiences || []),
+                                        { role: "", company: "", period: "", description: [] },
+                                    ],
+                                })
+                            }
+                        >
+                            <Plus className="w-4 h-4" />
+                            Thêm kinh nghiệm
+                        </Button>
+                        <SaveButton
+                            saving={saving === "experiences"}
+                            message={message.experiences || ""}
+                            onSave={() => handleSave("experiences")}
+                        />
+                    </div>
+                </div>
             </motion.section>
         </div>
     );

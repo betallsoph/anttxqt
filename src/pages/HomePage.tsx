@@ -84,11 +84,56 @@ export function HomePage() {
             </motion.section>
 
 
+            {/* Experience Section */}
+            {data.experiences && data.experiences.length > 0 && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.15 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Experience
+                    </h2>
+                    <div className="divide-y-2 divide-black/10">
+                        {data.experiences
+                            .filter((exp) => !exp.hidden)
+                            .map((exp, index) => (
+                                <div key={index} className="py-4 first:pt-0 last:pb-0">
+                                    <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-4">
+                                        <div>
+                                            <h3 className="text-base sm:text-lg font-black text-black">
+                                                {exp.role}
+                                            </h3>
+                                            <p className="text-sm sm:text-base text-zinc-600 font-semibold mt-0.5">
+                                                {exp.company}
+                                                {exp.location && ` • ${exp.location}`}
+                                            </p>
+                                        </div>
+                                        <span className="text-xs sm:text-sm font-bold text-zinc-950 bg-amber-200 px-2 py-0.5 rounded border-2 border-black self-start sm:self-auto shadow-xs">
+                                            {exp.period}
+                                        </span>
+                                    </div>
+                                    {exp.description && exp.description.length > 0 && (
+                                        <ul className="mt-2.5 space-y-1.5 list-disc list-inside text-sm sm:text-base text-zinc-700 leading-relaxed pl-1">
+                                            {exp.description.map((bullet, bIdx) => (
+                                                <li key={bIdx} className="pl-1 -indent-5 ml-5">
+                                                    {bullet}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+                            ))}
+                    </div>
+                </motion.section>
+            )}
+
             {/* Links Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 }}
+                transition={{ duration: 0.35, delay: 0.2 }}
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">

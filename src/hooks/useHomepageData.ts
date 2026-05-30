@@ -2,6 +2,15 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+export interface Experience {
+    role: string;
+    company: string;
+    period: string;
+    location?: string;
+    description?: string[];
+    hidden?: boolean;
+}
+
 export interface HomepageData {
     hero: {
         greeting: string;
@@ -19,6 +28,7 @@ export interface HomepageData {
         url: string;
         iconUrl?: string;
     }[];
+    experiences?: Experience[];
 }
 
 export const defaultHomepageData: HomepageData = {
@@ -51,6 +61,32 @@ export const defaultHomepageData: HomepageData = {
         { label: "LinkedIn", url: "https://linkedin.com/in/anttxqt" },
         { label: "Twitter", url: "https://twitter.com/anttxqt" },
     ],
+    experiences: [
+        {
+            role: "Software Developer Intern",
+            company: "FPT Software",
+            period: "2024 - Present",
+            location: "Ho Chi Minh City, Vietnam",
+            description: [
+                "Collaborated with senior engineers to implement new core features for a web-based document collaboration platform.",
+                "Optimized database queries and API endpoints, improving load times by 20% across key dashboards.",
+                "Participated in Agile sprint planning, daily standups, and rigorous team code reviews."
+            ],
+            hidden: false
+        },
+        {
+            role: "Frontend Developer",
+            company: "RMIT FinTech Club",
+            period: "2023 - 2024",
+            location: "RMIT University Vietnam",
+            description: [
+                "Designed and engineered interactive financial tools and landing pages to promote campus fintech initiatives.",
+                "Styled modern responsive user interfaces from scratch using custom CSS layouts and utility classes.",
+                "Integrated state management and unified API fetching patterns for real-time portfolio dashboards."
+            ],
+            hidden: false
+        }
+    ]
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "homepage");
