@@ -157,5 +157,6 @@ export function useProjectsData(type: CollectionType) {
 }
 
 export async function saveProjectsData(type: CollectionType, projects: Project[]) {
-    await setDoc(doc(db, "siteConfig", type), { items: projects });
+    const cleaned = JSON.parse(JSON.stringify(projects));
+    await setDoc(doc(db, "siteConfig", type), { items: cleaned });
 }

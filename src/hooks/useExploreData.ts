@@ -125,5 +125,6 @@ export function useExploreData() {
 }
 
 export async function saveExploreData(data: ExploreData) {
-    await setDoc(DOCUMENT_REF, data);
+    const cleaned = JSON.parse(JSON.stringify(data));
+    await setDoc(DOCUMENT_REF, cleaned);
 }
