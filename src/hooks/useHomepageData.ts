@@ -114,5 +114,17 @@ export function useHomepageData() {
 }
 
 export async function saveHomepageData(data: HomepageData) {
-    await setDoc(DOCUMENT_REF, data);
+    const cleaned = JSON.parse(JSON.stringify(data));
+    
+    // Clean up empty lines from experience descriptions
+    if (cleaned.experiences) {
+        cleaned.experiences = cleaned.experiences.map((exp: any) => {
+            if (exp.description) {
+                exp.description = exp.description.filter((line: string) => line.trim() !== "");
+            }
+            return exp;
+        });
+    }
+    
+    await setDoc(DOCUMENT_REF, cleaned);
 }

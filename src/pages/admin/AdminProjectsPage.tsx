@@ -416,7 +416,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 <textarea
                                     value={(project.keyFeatures || []).join("\n")}
                                     onChange={(e) => {
-                                        const features = e.target.value.split("\n").filter(f => f.trim() !== "");
+                                        const features = e.target.value.split("\n");
                                         updateProject(index, { keyFeatures: features });
                                     }}
                                     className={`${inputClass} min-h-[80px] leading-relaxed`}

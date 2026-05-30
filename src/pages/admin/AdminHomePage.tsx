@@ -507,7 +507,7 @@ export function AdminHomePage() {
                                                 const list = [...(data.experiences || [])];
                                                 list[index] = {
                                                     ...exp,
-                                                    description: e.target.value.split("\n").filter((line) => line.trim() !== ""),
+                                                    description: e.target.value.split("\n"),
                                                 };
                                                 setData({ ...data, experiences: list });
                                             }}

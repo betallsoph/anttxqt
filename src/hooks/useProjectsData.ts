@@ -158,5 +158,14 @@ export function useProjectsData(type: CollectionType) {
 
 export async function saveProjectsData(type: CollectionType, projects: Project[]) {
     const cleaned = JSON.parse(JSON.stringify(projects));
-    await setDoc(doc(db, "siteConfig", type), { items: cleaned });
+    
+    // Clean up empty lines from keyFeatures
+    const processed = cleaned.map((project: any) => {
+        if (project.keyFeatures) {
+            project.keyFeatures = project.keyFeatures.filter((f: string) => f.trim() !== "");
+        }
+        return project;
+    });
+    
+    await setDoc(doc(db, "siteConfig", type), { items: processed });
 }
