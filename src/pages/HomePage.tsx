@@ -99,7 +99,7 @@ export function HomePage() {
                         {data.experiences
                             .filter((exp) => !exp.hidden)
                             .map((exp, index) => (
-                                <div key={index} className="py-4 first:pt-0 last:pb-0">
+                                <div key={index} className="py-4 first:pt-3 sm:first:pt-4 last:pb-0">
                                     <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-4">
                                         <div>
                                             <h3 className="text-base sm:text-lg font-black text-black">
