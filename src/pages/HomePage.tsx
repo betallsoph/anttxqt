@@ -124,14 +124,22 @@ export function HomePage() {
                                         </ul>
                                     )}
                                     {index < arr.length - 1 && (
-                                        <div 
-                                            className="w-full h-[6px] mt-6 mb-2 opacity-15" 
-                                            style={{
-                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath d='M0 5 Q5 0 10 5 T20 5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")`,
-                                                backgroundRepeat: 'repeat-x',
-                                                backgroundSize: '20px 6px'
-                                            }}
-                                        />
+                                        <div className="w-full h-[6px] mt-6 mb-2 opacity-15">
+                                            <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                                                <defs>
+                                                    <pattern id={`wave-${index}`} width="20" height="6" patternUnits="userSpaceOnUse" viewBox="0 0 20 10">
+                                                        <path 
+                                                            d="M-5 5 Q0 0 5 5 T15 5 T25 5" 
+                                                            fill="none" 
+                                                            stroke="black" 
+                                                            strokeWidth="2" 
+                                                            strokeLinecap="round" 
+                                                        />
+                                                    </pattern>
+                                                </defs>
+                                                <rect width="100%" height="100%" fill={`url(#wave-${index})`} />
+                                            </svg>
+                                        </div>
                                     )}
                                 </div>
                             ))}
