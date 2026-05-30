@@ -95,11 +95,11 @@ export function HomePage() {
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         Experience
                     </h2>
-                    <div className="divide-y-2 divide-black/10">
+                    <div className="space-y-5 mt-4 sm:mt-5">
                         {data.experiences
                             .filter((exp) => !exp.hidden)
-                            .map((exp, index) => (
-                                <div key={index} className="py-4 first:pt-3 sm:first:pt-4 last:pb-0">
+                            .map((exp, index, arr) => (
+                                <div key={index} className="space-y-4">
                                     <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-4">
                                         <div>
                                             <h3 className="text-base sm:text-lg font-black text-blue-500">
@@ -122,6 +122,16 @@ export function HomePage() {
                                                 </li>
                                             ))}
                                         </ul>
+                                    )}
+                                    {index < arr.length - 1 && (
+                                        <div 
+                                            className="w-full h-[6px] mt-6 mb-2 opacity-15" 
+                                            style={{
+                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10' viewBox='0 0 20 10'%3E%3Cpath d='M0 5 Q5 0 10 5 T20 5' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")`,
+                                                backgroundRepeat: 'repeat-x',
+                                                backgroundSize: '20px 6px'
+                                            }}
+                                        />
                                     )}
                                 </div>
                             ))}
