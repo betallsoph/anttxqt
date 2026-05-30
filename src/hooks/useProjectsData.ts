@@ -6,6 +6,7 @@ export type ProjectStatus = "Production" | "Staging" | "In Development" | "Conce
 
 export interface Project {
     id: string;
+    hidden?: boolean;
     title: string;
     description: string;
     fullDescription?: string;

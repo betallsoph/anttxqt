@@ -10,7 +10,7 @@ import {
 } from "@/hooks/useExploreData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Trash2, Save, Loader2, X } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, X, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
@@ -226,6 +226,18 @@ export function AdminExplorePage() {
             .finally(() => setLoading(false));
     }, []);
 
+    const isSectionHidden = (sectionName: string) => {
+        return (data.hiddenSections || []).includes(sectionName);
+    };
+
+    const toggleSectionHidden = (sectionName: string) => {
+        const hiddenList = data.hiddenSections || [];
+        const next = hiddenList.includes(sectionName)
+            ? hiddenList.filter((s) => s !== sectionName)
+            : [...hiddenList, sectionName];
+        setData({ ...data, hiddenSections: next });
+    };
+
     const handleSave = async (section: string) => {
         setSaving(section);
         setMessage((prev) => ({ ...prev, [section]: "" }));
@@ -328,12 +340,35 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("favourites") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("favourites") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("favourites")}
+                                title={isSectionHidden("favourites") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("favourites") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">
@@ -402,12 +437,35 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Achievements
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("achievements") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("achievements") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("achievements")}
+                                title={isSectionHidden("achievements") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("achievements") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
@@ -617,12 +675,35 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Beyond Code
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("beyondCode") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("beyondCode")}
+                                title={isSectionHidden("beyondCode") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("beyondCode") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <ExploreItemListEditor
@@ -650,12 +731,35 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     Currently
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("currently") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("currently") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("currently")}
+                                title={isSectionHidden("currently") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("currently") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">
@@ -758,12 +862,35 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("stories") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("stories") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("stories")}
+                                title={isSectionHidden("stories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("stories") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
@@ -847,12 +974,35 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("whatsNext") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("whatsNext") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("whatsNext")}
+                                title={isSectionHidden("whatsNext") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("whatsNext") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-3 sm:space-y-4">
@@ -943,12 +1093,35 @@ export function AdminExplorePage() {
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                     If You're Reading Closely
                 </h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("readingClosely") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("readingClosely") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("readingClosely")}
+                                title={isSectionHidden("readingClosely") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("readingClosely") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
                     <div>
@@ -1019,12 +1192,35 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("moreAndMore") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                        <div className="flex items-center gap-2">
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isSectionHidden("moreAndMore") && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                    <EyeOff className="w-3 h-3" />
+                                    Đang ẩn phân mục
+                                </span>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                onClick={() => toggleSectionHidden("moreAndMore")}
+                                title={isSectionHidden("moreAndMore") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                            >
+                                {isSectionHidden("moreAndMore") ? (
+                                    <EyeOff className="w-4 h-4 text-zinc-400" />
+                                ) : (
+                                    <Eye className="w-4 h-4 text-zinc-700" />
+                                )}
+                            </Button>
+                        </div>
                     </div>
                     <div className="p-4 sm:p-6 space-y-4">
                     <div className="space-y-2 sm:space-y-3">

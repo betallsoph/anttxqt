@@ -12,6 +12,7 @@ export interface ExploreItem {
 }
 
 export interface ExploreData {
+    hiddenSections?: string[];
     intro: {
         title: string;
         description: string;

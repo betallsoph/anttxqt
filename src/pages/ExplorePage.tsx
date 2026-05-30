@@ -231,6 +231,10 @@ export function ExplorePage() {
     const [selectedExploreItem, setSelectedExploreItem] =
         useState<ExploreItem | null>(null);
 
+    const isSectionHidden = (sectionName: string) => {
+        return (data.hiddenSections || []).includes(sectionName);
+    };
+
     if (loading) {
         return (
             <LoadingScreen />
@@ -254,7 +258,7 @@ export function ExplorePage() {
             </motion.section>
 
             {/* Favourites Section */}
-            {data.favourites && data.favourites.length > 0 && (
+            {data.favourites && data.favourites.length > 0 && !isSectionHidden("favourites") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -288,7 +292,7 @@ export function ExplorePage() {
             )}
 
             {/* Achievements */}
-            {data.achievements.length > 0 && (
+            {data.achievements.length > 0 && !isSectionHidden("achievements") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -320,208 +324,220 @@ export function ExplorePage() {
             )}
 
             {/* Beyond Code */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Beyond Code
-                </h2>
-                {data.beyondCode && data.beyondCode.length > 0 ? (
-                    <ExploreGrid
-                        items={data.beyondCode}
-                        onSelect={setSelectedExploreItem}
-                    />
-                ) : (
-                    <ComingSoon />
-                )}
-            </motion.section>
+            {!isSectionHidden("beyondCode") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Beyond Code
+                    </h2>
+                    {data.beyondCode && data.beyondCode.length > 0 ? (
+                        <ExploreGrid
+                            items={data.beyondCode}
+                            onSelect={setSelectedExploreItem}
+                        />
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
 
             {/* Currently */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.1 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Currently
-                </h2>
-                {data.currently.length > 0 ? (
-                    <div className="space-y-2 sm:space-y-3">
-                        {data.currently.map((item, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
-                            >
-                                <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-blue-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
-                                    {item.label}
-                                </span>
-                                <span className="text-sm sm:text-base text-zinc-700">
-                                    {item.value}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <ComingSoon />
-                )}
-            </motion.section>
+            {!isSectionHidden("currently") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Currently
+                    </h2>
+                    {data.currently.length > 0 ? (
+                        <div className="space-y-2 sm:space-y-3">
+                            {data.currently.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                                >
+                                    <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-blue-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                        {item.label}
+                                    </span>
+                                    <span className="text-sm sm:text-base text-zinc-700">
+                                        {item.value}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
 
 
 
             {/* Stories */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.08 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
-                {data.stories && data.stories.length > 0 ? (
-                    <div className="space-y-4">
-                        {data.stories.map((story, index) => (
-                            <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
-                                <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-bold text-lg">{story.title}</h3>
-                                    {story.date && <span className="text-xs text-zinc-500 font-medium">{story.date}</span>}
+            {!isSectionHidden("stories") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+                    {data.stories && data.stories.length > 0 ? (
+                        <div className="space-y-4">
+                            {data.stories.map((story, index) => (
+                                <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
+                                    <div className="flex justify-between items-center mb-2">
+                                        <h3 className="font-bold text-lg">{story.title}</h3>
+                                        {story.date && <span className="text-xs text-zinc-500 font-medium">{story.date}</span>}
+                                    </div>
+                                    <p className="text-sm sm:text-base text-zinc-700 whitespace-pre-wrap">{story.content}</p>
                                 </div>
-                                <p className="text-sm sm:text-base text-zinc-700 whitespace-pre-wrap">{story.content}</p>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <ComingSoon />
-                )}
-            </motion.section>
+                            ))}
+                        </div>
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
 
             {/* What's Next */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.08 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
-                {data.whatsNext && data.whatsNext.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {data.whatsNext.map((item, index) => (
-                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
-                                <div className="flex justify-between items-start mb-1">
-                                    <h3 className="font-bold text-sm sm:text-base">{item.title}</h3>
-                                    <span className={`inline-flex items-center text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 border rounded ${
-                                        item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
-                                        item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
-                                        'bg-zinc-100 border-zinc-300 text-zinc-600'
-                                    }`}>
-                                        {item.status}
-                                    </span>
+            {!isSectionHidden("whatsNext") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
+                    {data.whatsNext && data.whatsNext.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {data.whatsNext.map((item, index) => (
+                                <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <h3 className="font-bold text-sm sm:text-base">{item.title}</h3>
+                                        <span className={`inline-flex items-center text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 border rounded ${
+                                            item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
+                                            item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
+                                            'bg-zinc-100 border-zinc-300 text-zinc-600'
+                                        }`}>
+                                            {item.status}
+                                        </span>
+                                    </div>
+                                    {item.description && <p className="text-xs sm:text-sm text-zinc-500 whitespace-pre-wrap">{item.description}</p>}
                                 </div>
-                                {item.description && <p className="text-xs sm:text-sm text-zinc-500 whitespace-pre-wrap">{item.description}</p>}
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <ComingSoon />
-                )}
-            </motion.section>
+                            ))}
+                        </div>
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
 
             {/* If You're Reading Closely */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.08 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    If You're Reading Closely
-                </h2>
-                {data.readingCloselyIntro && (
-                    <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap mb-5 sm:mb-6 italic">
-                        {data.readingCloselyIntro}
-                    </p>
-                )}
+            {!isSectionHidden("readingClosely") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        If You're Reading Closely
+                    </h2>
+                    {data.readingCloselyIntro && (
+                        <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap mb-5 sm:mb-6 italic">
+                            {data.readingCloselyIntro}
+                        </p>
+                    )}
 
-                <div className="space-y-5 sm:space-y-6">
-                    {/* Impact / People */}
-                    <div>
-                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
-                            Impact / People
-                        </h3>
-                        {data.impactPeople && data.impactPeople.length > 0 ? (
-                            <ExploreGrid
-                                items={data.impactPeople}
-                                onSelect={setSelectedExploreItem}
-                            />
-                        ) : (
-                            <ComingSoon />
-                        )}
-                    </div>
+                    <div className="space-y-5 sm:space-y-6">
+                        {/* Impact / People */}
+                        <div>
+                            <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
+                                Impact / People
+                            </h3>
+                            {data.impactPeople && data.impactPeople.length > 0 ? (
+                                <ExploreGrid
+                                    items={data.impactPeople}
+                                    onSelect={setSelectedExploreItem}
+                                />
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
 
-                    {/* Lessons / Failed */}
-                    <div>
-                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
-                            Lessons / Failed
-                        </h3>
-                        {data.lessonsFailed && data.lessonsFailed.length > 0 ? (
-                            <ExploreGrid
-                                items={data.lessonsFailed}
-                                onSelect={setSelectedExploreItem}
-                            />
-                        ) : (
-                            <ComingSoon />
-                        )}
-                    </div>
+                        {/* Lessons / Failed */}
+                        <div>
+                            <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
+                                Lessons / Failed
+                            </h3>
+                            {data.lessonsFailed && data.lessonsFailed.length > 0 ? (
+                                <ExploreGrid
+                                    items={data.lessonsFailed}
+                                    onSelect={setSelectedExploreItem}
+                                />
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
 
-                    {/* Off the Record */}
-                    <div>
-                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
-                            Off the Record
-                        </h3>
-                        {data.offTheRecord && data.offTheRecord.length > 0 ? (
-                            <ExploreGrid
-                                items={data.offTheRecord}
-                                onSelect={setSelectedExploreItem}
-                            />
-                        ) : (
-                            <ComingSoon />
-                        )}
+                        {/* Off the Record */}
+                        <div>
+                            <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
+                                Off the Record
+                            </h3>
+                            {data.offTheRecord && data.offTheRecord.length > 0 ? (
+                                <ExploreGrid
+                                    items={data.offTheRecord}
+                                    onSelect={setSelectedExploreItem}
+                                />
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
                     </div>
-                </div>
-            </motion.section>
+                </motion.section>
+            )}
 
             {/* More & More */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.35, delay: 0.085 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
-                {data.moreAndMore && data.moreAndMore.length > 0 ? (
-                    <div className="space-y-2 sm:space-y-3">
-                        {data.moreAndMore.map((item, index) => (
-                            <div
-                                key={index}
-                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
-                            >
-                                <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
-                                    {item.label}
-                                </span>
-                                {item.description && (
-                                    <span className="text-sm sm:text-base text-zinc-700">
-                                        {item.description}
+            {!isSectionHidden("moreAndMore") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.085 }}
+                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                    {data.moreAndMore && data.moreAndMore.length > 0 ? (
+                        <div className="space-y-2 sm:space-y-3">
+                            {data.moreAndMore.map((item, index) => (
+                                <div
+                                    key={index}
+                                    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                                >
+                                    <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                        {item.label}
                                     </span>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <ComingSoon />
-                )}
-            </motion.section>
+                                    {item.description && (
+                                        <span className="text-sm sm:text-base text-zinc-700">
+                                            {item.description}
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
 
             {/* Achievement Detail Modal */}
             {selectedAchievement && (

@@ -16,6 +16,7 @@ const statusStyles: Record<ProjectStatus, string> = {
 
 export function ProjectsPage({ type }: { type: CollectionType }) {
     const { projects, loading } = useProjectsData(type);
+    const visibleProjects = projects.filter((p) => !p.hidden);
     const title = type === "products" ? "Products" : "Projects";
     const itemLabel = type === "products" ? "products" : "projects";
     const subtitle = type === "products"
@@ -49,7 +50,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                 transition={{ duration: 0.35, delay: 0.2 }}
                 className="space-y-6"
             >
-                {projects.map((project) => (
+                {visibleProjects.map((project) => (
                     <div
                         key={project.id}
                     >

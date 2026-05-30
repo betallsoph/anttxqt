@@ -12,7 +12,7 @@ import {
 } from "@/hooks/useProjectsData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { Plus, Trash2, Save, Loader2, X } from "lucide-react";
+import { Plus, Trash2, Save, Loader2, X, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
@@ -154,7 +154,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 * Math.min(index, 5) }}
                 >
-                    <div className="border-2 border-black rounded-lg bg-white shadow-secondary overflow-hidden">
+                    <div className={`border-2 border-black rounded-lg bg-white shadow-secondary overflow-hidden transition-all duration-200 ${project.hidden ? "opacity-75 bg-zinc-50" : ""}`}>
                         {/* macOS Window Header */}
                         <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
                             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
@@ -163,7 +163,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                         </div>
                         {/* Card Header */}
                         <div className="flex items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-3">
-                            <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                                 <MoveButtons
                                     index={index}
                                     total={projects.length}
@@ -177,14 +177,34 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                         {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
                                     </span>
                                 )}
+                                {project.hidden && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                        <EyeOff className="w-3 h-3" />
+                                        Đang ẩn
+                                    </span>
+                                )}
                             </div>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => setProjects(projects.filter((_, i) => i !== index))}
-                            >
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                            </Button>
+                            <div className="flex items-center gap-1 sm:gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => updateProject(index, { hidden: !project.hidden })}
+                                    title={project.hidden ? "Hiển thị sản phẩm này ngoài trang chính" : "Tạm ẩn sản phẩm này khỏi trang chính"}
+                                >
+                                    {project.hidden ? (
+                                        <EyeOff className="w-4 h-4 text-zinc-400" />
+                                    ) : (
+                                        <Eye className="w-4 h-4 text-zinc-700" />
+                                    )}
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => setProjects(projects.filter((_, i) => i !== index))}
+                                >
+                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Card Content */}

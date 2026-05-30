@@ -36,7 +36,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         );
     }
 
-    if (!project) {
+    if (!project || project.hidden) {
         return (
             <div className="text-center py-20">
                 <h2 className="text-2xl font-bold mb-4">{title} not found</h2>
