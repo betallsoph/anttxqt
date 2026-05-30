@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useHomepageData } from "@/hooks/useHomepageData";
+import { parseBoldText } from "@/lib/utils";
 
 export function HomePage() {
     const { data, loading } = useHomepageData();
@@ -33,10 +34,10 @@ export function HomePage() {
                                 <strong className="text-black">
                                     {data.hero.name}
                                 </strong>
-                                , {paragraph}
+                                , {parseBoldText(paragraph)}
                             </>
                         ) : (
-                            paragraph
+                            parseBoldText(paragraph)
                         )}
                     </p>
                 ))}
@@ -118,7 +119,7 @@ export function HomePage() {
                                         <ul className="mt-2.5 space-y-1.5 list-disc list-inside text-sm sm:text-base text-zinc-700 leading-relaxed pl-1">
                                             {exp.description.map((bullet, bIdx) => (
                                                 <li key={bIdx} className="pl-1 -indent-5 ml-5">
-                                                    {bullet}
+                                                    {parseBoldText(bullet)}
                                                 </li>
                                             ))}
                                         </ul>
