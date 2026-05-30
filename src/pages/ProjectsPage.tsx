@@ -82,10 +82,10 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                 {/* Description */}
                                 <p className="text-sm sm:text-base text-zinc-600 mb-3 sm:mb-4 whitespace-pre-wrap">{project.description}</p>
 
-                                {/* Status & Topics (Left: Status Centered, Right: Roles + Hashtags Stacked) */}
-                                <div className="mt-auto pt-4 sm:pt-6 border-t border-black/10 flex items-center justify-between gap-4">
-                                    {/* Left Column: Status Badge (Vertically Centered) */}
-                                    <div className="flex-shrink-0 flex items-center">
+                                {/* Status & Topics (Responsive: Stacked Left-Aligned on Mobile, Split Balanced on Desktop) */}
+                                <div className="mt-auto pt-4 sm:pt-6 border-t border-black/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                                    {/* Left Column: Status Badge */}
+                                    <div className="flex-shrink-0 flex items-center justify-start">
                                         <span
                                             className={`inline-flex items-center px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
                                         >
@@ -93,11 +93,11 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                         </span>
                                     </div>
 
-                                    {/* Right Column: Roles & Topic Hashtags stacked vertically and right-aligned */}
-                                    <div className="flex flex-col gap-1.5 sm:gap-2 items-end min-w-0">
+                                    {/* Right Column: Roles & Topic Hashtags stacked vertically */}
+                                    <div className="flex flex-col gap-1.5 sm:gap-2 items-start sm:items-end min-w-0">
                                         {/* Row 1: Role Badges */}
                                         {(project.roles || []).length > 0 && (
-                                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end">
+                                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-start sm:justify-end">
                                                 {(project.roles || []).map((role) => (
                                                     <span
                                                         key={role}
@@ -111,7 +111,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
 
                                         {/* Row 2: Topic Hashtags */}
                                         {(project.topics || []).length > 0 && (
-                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
+                                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-start sm:justify-end">
                                                 {(project.topics || []).map((topic) => (
                                                     <span
                                                         key={topic}
