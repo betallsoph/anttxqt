@@ -276,23 +276,23 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 </select>
                             </div>
 
-                            {/* Topics */}
+                            {/* Roles */}
                             <div>
-                                <label className="block text-sm font-bold mb-1">Topics</label>
+                                <label className="block text-sm font-bold mb-1">Roles / Job Types (Nhãn tuyển dụng màu xanh dương)</label>
                                 <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
-                                    {(project.topics || []).map((topic, topicIndex) => (
+                                    {(project.roles || []).map((role, roleIndex) => (
                                         <span
-                                            key={topicIndex}
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
+                                            key={roleIndex}
+                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded text-blue-800"
                                         >
-                                            {topic}
+                                            {role}
                                             <button
                                                 type="button"
                                                 onClick={() => {
-                                                    const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
-                                                    updateProject(index, { topics: newTopics });
+                                                    const newRoles = (project.roles || []).filter((_, i) => i !== roleIndex);
+                                                    updateProject(index, { roles: newRoles });
                                                 }}
-                                                className="hover:text-red-500 transition-colors"
+                                                className="hover:text-red-500 transition-colors ml-1"
                                             >
                                                 <X className="w-3 h-3" />
                                             </button>
@@ -301,7 +301,47 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Nhập topic rồi Enter"
+                                    placeholder="Nhập role rồi Enter (Ví dụ: Web, Mobile, DevOps...)"
+                                    className={inputClass}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            const val = e.currentTarget.value.trim();
+                                            if (val) {
+                                                updateProject(index, { roles: [...(project.roles || []), val] });
+                                                e.currentTarget.value = "";
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+
+                            {/* Topics */}
+                            <div>
+                                <label className="block text-sm font-bold mb-1">Topics (Hashtag chủ đề màu xám)</label>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
+                                    {(project.topics || []).map((topic, topicIndex) => (
+                                        <span
+                                            key={topicIndex}
+                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium bg-zinc-100 border border-zinc-300 text-zinc-600 rounded"
+                                        >
+                                            #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
+                                                    updateProject(index, { topics: newTopics });
+                                                }}
+                                                className="hover:text-red-500 transition-colors ml-1"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <input
+                                    type="text"
+                                    placeholder="Nhập topic rồi Enter (Ví dụ: property-management...)"
                                     className={inputClass}
                                     onKeyDown={(e) => {
                                         if (e.key === "Enter") {

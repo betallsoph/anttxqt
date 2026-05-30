@@ -12,15 +12,7 @@ const statusStyles: Record<ProjectStatus, string> = {
     Retired: "bg-zinc-200 text-zinc-800 border-zinc-400",
 };
 
-const ROLE_KEYWORDS = [
-    "web", "mobile", "devops", "cloud", "ai", "frontend", "backend", 
-    "fullstack", "ui/ux", "system", "data science", "machine learning", 
-    "embedded", "game dev", "security"
-];
 
-const isRoleType = (val: string) => {
-    return ROLE_KEYWORDS.includes(val.toLowerCase().trim());
-};
 
 export function ProjectsPage({ type }: { type: CollectionType }) {
     const { projects, loading } = useProjectsData(type);
@@ -104,34 +96,30 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                     {/* Right Column: Roles & Topic Hashtags stacked vertically and right-aligned */}
                                     <div className="flex flex-col gap-1.5 sm:gap-2 items-end min-w-0">
                                         {/* Row 1: Role Badges */}
-                                        {(project.topics || []).filter((topic) => isRoleType(topic)).length > 0 && (
+                                        {(project.roles || []).length > 0 && (
                                             <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 justify-end">
-                                                {(project.topics || [])
-                                                    .filter((topic) => isRoleType(topic))
-                                                    .map((topic) => (
-                                                        <span
-                                                            key={topic}
-                                                            className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
-                                                        >
-                                                            {topic}
-                                                        </span>
-                                                    ))}
+                                                {(project.roles || []).map((role) => (
+                                                    <span
+                                                        key={role}
+                                                        className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded"
+                                                    >
+                                                        {role}
+                                                    </span>
+                                                ))}
                                             </div>
                                         )}
 
                                         {/* Row 2: Topic Hashtags */}
-                                        {(project.topics || []).filter((topic) => !isRoleType(topic)).length > 0 && (
+                                        {(project.topics || []).length > 0 && (
                                             <div className="flex flex-wrap items-center gap-2 sm:gap-3 justify-end">
-                                                {(project.topics || [])
-                                                    .filter((topic) => !isRoleType(topic))
-                                                    .map((topic) => (
-                                                        <span
-                                                            key={topic}
-                                                            className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200"
-                                                        >
-                                                            #{topic.toLowerCase().replace(/\s+/g, "-")}
-                                                        </span>
-                                                    ))}
+                                                {(project.topics || []).map((topic) => (
+                                                    <span
+                                                        key={topic}
+                                                        className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200"
+                                                    >
+                                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                                    </span>
+                                                ))}
                                             </div>
                                         )}
                                     </div>
