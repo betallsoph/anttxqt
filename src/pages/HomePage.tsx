@@ -102,7 +102,7 @@ export function HomePage() {
                                 <div key={index} className="py-4 first:pt-3 sm:first:pt-4 last:pb-0">
                                     <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-4">
                                         <div>
-                                            <h3 className="text-base sm:text-lg font-black text-black">
+                                            <h3 className="text-base sm:text-lg font-black text-blue-500">
                                                 {exp.role}
                                             </h3>
                                             <p className="text-sm sm:text-base text-zinc-600 font-semibold mt-0.5">
@@ -110,7 +110,7 @@ export function HomePage() {
                                                 {exp.location && ` • ${exp.location}`}
                                             </p>
                                         </div>
-                                        <span className="text-xs sm:text-sm font-bold text-zinc-950 bg-amber-200 px-2 py-0.5 rounded border-2 border-black self-start sm:self-auto shadow-xs">
+                                        <span className="text-xs sm:text-sm font-bold text-zinc-500 self-start sm:self-auto">
                                             {exp.period}
                                         </span>
                                     </div>
