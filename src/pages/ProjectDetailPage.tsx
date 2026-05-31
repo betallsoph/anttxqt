@@ -169,22 +169,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                             </div>
                         </div>
 
-                        {/* Topics */}
-                        {project.topics && project.topics.length > 0 && (
-                            <div>
-                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Topic</h3>
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                    {project.topics.map((topic) => (
-                                        <span
-                                            key={topic}
-                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
-                                        >
-                                            {topic}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
 
                         {/* Links */}
                         {(project.githubUrl || project.liveUrl) && (
