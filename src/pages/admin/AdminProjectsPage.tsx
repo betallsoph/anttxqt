@@ -271,15 +271,26 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                   />
                             </div>
 
-                            {/* The Story Behind / Full Description */}
+                            {/* Full Description */}
                             <div>
-                                <label className="block text-sm font-bold mb-1">The Story Behind / Full Description (Hiển thị ở trang chi tiết)</label>
+                                <label className="block text-sm font-bold mb-1">Full Description (Hiển thị ở trang chi tiết)</label>
                                 <textarea
                                     value={project.fullDescription || ""}
                                     onChange={(e) => updateProject(index, { fullDescription: e.target.value })}
                                     className={`${inputClass} min-h-[80px]`}
                                     rows={3}
-                                  />
+                                />
+                            </div>
+
+                            {/* The Story Behind */}
+                            <div>
+                                <label className="block text-sm font-bold mb-1">The Story Behind (Hiển thị ở trang chi tiết)</label>
+                                <textarea
+                                    value={project.storyBehind || ""}
+                                    onChange={(e) => updateProject(index, { storyBehind: e.target.value })}
+                                    className={`${inputClass} min-h-[80px]`}
+                                    rows={3}
+                                />
                             </div>
 
                             {/* Status */}

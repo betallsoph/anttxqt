@@ -10,6 +10,7 @@ export interface Project {
     title: string;
     description: string;
     fullDescription?: string;
+    storyBehind?: string;
     status: ProjectStatus;
     tags: string[];
     topics?: string[];
