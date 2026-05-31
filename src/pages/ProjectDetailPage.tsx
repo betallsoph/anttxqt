@@ -113,10 +113,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </span>
                     </div>
 
-                    {/* Short Description */}
-                    <p className="text-base sm:text-lg text-zinc-700 leading-relaxed mb-6 sm:mb-8 whitespace-pre-wrap">
-                        {parseBoldText(project.description)}
-                    </p>
+
 
                     {/* Key Features */}
                     {project.keyFeatures && project.keyFeatures.length > 0 && (
