@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
+import { parseBoldText } from "@/lib/utils";
 
 const statusStyles: Record<string, string> = {
     Production: "bg-green-200 text-green-800 border-green-400",
@@ -112,6 +113,11 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </span>
                     </div>
 
+                    {/* Short Description */}
+                    <p className="text-base sm:text-lg text-zinc-700 leading-relaxed mb-6 sm:mb-8 whitespace-pre-wrap">
+                        {parseBoldText(project.description)}
+                    </p>
+
                     {/* Key Features */}
                     {project.keyFeatures && project.keyFeatures.length > 0 && (
                         <div className="mb-6 sm:mb-8">
@@ -120,20 +126,22 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 {project.keyFeatures.map((feature, index) => (
                                     <div key={index} className="flex items-start gap-3">
                                         <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
-                                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">{feature}</p>
+                                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">{parseBoldText(feature)}</p>
                                     </div>
                                 ))}
                             </div>
                         </div>
                     )}
 
-                    {/* Description */}
-                    <div className="prose max-w-none mb-6 sm:mb-8">
-                        <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">Description - The Story Behind</h3>
-                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
-                            {project.fullDescription || project.description}
-                        </p>
-                    </div>
+                    {/* The Story Behind */}
+                    {project.fullDescription && (
+                        <div className="prose max-w-none mb-6 sm:mb-8 border-t-2 border-zinc-100 pt-6 sm:pt-8">
+                            <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">The Story Behind</h3>
+                            <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                {parseBoldText(project.fullDescription)}
+                            </p>
+                        </div>
+                    )}
 
                     {/* Meta Section (Roles, Tech Stack, Topics, Links/Explore) */}
                     <div className="pt-6 sm:pt-8 border-t-2 border-zinc-200 mt-6 sm:mt-8 space-y-6">
