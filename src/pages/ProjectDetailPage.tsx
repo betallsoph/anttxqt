@@ -115,6 +115,20 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
 
 
+                    {/* The Story Behind */}
+                    {project.storyBehind && (
+                        <div className="mb-6 sm:mb-8">
+                            <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">The Story Behind</h3>
+                            <div className="space-y-3 sm:space-y-4">
+                                {project.storyBehind.split(/\n\s*\n/).map((para, i) => (
+                                    <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                        {parseBoldText(para.trim())}
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Key Features */}
                     {project.keyFeatures && project.keyFeatures.length > 0 && (
                         <div className="mb-6 sm:mb-8">
@@ -125,20 +139,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                         <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
                                         <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">{parseBoldText(feature)}</p>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* The Story Behind */}
-                    {project.storyBehind && (
-                        <div className="mb-6 sm:mb-8">
-                            <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">The Story Behind</h3>
-                            <div className="space-y-3 sm:space-y-4">
-                                {project.storyBehind.split(/\n\s*\n/).map((para, i) => (
-                                    <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
-                                        {parseBoldText(para.trim())}
-                                    </p>
                                 ))}
                             </div>
                         </div>
