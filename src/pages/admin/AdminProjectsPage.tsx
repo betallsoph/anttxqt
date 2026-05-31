@@ -271,9 +271,9 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                   />
                             </div>
 
-                            {/* Full Description */}
+                            {/* The Story Behind / Full Description */}
                             <div>
-                                <label className="block text-sm font-bold mb-1">Full Description (Hiển thị ở trang chi tiết)</label>
+                                <label className="block text-sm font-bold mb-1">The Story Behind / Full Description (Hiển thị ở trang chi tiết)</label>
                                 <textarea
                                     value={project.fullDescription || ""}
                                     onChange={(e) => updateProject(index, { fullDescription: e.target.value })}
