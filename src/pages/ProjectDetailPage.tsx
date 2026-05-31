@@ -112,14 +112,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </span>
                     </div>
 
-                    {/* Description */}
-                    <div className="prose max-w-none mb-6 sm:mb-8">
-                        <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Description - The Story Behind</h3>
-                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
-                            {project.fullDescription || project.description}
-                        </p>
-                    </div>
-
                     {/* Key Features */}
                     {project.keyFeatures && project.keyFeatures.length > 0 && (
                         <div className="mb-6 sm:mb-8">
@@ -134,6 +126,14 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                             </div>
                         </div>
                     )}
+
+                    {/* Description */}
+                    <div className="prose max-w-none mb-6 sm:mb-8">
+                        <h3 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Description - The Story Behind</h3>
+                        <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                            {project.fullDescription || project.description}
+                        </p>
+                    </div>
 
                     {/* Meta Section (Roles, Tech Stack, Topics, Links/Explore) */}
                     <div className="pt-6 sm:pt-8 border-t-2 border-zinc-200 mt-6 sm:mt-8 space-y-6">
