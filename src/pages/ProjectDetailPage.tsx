@@ -132,21 +132,29 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                     {/* The Story Behind */}
                     {project.storyBehind && (
-                        <div className="prose max-w-none mb-6 sm:mb-8">
+                        <div className="mb-6 sm:mb-8">
                             <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">The Story Behind</h3>
-                            <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
-                                {parseBoldText(project.storyBehind)}
-                            </p>
+                            <div className="space-y-3 sm:space-y-4">
+                                {project.storyBehind.split(/\n\s*\n/).map((para, i) => (
+                                    <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                        {parseBoldText(para.trim())}
+                                    </p>
+                                ))}
+                            </div>
                         </div>
                     )}
 
                     {/* Full Description */}
                     {project.fullDescription && (
-                        <div className="prose max-w-none mb-6 sm:mb-8">
+                        <div className="mb-6 sm:mb-8">
                             <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">Full Description</h3>
-                            <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
-                                {parseBoldText(project.fullDescription)}
-                            </p>
+                            <div className="space-y-3 sm:space-y-4">
+                                {project.fullDescription.split(/\n\s*\n/).map((para, i) => (
+                                    <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                        {parseBoldText(para.trim())}
+                                    </p>
+                                ))}
+                            </div>
                         </div>
                     )}
 
