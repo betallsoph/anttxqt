@@ -135,8 +135,25 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </div>
                     )}
 
-                    {/* Meta Section (Tech Stack, Links, Topics) */}
+                    {/* Meta Section (Roles, Tech Stack, Topics, Links/Explore) */}
                     <div className="pt-6 sm:pt-8 border-t-2 border-zinc-200 mt-6 sm:mt-8 space-y-6">
+                        {/* Roles */}
+                        {project.roles && project.roles.length > 0 && (
+                            <div>
+                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Role</h3>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                    {project.roles.map((role) => (
+                                        <span
+                                            key={role}
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
+                                        >
+                                            {role}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Tech Stack */}
                         <div>
                             <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Tech Stack</h3>
@@ -151,6 +168,23 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 ))}
                             </div>
                         </div>
+
+                        {/* Topics */}
+                        {project.topics && project.topics.length > 0 && (
+                            <div>
+                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Topic</h3>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                                    {project.topics.map((topic) => (
+                                        <span
+                                            key={topic}
+                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
+                                        >
+                                            {topic}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Links */}
                         {(project.githubUrl || project.liveUrl) && (
@@ -179,40 +213,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                             Visit Website
                                         </a>
                                     )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Roles */}
-                        {project.roles && project.roles.length > 0 && (
-                            <div>
-                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Role</h3>
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                    {project.roles.map((role) => (
-                                        <span
-                                            key={role}
-                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
-                                        >
-                                            {role}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Topics */}
-                        {project.topics && project.topics.length > 0 && (
-                            <div>
-                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">Topic</h3>
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                                    {project.topics.map((topic) => (
-                                        <span
-                                            key={topic}
-                                            className="px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md"
-                                        >
-                                            {topic}
-                                        </span>
-                                    ))}
                                 </div>
                             </div>
                         )}
