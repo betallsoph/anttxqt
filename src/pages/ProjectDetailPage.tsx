@@ -115,11 +115,11 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* Key Features */}
                     {project.keyFeatures && project.keyFeatures.length > 0 && (
                         <div className="mb-6 sm:mb-8">
-                            <h3 className="text-lg sm:text-xl font-bold text-blue-500 mb-3 sm:mb-4">Key Features</h3>
+                            <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">Key Features</h3>
                             <div className="space-y-2 sm:space-y-3">
                                 {project.keyFeatures.map((feature, index) => (
                                     <div key={index} className="flex items-start gap-3">
-                                        <div className="w-2 h-2 mt-2.5 bg-blue-500 rounded-sm flex-shrink-0 border border-black"></div>
+                                        <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
                                         <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">{feature}</p>
                                     </div>
                                 ))}
@@ -129,7 +129,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                     {/* Description */}
                     <div className="prose max-w-none mb-6 sm:mb-8">
-                        <h3 className="text-lg sm:text-xl font-bold text-blue-500 mb-3 sm:mb-4">Description - The Story Behind</h3>
+                        <h3 className="text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4">Description - The Story Behind</h3>
                         <p className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                             {project.fullDescription || project.description}
                         </p>

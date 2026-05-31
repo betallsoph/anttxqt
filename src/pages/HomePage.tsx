@@ -103,7 +103,7 @@ export function HomePage() {
                                 <div key={index} className="space-y-4">
                                     <div className="flex flex-col sm:flex-row sm:items-baseline sm:justify-between gap-1.5 sm:gap-4">
                                         <div>
-                                            <h3 className="text-base sm:text-lg font-black text-blue-500">
+                                            <h3 className="text-base sm:text-lg font-black text-blue-600">
                                                 {exp.role}
                                             </h3>
                                             <p className="text-sm sm:text-base text-zinc-600 font-semibold mt-0.5">
