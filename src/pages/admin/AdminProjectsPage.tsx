@@ -66,6 +66,30 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
     }, [type]);
 
     const handleSave = async (index: number) => {
+        const project = projects[index];
+        const finalTitle = (project.title || "").trim();
+        let finalId = (project.id || "").trim();
+
+        if (!finalTitle) {
+            setMessages((prev) => ({ ...prev, [index]: "Lỗi: Title không được để trống!" }));
+            setTimeout(() => setMessages((prev) => ({ ...prev, [index]: "" })), 4000);
+            return;
+        }
+
+        if (!finalId) {
+            finalId = generateId(finalTitle);
+            if (!finalId) {
+                setMessages((prev) => ({ ...prev, [index]: "Lỗi: Không thể tự tạo ID từ Title!" }));
+                setTimeout(() => setMessages((prev) => ({ ...prev, [index]: "" })), 4000);
+                return;
+            }
+            // Update state and local reference before saving
+            const newProjects = [...projects];
+            newProjects[index] = { ...newProjects[index], id: finalId };
+            setProjects(newProjects);
+            projects[index].id = finalId;
+        }
+
         setSavingIndex(index);
         setMessages((prev) => ({ ...prev, [index]: "" }));
         try {
