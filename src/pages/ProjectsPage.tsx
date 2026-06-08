@@ -71,8 +71,8 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                     <div className="flex items-center gap-3 sm:gap-4">
                                         {/* Icon — only shown when set */}
                                         {project.iconUrl && (
-                                            <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 bg-white border-2 border-black rounded-xl overflow-hidden p-1 sm:p-1.5 shadow-sm">
-                                                <img src={project.iconUrl} alt={project.title} className="w-full h-full object-contain" />
+                                            <div className="h-12 sm:h-14 w-auto max-w-[120px] sm:max-w-[140px] flex-shrink-0 bg-white border-2 border-black rounded-xl overflow-hidden p-1 sm:p-1.5 shadow-sm flex items-center justify-center">
+                                                <img src={project.iconUrl} alt={project.title} className="h-full w-auto object-contain" />
                                             </div>
                                         )}
                                         <h3 className="text-lg sm:text-xl font-bold">{project.title}</h3>
