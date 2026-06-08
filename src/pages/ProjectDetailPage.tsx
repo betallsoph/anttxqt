@@ -1,6 +1,6 @@
 import { motion } from "motion/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github, ImageIcon } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
 import { parseBoldText } from "@/lib/utils";
@@ -80,25 +80,16 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 </div>
 
                 {/* Project Image */}
-                <div className="w-full h-40 sm:h-56 border-b-2 border-black overflow-hidden bg-zinc-50">
-                    {project.imageUrl ? (
+                {project.imageUrl && (
+                    <div className="w-full h-40 sm:h-56 border-b-2 border-black overflow-hidden bg-zinc-50">
                         <ImageWithLoader
                             src={project.imageUrl}
                             alt={project.title}
                             className="w-full h-full"
                             imgClassName="object-contain"
                         />
-                    ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                            <div className="text-center">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-2 bg-white/50 rounded-lg border-2 border-dashed border-blue-300 flex items-center justify-center">
-                                    <ImageIcon className="w-8 h-8 sm:w-10 sm:h-10 text-blue-400" />
-                                </div>
-                                <p className="text-sm sm:text-base text-blue-400 font-medium">{title} Image Coming Soon</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
                 <div className="p-4 sm:p-6">
                     {/* Title */}
