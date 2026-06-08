@@ -95,13 +95,39 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* Title */}
                     <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{project.title}</h1>
 
-                    {/* Status */}
-                    <div className="mb-4 sm:mb-6">
+                    {/* Status & Quick Links */}
+                    <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap mb-4 sm:mb-6">
                         <span
                             className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded ${statusStyles[project.status]}`}
                         >
                             {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
                         </span>
+
+                        {project.githubUrl && (
+                            <a
+                                href={project.githubUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-zinc-100 border border-zinc-300 rounded hover:bg-zinc-200 transition-colors"
+                                title="View code on GitHub"
+                            >
+                                <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                GitHub
+                            </a>
+                        )}
+
+                        {project.liveUrl && (
+                            <a
+                                href={project.liveUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                                title="Visit live website"
+                            >
+                                <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                Live
+                            </a>
+                        )}
                     </div>
 
 
