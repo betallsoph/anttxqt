@@ -79,7 +79,7 @@ function ExploreItemModal({
 
                         {item.story && (
                             <div className="space-y-2 pt-1">
-                                <h4 className="text-xs sm:text-sm font-bold text-blue-600 uppercase tracking-wider">
+                                <h4 className="text-xs sm:text-sm font-bold text-blue-600">
                                     My Story
                                 </h4>
                                 <div className="space-y-3">
