@@ -673,7 +673,7 @@ export function AdminExplorePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Beyond Code
+                    Skills Beyond Code
                 </h2>
                 <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
                     {/* macOS Window Header */}

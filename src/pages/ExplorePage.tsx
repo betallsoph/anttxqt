@@ -242,7 +242,7 @@ export function ExplorePage() {
     }
 
     return (
-        <div className="space-y-6 sm:space-y-8">
+        <div className="space-y-12 sm:space-y-16">
             {/* Header */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
@@ -257,13 +257,64 @@ export function ExplorePage() {
                 </p>
             </motion.section>
 
+            {/* Beyond Code (Skills Beyond Code) */}
+            {!isSectionHidden("beyondCode") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Skills Beyond Code
+                    </h2>
+                    {data.beyondCode && data.beyondCode.length > 0 ? (
+                        <ExploreGrid
+                            items={data.beyondCode}
+                            onSelect={setSelectedExploreItem}
+                        />
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
+
+            {/* Achievements */}
+            {data.achievements.length > 0 && !isSectionHidden("achievements") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Achievements
+                    </h2>
+                    <div className="space-y-2 sm:space-y-3">
+                        {data.achievements.map((item, index) => (
+                            <button
+                                key={index}
+                                onClick={() => setSelectedAchievement(item)}
+                                className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
+                            >
+                                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                    <h3 className="font-bold text-sm sm:text-base truncate">
+                                        {item.title}
+                                    </h3>
+                                </div>
+                                <span className="text-xs text-zinc-400 flex-shrink-0 ml-3">
+                                    {item.date}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+                </motion.section>
+            )}
+
             {/* Favourites Section */}
             {data.favourites && data.favourites.length > 0 && !isSectionHidden("favourites") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.08 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         Favourites
@@ -291,67 +342,12 @@ export function ExplorePage() {
                 </motion.section>
             )}
 
-            {/* Achievements */}
-            {data.achievements.length > 0 && !isSectionHidden("achievements") && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.1 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Achievements
-                    </h2>
-                    <div className="space-y-2 sm:space-y-3">
-                        {data.achievements.map((item, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setSelectedAchievement(item)}
-                                className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
-                            >
-                                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                                    <h3 className="font-bold text-sm sm:text-base truncate">
-                                        {item.title}
-                                    </h3>
-                                </div>
-                                <span className="text-xs text-zinc-400 flex-shrink-0 ml-3">
-                                    {item.date}
-                                </span>
-                            </button>
-                        ))}
-                    </div>
-                </motion.section>
-            )}
-
-            {/* Beyond Code */}
-            {!isSectionHidden("beyondCode") && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.1 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Beyond Code
-                    </h2>
-                    {data.beyondCode && data.beyondCode.length > 0 ? (
-                        <ExploreGrid
-                            items={data.beyondCode}
-                            onSelect={setSelectedExploreItem}
-                        />
-                    ) : (
-                        <ComingSoon />
-                    )}
-                </motion.section>
-            )}
-
             {/* Currently */}
             {!isSectionHidden("currently") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.1 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         Currently
@@ -386,7 +382,6 @@ export function ExplorePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.08 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
                     {data.stories && data.stories.length > 0 ? (
@@ -413,7 +408,6 @@ export function ExplorePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.08 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
                     {data.whatsNext && data.whatsNext.length > 0 ? (
@@ -446,7 +440,6 @@ export function ExplorePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.08 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         If You're Reading Closely
@@ -512,7 +505,6 @@ export function ExplorePage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.085 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
                     {data.moreAndMore && data.moreAndMore.length > 0 ? (
