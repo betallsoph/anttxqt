@@ -78,17 +78,22 @@ function ExploreItemModal({
                         </div>
 
                         {item.story && (
-                            <div className="space-y-3">
-                                {item.story.split("\n").map((paragraph, idx) => {
-                                    if (!paragraph.trim()) {
-                                        return <div key={idx} className="h-2" />;
-                                    }
-                                    return (
-                                        <p key={idx} className="text-sm sm:text-base text-zinc-700 leading-relaxed">
-                                            {paragraph}
-                                        </p>
-                                    );
-                                })}
+                            <div className="space-y-2 pt-1">
+                                <h4 className="text-xs sm:text-sm font-bold text-blue-600 uppercase tracking-wider">
+                                    My Story
+                                </h4>
+                                <div className="space-y-3">
+                                    {item.story.split("\n").map((paragraph, idx) => {
+                                        if (!paragraph.trim()) {
+                                            return <div key={idx} className="h-2" />;
+                                        }
+                                        return (
+                                            <p key={idx} className="text-sm sm:text-base text-zinc-700 leading-relaxed">
+                                                {paragraph}
+                                            </p>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         )}
 
