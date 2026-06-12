@@ -268,15 +268,18 @@ export function ExplorePage() {
                         Skills Beyond Code
                     </h2>
                     {data.beyondCode && data.beyondCode.length > 0 ? (
-                        <div className="space-y-2 sm:space-y-3">
+                        <div className="border-t-2 border-black/10">
                             {data.beyondCode.map((item, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setSelectedExploreItem(item)}
-                                    className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
+                                    className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
                                 >
-                                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                                        <h3 className="font-bold text-sm sm:text-base truncate">
+                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
+                                            {(index + 1).toString().padStart(2, "0")}
+                                        </span>
+                                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
                                             {item.title}
                                         </h3>
                                     </div>
