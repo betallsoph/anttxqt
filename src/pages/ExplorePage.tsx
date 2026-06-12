@@ -50,7 +50,7 @@ function ExploreItemModal({
                         </div>
                     )}
 
-                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[50vh]">
+                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[70vh]">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
@@ -191,7 +191,7 @@ function AchievementModal({
                     )}
 
                     {/* Content */}
-                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[50vh]">
+                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[70vh]">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
