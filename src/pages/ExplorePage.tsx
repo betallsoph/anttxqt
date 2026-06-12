@@ -54,7 +54,7 @@ function ExploreItemModal({
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="font-bold text-base sm:text-lg">
+                                    <h3 className="font-bold text-lg sm:text-2xl">
                                         {item.title}
                                     </h3>
                                     {item.since && (
@@ -64,7 +64,7 @@ function ExploreItemModal({
                                     )}
                                 </div>
                                 {item.summary && (
-                                    <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
+                                    <p className="text-sm sm:text-base text-zinc-500 mt-1">
                                         {item.summary}
                                     </p>
                                 )}
@@ -78,7 +78,7 @@ function ExploreItemModal({
                         </div>
 
                         {item.content && (
-                            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
+                            <p className="text-sm sm:text-base text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                 {item.content}
                             </p>
                         )}
@@ -181,14 +181,14 @@ function AchievementModal({
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="font-bold text-base sm:text-lg">
+                                    <h3 className="font-bold text-lg sm:text-2xl">
                                         {item.title}
                                     </h3>
                                     <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
                                         {item.date}
                                     </span>
                                 </div>
-                                <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">
+                                <p className="text-sm sm:text-base text-zinc-500 mt-1">
                                     {item.issuer}
                                 </p>
                             </div>
@@ -201,7 +201,7 @@ function AchievementModal({
                         </div>
 
                         {item.description && (
-                            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
+                            <p className="text-sm sm:text-base text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                 {item.description}
                             </p>
                         )}
@@ -283,9 +283,9 @@ export function ExplorePage() {
                                             {item.title}
                                         </h3>
                                     </div>
-                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-20 h-5 overflow-hidden">
+                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
                                         <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
-                                            xem thêm
+                                            dive into my story
                                         </span>
                                         <ArrowRight className="absolute right-0 w-4 h-4 text-blue-500 transition-all duration-300 ease-out opacity-0 -translate-x-8 group-hover:opacity-100 group-hover:translate-x-0" />
                                     </div>
