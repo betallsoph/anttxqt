@@ -77,10 +77,19 @@ function ExploreItemModal({
                             </button>
                         </div>
 
-                        {item.content && (
-                            <p className="text-sm sm:text-base text-zinc-700 leading-relaxed whitespace-pre-wrap">
-                                {item.content}
-                            </p>
+                        {item.story && (
+                            <div className="space-y-3">
+                                {item.story.split("\n").map((paragraph, idx) => {
+                                    if (!paragraph.trim()) {
+                                        return <div key={idx} className="h-2" />;
+                                    }
+                                    return (
+                                        <p key={idx} className="text-sm sm:text-base text-zinc-700 leading-relaxed">
+                                            {paragraph}
+                                        </p>
+                                    );
+                                })}
+                            </div>
                         )}
 
                         {item.tags && item.tags.length > 0 && (

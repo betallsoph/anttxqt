@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 export interface ExploreItem {
     title: string;
     summary: string;
-    content: string;
+    story: string;
     since?: string;
     imageUrl?: string;
     tags?: string[];
@@ -95,14 +95,14 @@ export const defaultExploreData: ExploreData = {
         {
             title: "Marathon Running",
             summary: "Training for endurance and discipline.",
-            content: "Running long distances is my way of clearing my mind, building mental resilience, and maintaining peak physical condition. It has taught me the value of consistency, pacing, and incremental progress, which directly applies to how I tackle complex engineering projects.",
+            story: "Running long distances is my way of clearing my mind, building mental resilience, and maintaining peak physical condition. It has taught me the value of consistency, pacing, and incremental progress, which directly applies to how I tackle complex engineering projects.",
             since: "2024",
             tags: ["Endurance", "Fitness"]
         },
         {
             title: "Landscape Photography",
             summary: "Capturing light, perspectives, and visual stories.",
-            content: "Photography is my main creative outlet outside of programming. Playing with cameras, lenses, and editing tools keeps my creative instincts sharp. It trains my eyes for composition, lighting, and detail, which directly influences my UI/UX design work.",
+            story: "Photography is my main creative outlet outside of programming. Playing with cameras, lenses, and editing tools keeps my creative instincts sharp. It trains my eyes for composition, lighting, and detail, which directly influences my UI/UX design work.",
             since: "2023",
             tags: ["Creative", "Art"]
         }

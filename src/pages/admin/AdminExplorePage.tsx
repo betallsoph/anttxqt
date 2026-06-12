@@ -134,10 +134,10 @@ function ExploreItemListEditor({
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold mb-1">Content</label>
+                            <label className="block text-sm font-bold mb-1">Story</label>
                             <textarea
-                                value={item.content}
-                                onChange={(e) => updateItem(index, { content: e.target.value })}
+                                value={item.story}
+                                onChange={(e) => updateItem(index, { story: e.target.value })}
                                 className={`${inputClass} min-h-[120px]`}
                                 rows={5}
                                 placeholder="Câu chuyện đầy đủ..."
@@ -196,7 +196,7 @@ function ExploreItemListEditor({
                 onClick={() =>
                     onChange([
                         ...items,
-                        { title: "", summary: "", content: "" },
+                        { title: "", summary: "", story: "" },
                     ])
                 }
             >
