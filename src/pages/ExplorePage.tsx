@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, ExternalLink } from "lucide-react";
+import { X, ExternalLink, ArrowRight } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
 
@@ -268,10 +268,27 @@ export function ExplorePage() {
                         Skills Beyond Code
                     </h2>
                     {data.beyondCode && data.beyondCode.length > 0 ? (
-                        <ExploreGrid
-                            items={data.beyondCode}
-                            onSelect={setSelectedExploreItem}
-                        />
+                        <div className="space-y-2 sm:space-y-3">
+                            {data.beyondCode.map((item, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setSelectedExploreItem(item)}
+                                    className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                                        <h3 className="font-bold text-sm sm:text-base truncate">
+                                            {item.title}
+                                        </h3>
+                                    </div>
+                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-20 h-5 overflow-hidden">
+                                        <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
+                                            xem thêm
+                                        </span>
+                                        <ArrowRight className="absolute right-0 w-4 h-4 text-blue-500 transition-all duration-300 ease-out opacity-0 -translate-x-8 group-hover:opacity-100 group-hover:translate-x-0" />
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
                     ) : (
                         <ComingSoon />
                     )}
