@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, ExternalLink, ArrowRight } from "lucide-react";
+import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
 
@@ -244,6 +244,7 @@ export function ExplorePage() {
         useState<Achievement | null>(null);
     const [selectedExploreItem, setSelectedExploreItem] =
         useState<ExploreItem | null>(null);
+    const [isMoreExpanded, setIsMoreExpanded] = useState(false);
 
     const isSectionHidden = (sectionName: string) => {
         return (data.hiddenSections || []).includes(sectionName);
@@ -384,11 +385,30 @@ export function ExplorePage() {
                     transition={{ duration: 0.35, delay: 0.1 }}
                     className="space-y-6 sm:space-y-8"
                 >
-                    <h2 className="text-xl sm:text-2xl font-bold border-b-2 border-black pb-2 mb-4">
-                        More & More
-                    </h2>
+                    <button
+                        onClick={() => setIsMoreExpanded(!isMoreExpanded)}
+                        className="w-full flex items-center justify-between text-left border-b-2 border-black pb-2 mb-4 group cursor-pointer focus:outline-none"
+                    >
+                        <span className="text-xl sm:text-2xl font-bold">
+                            More & More
+                        </span>
+                        <ChevronDown
+                            className={`w-6 h-6 transition-transform duration-300 ease-in-out ${
+                                isMoreExpanded ? "rotate-180" : ""
+                            }`}
+                        />
+                    </button>
                     
-                    <div className="space-y-6 divide-y divide-black/10">
+                    <motion.div
+                        initial={false}
+                        animate={{
+                            height: isMoreExpanded ? "auto" : 0,
+                            opacity: isMoreExpanded ? 1 : 0
+                        }}
+                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                        className="overflow-hidden"
+                    >
+                        <div className="space-y-6 divide-y divide-black/10">
                         {/* Currently */}
                         {!isSectionHidden("currently") && (
                             <div className="space-y-3 pt-6 first:pt-0">
@@ -573,6 +593,7 @@ export function ExplorePage() {
                             </div>
                         )}
                     </div>
+                    </motion.div>
                 </motion.section>
             )}
 
