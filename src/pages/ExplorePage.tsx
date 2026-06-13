@@ -353,15 +353,15 @@ export function ExplorePage() {
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         Favourites
                     </h2>
-                    <div className="space-y-2 sm:space-y-3">
+                    <div className="space-y-1.5">
                         {data.favourites.map((item, index) => (
                             <div
                                 key={index}
-                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                                className="flex items-center gap-2 sm:gap-3 py-1"
                             >
-                                <div className="w-2 h-2 bg-blue-400 rounded-full flex-shrink-0"></div>
+                                <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
                                 <div className="min-w-0">
-                                    <span className="font-medium text-sm sm:text-base">
+                                    <span className="font-medium text-sm sm:text-base text-zinc-900">
                                         {item.label}
                                     </span>
                                     {item.description && (
