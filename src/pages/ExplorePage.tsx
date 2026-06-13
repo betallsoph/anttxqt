@@ -253,7 +253,7 @@ function CollapsibleMoreSection({
     const highlightRef = useRef<HTMLSpanElement>(null);
     const { scrollYProgress } = useScroll({
         target: highlightRef,
-        offset: ["start 85%", "start 60%"]
+        offset: ["start 98%", "start 88%"]
     });
     const highlightScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
