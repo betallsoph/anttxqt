@@ -1,10 +1,37 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Globe, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
 import { parseBoldText } from "@/lib/utils";
+
+interface LangItem {
+    readonly key: string;
+    readonly name: string;
+    readonly flag: string;
+    readonly suffix: string;
+    readonly dir?: "rtl" | "ltr";
+}
+
+const langList: readonly LangItem[] = [
+    { key: "en", name: "English", flag: "🇺🇸", suffix: "" },
+    { key: "vi", name: "Tiếng Việt", flag: "🇻🇳", suffix: "Vi" },
+    { key: "ar", name: "العربية (MSA)", flag: "🇸🇦", suffix: "Ar", dir: "rtl" },
+    { key: "de", name: "Deutsch", flag: "🇩🇪", suffix: "De" },
+    { key: "nl", name: "Nederlands", flag: "🇳🇱", suffix: "Nl" },
+    { key: "sv", name: "Svenska", flag: "🇸🇪", suffix: "Sv" },
+    { key: "cs", name: "Čeština", flag: "🇨🇿", suffix: "Cs" },
+    { key: "da", name: "Dansk", flag: "🇩🇰", suffix: "Da" },
+    { key: "es", name: "Español", flag: "🇪🇸", suffix: "Es" },
+    { key: "fr", name: "Français", flag: "🇫🇷", suffix: "Fr" },
+    { key: "no", name: "Norsk", flag: "🇳🇴", suffix: "No" },
+    { key: "fi", name: "Suomi", flag: "🇫🇮", suffix: "Fi" },
+    { key: "it", name: "Italiano", flag: "🇮🇹", suffix: "It" },
+    { key: "pt", name: "Português", flag: "🇵🇹", suffix: "Pt" },
+    { key: "hu", name: "Magyar", flag: "🇭🇺", suffix: "Hu" },
+    { key: "el", name: "Ελληνικά", flag: "🇬🇷", suffix: "El" }
+];
 
 
 
@@ -24,7 +51,8 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const backLink = type === "products" ? "/products" : "/projects";
     const backLabel = type === "products" ? "products" : "projects";
     const navigate = useNavigate();
-    const [lang, setLang] = useState<"en" | "vi" | "ar">("en");
+    const [lang, setLang] = useState<string>("en");
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const handleBack = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -52,24 +80,32 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         );
     }
 
-    const hasVietnameseData = !!(
-        project.titleVi?.trim() ||
-        project.descriptionVi?.trim() ||
-        project.storyBehindVi?.trim() ||
-        project.fullDescriptionVi?.trim() ||
-        (project.keyFeaturesVi && project.keyFeaturesVi.length > 0)
-    );
+    const hasTranslationData = (suffix: string) => {
+        if (!suffix) return true;
+        const titleKey = `title${suffix}`;
+        const descKey = `description${suffix}`;
+        const storyKey = `storyBehind${suffix}`;
+        const fullDescKey = `fullDescription${suffix}`;
+        const featuresKey = `keyFeatures${suffix}`;
 
-    const hasArabicData = !!(
-        project.titleAr?.trim() ||
-        project.descriptionAr?.trim() ||
-        project.storyBehindAr?.trim() ||
-        project.fullDescriptionAr?.trim() ||
-        (project.keyFeaturesAr && project.keyFeaturesAr.length > 0)
-    );
+        return !!(
+            project[titleKey]?.trim() ||
+            project[descKey]?.trim() ||
+            project[storyKey]?.trim() ||
+            project[fullDescKey]?.trim() ||
+            (project[featuresKey] && project[featuresKey].length > 0)
+        );
+    };
+
+    const availableLanguages = langList.filter((langItem) => {
+        if (langItem.key === "en") return true;
+        const showFieldKey = `show${langItem.suffix}`;
+        if (!project[showFieldKey]) return false;
+        return hasTranslationData(langItem.suffix);
+    });
 
     const getLabel = (key: string) => {
-        const labels: Record<string, { en: string; vi: string; ar: string }> = {
+        const labels: Record<string, Record<string, string>> = {
             back: {
                 en: `Back to ${backLabel}`,
                 vi: `Quay lại trang ${type === "products" ? "sản phẩm" : "dự án"}`,
@@ -119,10 +155,14 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         return labels[key]?.[lang] || labels[key]?.en || "";
     };
 
-    const titleText = (lang === "vi" && project.titleVi) || (lang === "ar" && project.titleAr) || project.title;
-    const storyBehindText = (lang === "vi" && project.storyBehindVi) || (lang === "ar" && project.storyBehindAr) || project.storyBehind;
-    const keyFeaturesList = (lang === "vi" && project.keyFeaturesVi) || (lang === "ar" && project.keyFeaturesAr) || project.keyFeatures;
-    const fullDescriptionText = (lang === "vi" && project.fullDescriptionVi) || (lang === "ar" && project.fullDescriptionAr) || project.fullDescription;
+    const activeLangItem = langList.find((l) => l.key === lang) || langList[0];
+    const suffix = activeLangItem.suffix;
+    const isRtl = activeLangItem.dir === "rtl";
+
+    const titleText = (suffix && (project[`title${suffix}`] as string)) || project.title;
+    const storyBehindText = (suffix && (project[`storyBehind${suffix}`] as string)) || project.storyBehind;
+    const keyFeaturesList = (suffix && (project[`keyFeatures${suffix}`] as string[])) || project.keyFeatures;
+    const fullDescriptionText = (suffix && (project[`fullDescription${suffix}`] as string)) || project.fullDescription;
 
     return (
         <div className="space-y-8">
@@ -155,39 +195,54 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
                         <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                     </div>
-                    {/* Language Switcher Link (styled like dive in my story) */}
-                    <div className="flex items-center gap-3">
-                        {lang !== "en" && (
+                    {/* Language Switcher Dropdown */}
+                    {availableLanguages.length > 1 && (
+                        <div className="relative">
+                            {/* Backdrop overlay for closing dropdown */}
+                            {isDropdownOpen && (
+                                <div
+                                    className="fixed inset-0 z-35 cursor-default"
+                                    onClick={() => setIsDropdownOpen(false)}
+                                />
+                            )}
+                            
+                            {/* Trigger Button */}
                             <button
-                                onClick={() => setLang("en")}
-                                className="text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-blue-600 hover:underline transition-colors cursor-pointer select-none"
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                className="relative z-40 flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold text-black bg-white border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-zinc-50 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer select-none"
                             >
-                                view english version
+                                <Globe className="w-3.5 h-3.5 text-zinc-500" />
+                                <span>{activeLangItem.name}</span>
+                                <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                             </button>
-                        )}
-                        {lang !== "en" && ((project.showVi && hasVietnameseData) || (project.showAr && hasArabicData)) && (
-                            <span className="text-[10px] sm:text-xs font-mono text-zinc-300">/</span>
-                        )}
-                        {lang !== "vi" && project.showVi && hasVietnameseData && (
-                            <button
-                                onClick={() => setLang("vi")}
-                                className="text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-blue-600 hover:underline transition-colors cursor-pointer select-none"
-                            >
-                                xem bản tiếng việt
-                            </button>
-                        )}
-                        {lang !== "vi" && project.showVi && hasVietnameseData && project.showAr && hasArabicData && lang !== "ar" && (
-                            <span className="text-[10px] sm:text-xs font-mono text-zinc-300">/</span>
-                        )}
-                        {lang !== "ar" && project.showAr && hasArabicData && (
-                            <button
-                                onClick={() => setLang("ar")}
-                                className="text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-blue-600 hover:underline transition-colors cursor-pointer select-none"
-                            >
-                                tiếng ả rập msa
-                            </button>
-                        )}
-                    </div>
+
+                            {/* Dropdown Options List */}
+                            {isDropdownOpen && (
+                                <div className="absolute right-0 mt-1.5 w-48 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-1.5 z-40 overflow-hidden min-w-[170px]">
+                                    {availableLanguages.map((langItem) => {
+                                        const isActive = langItem.key === lang;
+                                        return (
+                                            <button
+                                                key={langItem.key}
+                                                onClick={() => {
+                                                    setLang(langItem.key);
+                                                    setIsDropdownOpen(false);
+                                                }}
+                                                className={`w-full text-left px-3 py-1.5 text-xs font-mono font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
+                                                    isActive 
+                                                        ? "bg-zinc-100 text-black border-l-4 border-black pl-2" 
+                                                        : "text-zinc-600 hover:bg-zinc-50 hover:text-black"
+                                                }`}
+                                            >
+                                                <span className="text-sm select-none">{langItem.flag}</span>
+                                                <span className="flex-1">{langItem.name}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Project Image */}
@@ -203,7 +258,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 )}
 
                 <div className="p-4 sm:p-6">
-                    <h1 className={`text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>{titleText}</h1>
+                    <h1 className={`text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>{titleText}</h1>
 
                     {/* Status & Quick Links */}
                     <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap mb-4 sm:mb-6">
@@ -245,12 +300,12 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* The Story Behind */}
                     {storyBehindText && (
                         <div className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("story")}
                             </h3>
                             <div className="space-y-3 sm:space-y-4">
-                                {storyBehindText.split(/\n\s*\n/).map((para, i) => (
-                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                                {storyBehindText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                         {parseBoldText(para.trim())}
                                     </p>
                                 ))}
@@ -261,14 +316,14 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* Key Features */}
                     {keyFeaturesList && keyFeaturesList.length > 0 && (
                         <div className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("features")}
                             </h3>
                             <div className="space-y-2 sm:space-y-3">
-                                {keyFeaturesList.map((feature, index) => (
-                                    <div key={index} className={`flex items-start gap-3 ${lang === "ar" ? "flex-row-reverse" : ""}`}>
+                                {keyFeaturesList.map((feature: string, index: number) => (
+                                    <div key={index} className={`flex items-start gap-3 ${isRtl ? "flex-row-reverse" : ""}`}>
                                         <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
-                                        <p className={`text-base sm:text-lg text-zinc-700 leading-relaxed ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>{parseBoldText(feature)}</p>
+                                        <p className={`text-base sm:text-lg text-zinc-700 leading-relaxed ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>{parseBoldText(feature)}</p>
                                     </div>
                                 ))}
                             </div>
@@ -278,12 +333,12 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {/* Full Description */}
                     {fullDescriptionText && (
                         <div className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("description")}
                             </h3>
                             <div className="space-y-3 sm:space-y-4">
-                                {fullDescriptionText.split(/\n\s*\n/).map((para, i) => (
-                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                                {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                         {parseBoldText(para.trim())}
                                     </p>
                                 ))}
@@ -296,10 +351,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         {/* Roles */}
                         {project.roles && project.roles.length > 0 && (
                             <div>
-                                <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                                <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                     {getLabel("role")}
                                 </h3>
-                                <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${lang === "ar" ? "flex-row-reverse" : ""}`}>
+                                <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
                                     {project.roles.map((role) => (
                                         <span
                                             key={role}
@@ -314,10 +369,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                         {/* Tech Stack */}
                         <div>
-                            <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                            <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("tech")}
                             </h3>
-                            <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${lang === "ar" ? "flex-row-reverse" : ""}`}>
+                            <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
                                 {project.tags.map((tag) => (
                                     <span
                                         key={tag}
@@ -333,10 +388,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         {/* Links */}
                         {(project.githubUrl || project.liveUrl) && (
                             <div>
-                                <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${lang === "ar" ? "text-right" : ""}`} dir={lang === "ar" ? "rtl" : "ltr"}>
+                                <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                     {getLabel("explore")}
                                 </h3>
-                                <div className={`flex flex-col sm:flex-row gap-2 sm:gap-4 ${lang === "ar" ? "flex-row-reverse" : ""}`}>
+                                <div className={`flex flex-col sm:flex-row gap-2 sm:gap-4 ${isRtl ? "flex-row-reverse" : ""}`}>
                                     {project.githubUrl && (
                                         <a
                                             href={project.githubUrl}
