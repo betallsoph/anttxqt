@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useInView } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
@@ -249,6 +249,11 @@ function CollapsibleMoreSection({
 }) {
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
     const [isButtonHovered, setIsButtonHovered] = useState(false);
+    const containerRef = useRef<HTMLButtonElement>(null);
+    const isInView = useInView(containerRef, {
+        once: false,
+        margin: "0px 0px -120px 0px"
+    });
 
     return (
         <motion.section
@@ -258,6 +263,7 @@ function CollapsibleMoreSection({
             className="space-y-6 sm:space-y-8"
         >
             <button
+                ref={containerRef}
                 onMouseEnter={() => setIsButtonHovered(true)}
                 onMouseLeave={() => setIsButtonHovered(false)}
                 onClick={() => setIsMoreExpanded(!isMoreExpanded)}
@@ -280,9 +286,8 @@ function CollapsibleMoreSection({
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             initial={{ pathLength: 0 }}
-                            whileInView={{ pathLength: 1 }}
-                            viewport={{ once: false, margin: "0px 0px -90px 0px" }}
-                            transition={{ duration: 0.85, ease: [0.47, 0, 0.745, 0.715], delay: 0.15 }}
+                            animate={{ pathLength: isInView ? 1 : 0 }}
+                            transition={{ duration: 0.85, ease: [0.47, 0, 0.745, 0.715], delay: isInView ? 0.15 : 0 }}
                         />
                     </svg>
                 </span>
