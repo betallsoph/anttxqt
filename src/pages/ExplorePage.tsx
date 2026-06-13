@@ -543,21 +543,43 @@ export function ExplorePage() {
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
                     {data.moreAndMore && data.moreAndMore.length > 0 ? (
                         <div className="space-y-2 sm:space-y-3">
-                            {data.moreAndMore.map((item, index) => (
-                                <div
-                                    key={index}
-                                    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
-                                >
-                                    <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
-                                        {item.label}
-                                    </span>
-                                    {item.description && (
-                                        <span className="text-sm sm:text-base text-zinc-700">
-                                            {item.description}
+                            {data.moreAndMore.map((item, index) => {
+                                const isLink = !!item.url;
+                                const content = (
+                                    <>
+                                        <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                            {item.label}
                                         </span>
-                                    )}
-                                </div>
-                            ))}
+                                        {item.description && (
+                                            <span className="text-sm sm:text-base text-zinc-700 flex-1 group-hover:text-blue-600 transition-colors">
+                                                {item.description}
+                                            </span>
+                                        )}
+                                        {isLink && (
+                                            <ExternalLink className="w-4 h-4 text-zinc-400 group-hover:text-blue-500 transition-colors ml-auto" />
+                                        )}
+                                    </>
+                                );
+
+                                return isLink ? (
+                                    <a
+                                        key={index}
+                                        href={item.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group cursor-pointer"
+                                    >
+                                        {content}
+                                    </a>
+                                ) : (
+                                    <div
+                                        key={index}
+                                        className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                                    >
+                                        {content}
+                                    </div>
+                                );
+                            })}
                         </div>
                     ) : (
                         <ComingSoon />

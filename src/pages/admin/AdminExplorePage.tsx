@@ -1231,25 +1231,38 @@ export function AdminExplorePage() {
                                     total={(data.moreAndMore || []).length}
                                     onMove={(from, to) => setData({ ...data, moreAndMore: swap(data.moreAndMore || [], from, to) })}
                                 />
-                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                <div className="flex-1 space-y-2">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Label (e.g. Font)"
+                                            value={item.label}
+                                            onChange={(e) => {
+                                                const m = [...(data.moreAndMore || [])];
+                                                m[index] = { ...item, label: e.target.value };
+                                                setData({ ...data, moreAndMore: m });
+                                            }}
+                                            className={inputClass}
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Description (e.g. Inter)"
+                                            value={item.description || ""}
+                                            onChange={(e) => {
+                                                const m = [...(data.moreAndMore || [])];
+                                                m[index] = { ...item, description: e.target.value };
+                                                setData({ ...data, moreAndMore: m });
+                                            }}
+                                            className={inputClass}
+                                        />
+                                    </div>
                                     <input
                                         type="text"
-                                        placeholder="Label (e.g. Font)"
-                                        value={item.label}
+                                        placeholder="URL (optional, e.g. https://...)"
+                                        value={item.url || ""}
                                         onChange={(e) => {
                                             const m = [...(data.moreAndMore || [])];
-                                            m[index] = { ...item, label: e.target.value };
-                                            setData({ ...data, moreAndMore: m });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Description (e.g. Inter)"
-                                        value={item.description || ""}
-                                        onChange={(e) => {
-                                            const m = [...(data.moreAndMore || [])];
-                                            m[index] = { ...item, description: e.target.value };
+                                            m[index] = { ...item, url: e.target.value };
                                             setData({ ...data, moreAndMore: m });
                                         }}
                                         className={inputClass}
@@ -1269,7 +1282,7 @@ export function AdminExplorePage() {
                         variant="ghost"
                         size="sm"
                         className="mt-3"
-                        onClick={() => setData({ ...data, moreAndMore: [...(data.moreAndMore || []), { label: "", description: "" }] })}
+                        onClick={() => setData({ ...data, moreAndMore: [...(data.moreAndMore || []), { label: "", description: "", url: "" }] })}
                     >
                         <Plus className="w-4 h-4" />
                         Thêm mục

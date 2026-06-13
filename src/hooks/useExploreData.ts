@@ -51,6 +51,7 @@ export interface ExploreData {
     moreAndMore: {
         label: string;
         description?: string;
+        url?: string;
     }[];
 }
 
@@ -112,7 +113,18 @@ export const defaultExploreData: ExploreData = {
     impactPeople: [],
     lessonsFailed: [],
     offTheRecord: [],
-    moreAndMore: [],
+    moreAndMore: [
+        {
+            label: "Resumé",
+            description: "Software Developer CV",
+            url: "https://example.com/cv-software-developer.pdf"
+        },
+        {
+            label: "Resumé",
+            description: "UI/UX Designer CV",
+            url: "https://example.com/cv-uiux-designer.pdf"
+        }
+    ],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");
