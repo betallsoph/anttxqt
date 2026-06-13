@@ -281,7 +281,7 @@ function CollapsibleMoreSection({
                         <motion.path
                             d="M 1,5 C 30,3 70,3 99,5 C 70,9 30,9 5,10 C 35,10 70,9 95,8"
                             fill="none"
-                            stroke="rgba(147, 197, 253, 0.85)"
+                            stroke="rgba(191, 219, 254, 0.5)"
                             strokeWidth={3}
                             strokeLinecap="round"
                             strokeLinejoin="round"
