@@ -238,12 +238,15 @@ function AchievementModal({
     );
 }
 
-export function ExplorePage() {
-    const { data, loading } = useExploreData();
-    const [selectedAchievement, setSelectedAchievement] =
-        useState<Achievement | null>(null);
-    const [selectedExploreItem, setSelectedExploreItem] =
-        useState<ExploreItem | null>(null);
+function CollapsibleMoreSection({
+    data,
+    isSectionHidden,
+    setSelectedExploreItem,
+}: {
+    data: ExploreData;
+    isSectionHidden: (sectionName: string) => boolean;
+    setSelectedExploreItem: (item: ExploreItem) => void;
+}) {
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
     const [isButtonHovered, setIsButtonHovered] = useState(false);
 
@@ -253,6 +256,257 @@ export function ExplorePage() {
         offset: ["start 85%", "start 60%"]
     });
     const highlightScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+    return (
+        <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: 0.1 }}
+            className="space-y-6 sm:space-y-8"
+        >
+            <button
+                onMouseEnter={() => setIsButtonHovered(true)}
+                onMouseLeave={() => setIsButtonHovered(false)}
+                onClick={() => setIsMoreExpanded(!isMoreExpanded)}
+                className="w-full flex items-center justify-between text-left border-b-2 border-black pb-2 mb-4 group cursor-pointer focus:outline-none"
+            >
+                <span ref={highlightRef} className="relative isolate inline-block">
+                    <span className="text-xl sm:text-2xl font-bold">
+                        More & More
+                    </span>
+                    <motion.span
+                        style={{ scaleX: highlightScaleX }}
+                        className="absolute bottom-1 left-0 right-0 h-2 sm:h-2.5 bg-blue-200/70 -z-10 origin-left rounded-sm"
+                    />
+                </span>
+                <motion.div
+                    animate={{
+                        rotate: isButtonHovered
+                            ? (isMoreExpanded ? [180, 160, 200, 160, 200, 170, 190, 180] : [0, -20, 20, -20, 20, -10, 10, 0])
+                            : (isMoreExpanded ? 180 : 0),
+                        color: isButtonHovered ? "#2563eb" : "#71717a"
+                    }}
+                    transition={{
+                        rotate: {
+                            duration: isButtonHovered ? 0.6 : 0.35,
+                            ease: "easeInOut"
+                        },
+                        color: {
+                            duration: 0.2
+                        }
+                    }}
+                    className="flex items-center justify-center"
+                >
+                    <ChevronDown className="w-6 h-6" />
+                </motion.div>
+            </button>
+            
+            <motion.div
+                initial={false}
+                animate={{
+                    height: isMoreExpanded ? "auto" : 0,
+                    opacity: isMoreExpanded ? 1 : 0
+                }}
+                transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
+                className="overflow-hidden"
+            >
+                <div className="space-y-6 divide-y divide-black/10">
+                    {/* Currently */}
+                    {!isSectionHidden("currently") && (
+                        <div className="space-y-3 pt-6 first:pt-0">
+                            <h3 className="text-base sm:text-lg font-bold text-zinc-900">Currently</h3>
+                            {data.currently.length > 0 ? (
+                                <div className="space-y-2 sm:space-y-3">
+                                    {data.currently.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                                        >
+                                            <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-blue-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                                {item.label}
+                                            </span>
+                                            <span className="text-sm sm:text-base text-zinc-700">
+                                                {item.value}
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
+                    )}
+
+                    {/* My Resumé */}
+                    {!isSectionHidden("moreAndMore") && (
+                        <div className="space-y-3 pt-6 first:pt-0">
+                            <h3 className="text-base sm:text-lg font-bold text-zinc-900">My Resumé</h3>
+                            {data.moreAndMore && data.moreAndMore.length > 0 ? (
+                                <div className="space-y-2 sm:space-y-3">
+                                    {data.moreAndMore.map((item, index) => {
+                                        const isLink = !!item.url;
+                                        const content = (
+                                            <>
+                                                <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
+                                                    {item.label}
+                                                </span>
+                                                {item.description && (
+                                                    <span className="text-sm sm:text-base text-zinc-700 flex-1 group-hover:text-blue-600 transition-colors">
+                                                        {item.description}
+                                                    </span>
+                                                )}
+                                                {isLink && (
+                                                    <ExternalLink className="w-4 h-4 text-zinc-400 group-hover:text-blue-500 transition-colors ml-auto" />
+                                                )}
+                                            </>
+                                        );
+
+                                        return isLink ? (
+                                            <a
+                                                key={index}
+                                                href={item.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group cursor-pointer"
+                                            >
+                                                {content}
+                                            </a>
+                                        ) : (
+                                            <div
+                                                key={index}
+                                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
+                                            >
+                                                {content}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
+                    )}
+
+                    {/* Stories */}
+                    {!isSectionHidden("stories") && (
+                        <div className="space-y-3 pt-6 first:pt-0">
+                            <h3 className="text-base sm:text-lg font-bold text-zinc-900">Stories</h3>
+                            {data.stories && data.stories.length > 0 ? (
+                                <div className="space-y-4">
+                                    {data.stories.map((story, index) => (
+                                        <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h4 className="font-bold text-lg">{story.title}</h4>
+                                                {story.date && <span className="text-xs text-zinc-500 font-medium">{story.date}</span>}
+                                            </div>
+                                            <p className="text-sm sm:text-base text-zinc-700 whitespace-pre-wrap">{story.content}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
+                    )}
+
+                    {/* What's Next */}
+                    {!isSectionHidden("whatsNext") && (
+                        <div className="space-y-3 pt-6 first:pt-0">
+                            <h3 className="text-base sm:text-lg font-bold text-zinc-900">What's Next</h3>
+                            {data.whatsNext && data.whatsNext.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    {data.whatsNext.map((item, index) => (
+                                        <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <h4 className="font-bold text-sm sm:text-base">{item.title}</h4>
+                                                <span className={`inline-flex items-center text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 border rounded ${
+                                                    item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
+                                                    item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
+                                                    'bg-zinc-100 border-zinc-300 text-zinc-600'
+                                                }`}>
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                            {item.description && <p className="text-xs sm:text-sm text-zinc-500 whitespace-pre-wrap">{item.description}</p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <ComingSoon />
+                            )}
+                        </div>
+                    )}
+
+                    {/* If You're Reading Closely */}
+                    {!isSectionHidden("readingClosely") && (
+                        <div className="space-y-3 pt-6 first:pt-0">
+                            <h3 className="text-base sm:text-lg font-bold text-zinc-900">If You're Reading Closely</h3>
+                            {data.readingCloselyIntro && (
+                                <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap mb-4 italic">
+                                    {data.readingCloselyIntro}
+                                </p>
+                            )}
+                            <div className="space-y-5 sm:space-y-6">
+                                {/* Impact / People */}
+                                <div>
+                                    <h4 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
+                                        Impact / People
+                                    </h4>
+                                    {data.impactPeople && data.impactPeople.length > 0 ? (
+                                        <ExploreGrid
+                                            items={data.impactPeople}
+                                            onSelect={setSelectedExploreItem}
+                                        />
+                                    ) : (
+                                        <ComingSoon />
+                                    )}
+                                </div>
+
+                                {/* Lessons / Failed */}
+                                <div>
+                                    <h4 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
+                                        Lessons / Failed
+                                    </h4>
+                                    {data.lessonsFailed && data.lessonsFailed.length > 0 ? (
+                                        <ExploreGrid
+                                            items={data.lessonsFailed}
+                                            onSelect={setSelectedExploreItem}
+                                        />
+                                    ) : (
+                                        <ComingSoon />
+                                    )}
+                                </div>
+
+                                {/* Off the Record */}
+                                <div>
+                                    <h4 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
+                                        Off the Record
+                                    </h4>
+                                    {data.offTheRecord && data.offTheRecord.length > 0 ? (
+                                        <ExploreGrid
+                                            items={data.offTheRecord}
+                                            onSelect={setSelectedExploreItem}
+                                        />
+                                    ) : (
+                                        <ComingSoon />
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </motion.div>
+        </motion.section>
+    );
+}
+
+export function ExplorePage() {
+    const { data, loading } = useExploreData();
+    const [selectedAchievement, setSelectedAchievement] =
+        useState<Achievement | null>(null);
+    const [selectedExploreItem, setSelectedExploreItem] =
+        useState<ExploreItem | null>(null);
+
 
     const isSectionHidden = (sectionName: string) => {
         return (data.hiddenSections || []).includes(sectionName);
@@ -387,245 +641,11 @@ export function ExplorePage() {
 
             {/* More & More Grouped Section */}
             {(!isSectionHidden("currently") || !isSectionHidden("moreAndMore") || !isSectionHidden("stories") || !isSectionHidden("whatsNext") || !isSectionHidden("readingClosely")) && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.1 }}
-                    className="space-y-6 sm:space-y-8"
-                >
-                    <button
-                        onMouseEnter={() => setIsButtonHovered(true)}
-                        onMouseLeave={() => setIsButtonHovered(false)}
-                        onClick={() => setIsMoreExpanded(!isMoreExpanded)}
-                        className="w-full flex items-center justify-between text-left border-b-2 border-black pb-2 mb-4 group cursor-pointer focus:outline-none"
-                    >
-                        <span ref={highlightRef} className="relative isolate inline-block">
-                            <span className="text-xl sm:text-2xl font-bold">
-                                More & More
-                            </span>
-                            <motion.span
-                                style={{ scaleX: highlightScaleX }}
-                                className="absolute bottom-1 left-0 right-0 h-2 sm:h-2.5 bg-blue-200/70 -z-10 origin-left rounded-sm"
-                            />
-                        </span>
-                        <motion.div
-                            animate={{
-                                rotate: isButtonHovered
-                                    ? (isMoreExpanded ? [180, 160, 200, 160, 200, 170, 190, 180] : [0, -20, 20, -20, 20, -10, 10, 0])
-                                    : (isMoreExpanded ? 180 : 0),
-                                color: isButtonHovered ? "#2563eb" : "#71717a"
-                            }}
-                            transition={{
-                                rotate: {
-                                    duration: isButtonHovered ? 0.6 : 0.35,
-                                    ease: "easeInOut"
-                                },
-                                color: {
-                                    duration: 0.2
-                                }
-                            }}
-                            className="flex items-center justify-center"
-                        >
-                            <ChevronDown className="w-6 h-6" />
-                        </motion.div>
-                    </button>
-                    
-                    <motion.div
-                        initial={false}
-                        animate={{
-                            height: isMoreExpanded ? "auto" : 0,
-                            opacity: isMoreExpanded ? 1 : 0
-                        }}
-                        transition={{ duration: 0.3, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden"
-                    >
-                        <div className="space-y-6 divide-y divide-black/10">
-                        {/* Currently */}
-                        {!isSectionHidden("currently") && (
-                            <div className="space-y-3 pt-6 first:pt-0">
-                                <h3 className="text-base sm:text-lg font-bold text-zinc-900">Currently</h3>
-                                {data.currently.length > 0 ? (
-                                    <div className="space-y-2 sm:space-y-3">
-                                        {data.currently.map((item, index) => (
-                                            <div
-                                                key={index}
-                                                className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
-                                            >
-                                                <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-blue-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
-                                                    {item.label}
-                                                </span>
-                                                <span className="text-sm sm:text-base text-zinc-700">
-                                                    {item.value}
-                                                </span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <ComingSoon />
-                                )}
-                            </div>
-                        )}
-
-                        {/* My Resumé */}
-                        {!isSectionHidden("moreAndMore") && (
-                            <div className="space-y-3 pt-6 first:pt-0">
-                                <h3 className="text-base sm:text-lg font-bold text-zinc-900">My Resumé</h3>
-                                {data.moreAndMore && data.moreAndMore.length > 0 ? (
-                                    <div className="space-y-2 sm:space-y-3">
-                                        {data.moreAndMore.map((item, index) => {
-                                            const isLink = !!item.url;
-                                            const content = (
-                                                <>
-                                                    <span className="text-xs sm:text-sm font-bold text-zinc-900 bg-emerald-200 px-2 py-0.5 rounded border border-black flex-shrink-0">
-                                                        {item.label}
-                                                    </span>
-                                                    {item.description && (
-                                                        <span className="text-sm sm:text-base text-zinc-700 flex-1 group-hover:text-blue-600 transition-colors">
-                                                            {item.description}
-                                                        </span>
-                                                    )}
-                                                    {isLink && (
-                                                        <ExternalLink className="w-4 h-4 text-zinc-400 group-hover:text-blue-500 transition-colors ml-auto" />
-                                                    )}
-                                                </>
-                                            );
-
-                                            return isLink ? (
-                                                <a
-                                                    key={index}
-                                                    href={item.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group cursor-pointer"
-                                                >
-                                                    {content}
-                                                </a>
-                                            ) : (
-                                                <div
-                                                    key={index}
-                                                    className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white"
-                                                >
-                                                    {content}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                ) : (
-                                    <ComingSoon />
-                                )}
-                            </div>
-                        )}
-
-                        {/* Stories */}
-                        {!isSectionHidden("stories") && (
-                            <div className="space-y-3 pt-6 first:pt-0">
-                                <h3 className="text-base sm:text-lg font-bold text-zinc-900">Stories</h3>
-                                {data.stories && data.stories.length > 0 ? (
-                                    <div className="space-y-4">
-                                        {data.stories.map((story, index) => (
-                                            <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
-                                                <div className="flex justify-between items-center mb-2">
-                                                    <h4 className="font-bold text-lg">{story.title}</h4>
-                                                    {story.date && <span className="text-xs text-zinc-500 font-medium">{story.date}</span>}
-                                                </div>
-                                                <p className="text-sm sm:text-base text-zinc-700 whitespace-pre-wrap">{story.content}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <ComingSoon />
-                                )}
-                            </div>
-                        )}
-
-                        {/* What's Next */}
-                        {!isSectionHidden("whatsNext") && (
-                            <div className="space-y-3 pt-6 first:pt-0">
-                                <h3 className="text-base sm:text-lg font-bold text-zinc-900">What's Next</h3>
-                                {data.whatsNext && data.whatsNext.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        {data.whatsNext.map((item, index) => (
-                                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
-                                                <div className="flex justify-between items-start mb-1">
-                                                    <h4 className="font-bold text-sm sm:text-base">{item.title}</h4>
-                                                    <span className={`inline-flex items-center text-[10px] sm:text-xs font-bold px-2 py-0.5 sm:py-1 border rounded ${
-                                                        item.status === 'Done' ? 'bg-green-200 border-green-400 text-green-800' :
-                                                        item.status === 'In Progress' ? 'bg-blue-200 border-blue-400 text-blue-800' :
-                                                        'bg-zinc-100 border-zinc-300 text-zinc-600'
-                                                    }`}>
-                                                        {item.status}
-                                                    </span>
-                                                </div>
-                                                {item.description && <p className="text-xs sm:text-sm text-zinc-500 whitespace-pre-wrap">{item.description}</p>}
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <ComingSoon />
-                                )}
-                            </div>
-                        )}
-
-                        {/* If You're Reading Closely */}
-                        {!isSectionHidden("readingClosely") && (
-                            <div className="space-y-3 pt-6 first:pt-0">
-                                <h3 className="text-base sm:text-lg font-bold text-zinc-900">If You're Reading Closely</h3>
-                                {data.readingCloselyIntro && (
-                                    <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap mb-4 italic">
-                                        {data.readingCloselyIntro}
-                                    </p>
-                                )}
-                                <div className="space-y-5 sm:space-y-6">
-                                    {/* Impact / People */}
-                                    <div>
-                                        <h4 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
-                                            Impact / People
-                                        </h4>
-                                        {data.impactPeople && data.impactPeople.length > 0 ? (
-                                            <ExploreGrid
-                                                items={data.impactPeople}
-                                                onSelect={setSelectedExploreItem}
-                                            />
-                                        ) : (
-                                            <ComingSoon />
-                                        )}
-                                    </div>
-
-                                    {/* Lessons / Failed */}
-                                    <div>
-                                        <h4 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
-                                            Lessons / Failed
-                                        </h4>
-                                        {data.lessonsFailed && data.lessonsFailed.length > 0 ? (
-                                            <ExploreGrid
-                                                items={data.lessonsFailed}
-                                                onSelect={setSelectedExploreItem}
-                                            />
-                                        ) : (
-                                            <ComingSoon />
-                                        )}
-                                    </div>
-
-                                    {/* Off the Record */}
-                                    <div>
-                                        <h4 className="text-sm sm:text-base font-bold text-blue-600 mb-2 sm:mb-3">
-                                            Off the Record
-                                        </h4>
-                                        {data.offTheRecord && data.offTheRecord.length > 0 ? (
-                                            <ExploreGrid
-                                                items={data.offTheRecord}
-                                                onSelect={setSelectedExploreItem}
-                                            />
-                                        ) : (
-                                            <ComingSoon />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                    </motion.div>
-                </motion.section>
+                <CollapsibleMoreSection
+                    data={data}
+                    isSectionHidden={isSectionHidden}
+                    setSelectedExploreItem={setSelectedExploreItem}
+                />
             )}
 
             {/* Achievement Detail Modal */}
