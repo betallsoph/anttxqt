@@ -516,8 +516,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                         {/* SECTION C: Bilingual & Multilingual Tabbed Translations */}
                                         <div className="border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-                                            {/* Tabs Header - Scrollable dynamically */}
-                                            <div className="flex border-b border-zinc-200 bg-zinc-50 overflow-x-auto whitespace-nowrap scrollbar-thin">
+                                            {/* Tabs Header - Responsive grid wrapping at max 5 columns */}
+                                            <div className="grid grid-cols-2 sm:grid-cols-5 bg-zinc-50 border-b border-zinc-200">
                                                 {langList.map((lang) => {
                                                     const isTabActive = activeLangTab === lang.key;
                                                     const suffix = lang.suffix;
@@ -533,8 +533,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                             key={lang.key}
                                                             type="button"
                                                             onClick={() => setActiveLangTab(lang.key)}
-                                                            className={`flex-1 min-w-[125px] py-2.5 px-3 text-xs font-semibold border-r border-zinc-200 last:border-r-0 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 ${
-                                                                isTabActive ? "bg-white text-zinc-900 border-b-2 border-b-zinc-900" : "text-zinc-500 hover:bg-zinc-100/50 hover:text-zinc-700"
+                                                            className={`py-2.5 px-3 text-xs font-semibold border-r border-b border-zinc-200 last:border-r-0 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 ${
+                                                                isTabActive ? "bg-white text-zinc-900 font-bold" : "text-zinc-500 hover:bg-zinc-100/50 hover:text-zinc-700"
                                                             }`}
                                                         >
                                                             {lang.label}
