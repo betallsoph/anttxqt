@@ -277,7 +277,7 @@ function CollapsibleMoreSection({
                     <svg
                         viewBox="0 0 100 12"
                         preserveAspectRatio="none"
-                        className="absolute bottom-1 left-0 right-0 h-3 sm:h-4 w-full -z-10 pointer-events-none"
+                        className="absolute bottom-0.5 left-0 right-0 h-[75%] w-full -z-10 pointer-events-none"
                     >
                         <motion.path
                             d="M 1,5 C 30,3 70,3 99,5 C 70,9 30,9 5,10 C 35,10 70,9 95,8"
