@@ -209,7 +209,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                             {/* Trigger Text Button */}
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="relative z-40 flex items-center gap-1 text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-black transition-colors cursor-pointer select-none"
+                                className="relative z-40 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-400 hover:text-black transition-colors cursor-pointer select-none"
                             >
                                 <Globe className="w-3.5 h-3.5" />
                                 <span>{activeLangItem.name}</span>
@@ -228,10 +228,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                                     setLang(langItem.key);
                                                     setIsDropdownOpen(false);
                                                 }}
-                                                className={`w-full text-left px-3 py-1.5 text-xs font-mono font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
+                                                className={`w-full text-left px-3 py-2 text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
                                                     isActive 
                                                         ? "bg-blue-300 text-black" 
-                                                        : "text-zinc-600 hover:bg-zinc-50 hover:text-black"
+                                                        : "text-zinc-700 hover:bg-zinc-50 hover:text-black"
                                                 }`}
                                             >
                                                 <span className="text-sm select-none">{langItem.flag}</span>
