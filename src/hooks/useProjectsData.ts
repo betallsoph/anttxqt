@@ -35,7 +35,10 @@ export interface Project {
     keyFeaturesAr?: string[];
     fullDescriptionAr?: string;
     showAr?: boolean;
+    // Index signature for dynamic multilingual support
+    [key: string]: any;
 }
+
 
 export type CollectionType = "products" | "projects";
 
@@ -175,15 +178,12 @@ export async function saveProjectsData(type: CollectionType, projects: Project[]
     const cleaned = JSON.parse(JSON.stringify(projects));
     
     const processed = cleaned.map((project: any) => {
-        if (project.keyFeatures) {
-            project.keyFeatures = project.keyFeatures.filter((f: string) => f.trim() !== "");
-        }
-        if (project.keyFeaturesVi) {
-            project.keyFeaturesVi = project.keyFeaturesVi.filter((f: string) => f.trim() !== "");
-        }
-        if (project.keyFeaturesAr) {
-            project.keyFeaturesAr = project.keyFeaturesAr.filter((f: string) => f.trim() !== "");
-        }
+        // Filter out empty lines in all keyFeatures array fields dynamically
+        Object.keys(project).forEach((key) => {
+            if (key.startsWith("keyFeatures") && Array.isArray(project[key])) {
+                project[key] = project[key].filter((f: any) => typeof f === "string" && f.trim() !== "");
+            }
+        });
         return project;
     });
     
