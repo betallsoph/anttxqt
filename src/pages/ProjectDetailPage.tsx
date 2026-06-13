@@ -206,19 +206,19 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 />
                             )}
                             
-                            {/* Trigger Button */}
+                            {/* Trigger Text Button */}
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="relative z-40 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-black bg-white border-2 border-black rounded shadow-secondary hover:bg-zinc-50 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer select-none"
+                                className="relative z-40 flex items-center gap-1 text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-black transition-colors cursor-pointer select-none"
                             >
-                                <Globe className="w-3.5 h-3.5 text-zinc-500" />
+                                <Globe className="w-3.5 h-3.5" />
                                 <span>{activeLangItem.name}</span>
-                                <ChevronDown className={`w-3 h-3 text-zinc-400 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
+                                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
                             </button>
 
                             {/* Dropdown Options List */}
                             {isDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-lg shadow-secondary py-1 z-40 overflow-hidden min-w-[170px]">
+                                <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-lg shadow-secondary py-1.5 z-40 overflow-hidden min-w-[170px]">
                                     {availableLanguages.map((langItem) => {
                                         const isActive = langItem.key === lang;
                                         return (
@@ -228,10 +228,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                                     setLang(langItem.key);
                                                     setIsDropdownOpen(false);
                                                 }}
-                                                className={`w-full text-left px-3 py-2 text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
+                                                className={`w-full text-left px-3 py-1.5 text-xs font-mono font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
                                                     isActive 
                                                         ? "bg-blue-300 text-black" 
-                                                        : "text-zinc-700 hover:bg-zinc-50 hover:text-black"
+                                                        : "text-zinc-600 hover:bg-zinc-50 hover:text-black"
                                                 }`}
                                             >
                                                 <span className="text-sm select-none">{langItem.flag}</span>
