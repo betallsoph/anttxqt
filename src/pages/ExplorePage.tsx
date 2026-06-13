@@ -385,19 +385,37 @@ export function ExplorePage() {
                     transition={{ duration: 0.35, delay: 0.1 }}
                     className="space-y-6 sm:space-y-8"
                 >
-                    <button
+                    <motion.button
+                        whileHover="hover"
                         onClick={() => setIsMoreExpanded(!isMoreExpanded)}
                         className="w-full flex items-center justify-between text-left border-b-2 border-black pb-2 mb-4 group cursor-pointer focus:outline-none"
                     >
-                        <span className="text-xl sm:text-2xl font-bold">
-                            More & More
+                        <span className="relative isolate inline-block">
+                            <span className="text-xl sm:text-2xl font-bold">
+                                More & More
+                            </span>
+                            <span className="absolute bottom-1 left-0 right-0 h-2 sm:h-2.5 bg-yellow-200/70 -z-10 origin-left transform scale-x-0 transition-transform duration-300 ease-out group-hover:scale-x-100 rounded-sm" />
                         </span>
-                        <ChevronDown
-                            className={`w-6 h-6 transition-transform duration-300 ease-in-out ${
-                                isMoreExpanded ? "rotate-180" : ""
-                            }`}
-                        />
-                    </button>
+                        <motion.div
+                            variants={{
+                                hover: {
+                                    y: [0, 4, 0],
+                                    transition: {
+                                        repeat: Infinity,
+                                        duration: 0.8,
+                                        ease: "easeInOut"
+                                    }
+                                }
+                            }}
+                            animate={{
+                                rotate: isMoreExpanded ? 180 : 0
+                            }}
+                            transition={{ duration: 0.3, ease: "easeInOut" }}
+                            className="flex items-center justify-center"
+                        >
+                            <ChevronDown className="w-6 h-6" />
+                        </motion.div>
+                    </motion.button>
                     
                     <motion.div
                         initial={false}
