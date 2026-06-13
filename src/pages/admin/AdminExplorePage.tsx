@@ -14,7 +14,7 @@ import { Plus, Trash2, Save, Loader2, X, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
-    "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
+    "w-full border border-zinc-300 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all";
 
 function SaveButton({
     saving,
@@ -69,7 +69,7 @@ function ExploreItemListEditor({
                 {items.map((item, index) => (
                     <div
                         key={index}
-                        className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3"
+                        className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3"
                     >
                         <div className="flex justify-between items-center gap-2">
                             <MoveButtons
@@ -269,819 +269,926 @@ export function AdminExplorePage() {
 
     return (
         <div className="space-y-6 sm:space-y-8">
-            {/* Intro Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Explore Editor
-                </h2>
-                <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
-                    {/* macOS Window Header */}
-                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div>
-                        <label className="block text-sm font-bold mb-1">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            value={data.intro.title}
-                            onChange={(e) =>
-                                setData({
-                                    ...data,
-                                    intro: {
-                                        ...data.intro,
-                                        title: e.target.value,
-                                    },
-                                })
-                            }
-                            className={inputClass}
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">
-                            Description
-                        </label>
-                        <textarea
-                            value={data.intro.description}
-                            onChange={(e) =>
-                                setData({
-                                    ...data,
-                                    intro: {
-                                        ...data.intro,
-                                        description: e.target.value,
-                                    },
-                                })
-                            }
-                            className={`${inputClass} min-h-[60px]`}
-                            rows={2}
-                        />
-                    </div>
-                    <SaveButton
-                        saving={saving === "intro"}
-                        message={message.intro || ""}
-                        onSave={() => handleSave("intro")}
-                    />
-                </div>
-            </div>
-            </motion.section>
-            {/* Favourites Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.05 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("favourites") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("favourites") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("favourites")}
-                                title={isSectionHidden("favourites") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("favourites") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-2 sm:space-y-3">
-                        {(data.favourites || []).map((item, index) => (
-                            <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
-                                <MoveButtons
-                                    index={index}
-                                    total={(data.favourites || []).length}
-                                    onMove={(from, to) => setData({ ...data, favourites: swap(data.favourites || [], from, to) })}
-                                />
-                                <div className="flex-1 grid grid-cols-2 gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Label"
-                                        value={item.label}
-                                        onChange={(e) => {
-                                            const f = [...(data.favourites || [])];
-                                            f[index] = { ...item, label: e.target.value };
-                                            setData({ ...data, favourites: f });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Description (optional)"
-                                        value={item.description || ""}
-                                        onChange={(e) => {
-                                            const f = [...(data.favourites || [])];
-                                            f[index] = { ...item, description: e.target.value };
-                                            setData({ ...data, favourites: f });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setData({ ...data, favourites: (data.favourites || []).filter((_, i) => i !== index) })}
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() => setData({ ...data, favourites: [...(data.favourites || []), { label: "", description: "" }] })}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                {/* Column 1: Intro, Favourites, Achievements, Beyond Code */}
+                <div className="space-y-6 sm:space-y-8">
+                    {/* Intro Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
                     >
-                        <Plus className="w-4 h-4" />
-                        Thêm favourite
-                    </Button>
-                    <SaveButton saving={saving === "favourites"} message={message.favourites || ""} onSave={() => handleSave("favourites")} />
-                </div>
-            </div>
-            </motion.section>
-
-            {/* Achievements Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Achievements
-                </h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("achievements") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("achievements") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("achievements")}
-                                title={isSectionHidden("achievements") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("achievements") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-3 sm:space-y-4">
-                        {data.achievements.map((item, index) => (
-                            <div
-                                key={index}
-                                className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3"
-                            >
-                                <div className="flex justify-between items-center gap-2">
-                                    <MoveButtons
-                                        index={index}
-                                        total={data.achievements.length}
-                                        onMove={(from, to) => setData({ ...data, achievements: swap(data.achievements, from, to) })}
-                                    />
-                                    <span className="font-bold text-sm">
-                                        Achievement {index + 1}
-                                    </span>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() =>
-                                            setData({
-                                                ...data,
-                                                achievements:
-                                                    data.achievements.filter(
-                                                        (_, i) => i !== index
-                                                    ),
-                                            })
-                                        }
-                                    >
-                                        <Trash2 className="w-4 h-4 text-red-500" />
-                                    </Button>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">
-                                        Image
-                                    </label>
-                                    <ImageUpload
-                                        value={item.imageUrl || ""}
-                                        onChange={(url) => {
-                                            const a = [...data.achievements];
-                                            a[index] = {
-                                                ...item,
-                                                imageUrl: url,
-                                            };
-                                            setData({
-                                                ...data,
-                                                achievements: a,
-                                            });
-                                        }}
-                                        folder="achievements"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">
-                                        Title
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={item.title}
-                                        onChange={(e) => {
-                                            const a = [...data.achievements];
-                                            a[index] = {
-                                                ...item,
-                                                title: e.target.value,
-                                            };
-                                            setData({
-                                                ...data,
-                                                achievements: a,
-                                            });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-sm font-bold mb-1">
-                                            Issuer
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={item.issuer}
-                                            onChange={(e) => {
-                                                const a = [
-                                                    ...data.achievements,
-                                                ];
-                                                a[index] = {
-                                                    ...item,
-                                                    issuer: e.target.value,
-                                                };
-                                                setData({
-                                                    ...data,
-                                                    achievements: a,
-                                                });
-                                            }}
-                                            className={inputClass}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-bold mb-1">
-                                            Date
-                                        </label>
-                                        <input
-                                            type="text"
-                                            value={item.date}
-                                            onChange={(e) => {
-                                                const a = [
-                                                    ...data.achievements,
-                                                ];
-                                                a[index] = {
-                                                    ...item,
-                                                    date: e.target.value,
-                                                };
-                                                setData({
-                                                    ...data,
-                                                    achievements: a,
-                                                });
-                                            }}
-                                            className={inputClass}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">
-                                        Description (optional)
-                                    </label>
-                                    <textarea
-                                        value={item.description || ""}
-                                        onChange={(e) => {
-                                            const a = [...data.achievements];
-                                            a[index] = {
-                                                ...item,
-                                                description: e.target.value,
-                                            };
-                                            setData({
-                                                ...data,
-                                                achievements: a,
-                                            });
-                                        }}
-                                        className={`${inputClass} min-h-[60px]`}
-                                        rows={2}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">
-                                        URL (optional)
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={item.url || ""}
-                                        onChange={(e) => {
-                                            const a = [...data.achievements];
-                                            a[index] = {
-                                                ...item,
-                                                url: e.target.value,
-                                            };
-                                            setData({
-                                                ...data,
-                                                achievements: a,
-                                            });
-                                        }}
-                                        className={inputClass}
-                                        placeholder="https://..."
-                                    />
-                                </div>
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                            Explore Editor
+                        </h2>
+                        <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
+                            {/* macOS Window Header */}
+                            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                             </div>
-                        ))}
-                    </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() =>
-                            setData({
-                                ...data,
-                                achievements: [
-                                    ...data.achievements,
-                                    {
-                                        title: "",
-                                        issuer: "",
-                                        date: "",
-                                        description: "",
-                                    },
-                                ],
-                            })
-                        }
-                    >
-                        <Plus className="w-4 h-4" />
-                        Thêm achievement
-                    </Button>
-                    <SaveButton
-                        saving={saving === "achievements"}
-                        message={message.achievements || ""}
-                        onSave={() => handleSave("achievements")}
-                    />
-                </div>
-            </div>
-            </motion.section>
-
-            {/* Beyond Code Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.15 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Skills Beyond Code
-                </h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("beyondCode") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("beyondCode")}
-                                title={isSectionHidden("beyondCode") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("beyondCode") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <ExploreItemListEditor
-                        items={data.beyondCode || []}
-                        onChange={(items) => setData({ ...data, beyondCode: items })}
-                        folder="beyond-code"
-                        itemLabel="Item"
-                    />
-                    <SaveButton
-                        saving={saving === "beyondCode"}
-                        message={message.beyondCode || ""}
-                        onSave={() => handleSave("beyondCode")}
-                    />
-                </div>
-            </div>
-            </motion.section>
-
-            {/* Currently Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Currently
-                </h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("currently") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("currently") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("currently")}
-                                title={isSectionHidden("currently") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("currently") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-2 sm:space-y-3">
-                        {data.currently.map((item, index) => (
-                            <div
-                                key={index}
-                                className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3"
-                            >
-                                <MoveButtons
-                                    index={index}
-                                    total={data.currently.length}
-                                    onMove={(from, to) => setData({ ...data, currently: swap(data.currently, from, to) })}
-                                />                                <div className="flex-1 grid grid-cols-2 gap-2">
-                                    <input
-                                        type="text"
-                                        placeholder="Label (e.g. Learning)"
-                                        value={item.label}
-                                        onChange={(e) => {
-                                            const c = [...data.currently];
-                                            c[index] = {
-                                                ...item,
-                                                label: e.target.value,
-                                            };
-                                            setData({
-                                                ...data,
-                                                currently: c,
-                                            });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="Value"
-                                        value={item.value}
-                                        onChange={(e) => {
-                                            const c = [...data.currently];
-                                            c[index] = {
-                                                ...item,
-                                                value: e.target.value,
-                                            };
-                                            setData({
-                                                ...data,
-                                                currently: c,
-                                            });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() =>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold mb-1">
+                                    Title
+                                </label>
+                                <input
+                                    type="text"
+                                    value={data.intro.title}
+                                    onChange={(e) =>
                                         setData({
                                             ...data,
-                                            currently: data.currently.filter(
-                                                (_, i) => i !== index
-                                            ),
+                                            intro: {
+                                                ...data.intro,
+                                                title: e.target.value,
+                                            },
                                         })
                                     }
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                </Button>
+                                    className={inputClass}
+                                />
                             </div>
-                        ))}
+                            <div>
+                                <label className="block text-sm font-bold mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    value={data.intro.description}
+                                    onChange={(e) =>
+                                        setData({
+                                            ...data,
+                                            intro: {
+                                                ...data.intro,
+                                                description: e.target.value,
+                                            },
+                                        })
+                                    }
+                                    className={`${inputClass} min-h-[60px]`}
+                                    rows={2}
+                                />
+                            </div>
+                            <SaveButton
+                                saving={saving === "intro"}
+                                message={message.intro || ""}
+                                onSave={() => handleSave("intro")}
+                            />
+                        </div>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() =>
-                            setData({
-                                ...data,
-                                currently: [
-                                    ...data.currently,
-                                    { label: "", value: "" },
-                                ],
-                            })
-                        }
+                    </motion.section>
+
+                    {/* Favourites Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.05 }}
                     >
-                        <Plus className="w-4 h-4" />
-                        Thêm mục
-                    </Button>
-                    <SaveButton
-                        saving={saving === "currently"}
-                        message={message.currently || ""}
-                        onSave={() => handleSave("currently")}
-                    />
-                </div>
-            </div>
-            </motion.section>
-
-
-
-
-            {/* Stories Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("stories") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("stories") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("stories")}
-                                title={isSectionHidden("stories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("stories") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-3 sm:space-y-4">
-                        {(data.stories || []).map((item, index) => (
-                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
-                                <div className="flex justify-between items-center gap-2">
-                                    <MoveButtons
-                                        index={index}
-                                        total={(data.stories || []).length}
-                                        onMove={(from, to) => setData({ ...data, stories: swap(data.stories || [], from, to) })}
-                                    />
-                                    <span className="font-bold text-sm">Story {index + 1}</span>
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("favourites") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("favourites") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        onClick={() => setData({ ...data, stories: (data.stories || []).filter((_, i) => i !== index) })}
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("favourites")}
+                                        title={isSectionHidden("favourites") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
                                     >
-                                        <Trash2 className="w-4 h-4 text-red-500" />
+                                        {isSectionHidden("favourites") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
                                     </Button>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">Title</label>
-                                    <input
-                                        type="text"
-                                        value={item.title}
-                                        onChange={(e) => {
-                                            const s = [...(data.stories || [])];
-                                            s[index] = { ...item, title: e.target.value };
-                                            setData({ ...data, stories: s });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">Date (optional)</label>
-                                    <input
-                                        type="text"
-                                        value={item.date || ""}
-                                        onChange={(e) => {
-                                            const s = [...(data.stories || [])];
-                                            s[index] = { ...item, date: e.target.value };
-                                            setData({ ...data, stories: s });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold mb-1">Content</label>
-                                    <textarea
-                                        value={item.content}
-                                        onChange={(e) => {
-                                            const s = [...(data.stories || [])];
-                                            s[index] = { ...item, content: e.target.value };
-                                            setData({ ...data, stories: s });
-                                        }}
-                                        className={`${inputClass} min-h-[100px]`}
-                                    />
-                                </div>
                             </div>
-                        ))}
-                    </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", date: "" }] })}
-                    >
-                        <Plus className="w-4 h-4" />
-                        Thêm story
-                    </Button>
-                    <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
-                </div>
-            </div>
-            </motion.section>
-
-            {/* What's Next Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("whatsNext") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("whatsNext") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("whatsNext")}
-                                title={isSectionHidden("whatsNext") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("whatsNext") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-3 sm:space-y-4">
-                        {(data.whatsNext || []).map((item, index) => (
-                            <div key={index} className="border-2 border-black rounded-lg bg-white p-3 sm:p-4 space-y-3">
-                                <div className="flex justify-between items-center gap-2">
-                                    <MoveButtons
-                                        index={index}
-                                        total={(data.whatsNext || []).length}
-                                        onMove={(from, to) => setData({ ...data, whatsNext: swap(data.whatsNext || [], from, to) })}
-                                    />
-                                    <div className="flex-1">
-                                        <input
-                                            type="text"
-                                            placeholder="Title"
-                                            value={item.title}
-                                            onChange={(e) => {
-                                                const w = [...(data.whatsNext || [])];
-                                                w[index] = { ...item, title: e.target.value };
-                                                setData({ ...data, whatsNext: w });
-                                            }}
-                                            className={inputClass}
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-2 sm:space-y-3">
+                                {(data.favourites || []).map((item, index) => (
+                                    <div key={index} className="flex gap-2 items-center border border-zinc-200 rounded-lg bg-zinc-50/50 p-2.5 sm:p-3">
+                                        <MoveButtons
+                                            index={index}
+                                            total={(data.favourites || []).length}
+                                            onMove={(from, to) => setData({ ...data, favourites: swap(data.favourites || [], from, to) })}
                                         />
-                                    </div>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={() => setData({ ...data, whatsNext: (data.whatsNext || []).filter((_, i) => i !== index) })}
-                                    >
-                                        <Trash2 className="w-4 h-4 text-red-500" />
-                                    </Button>
-                                </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    <div>
-                                        <label className="block text-xs font-bold mb-1 text-zinc-500">Status</label>
-                                        <select
-                                            value={item.status}
-                                            onChange={(e) => {
-                                                const w = [...(data.whatsNext || [])];
-                                                w[index] = { ...item, status: e.target.value as any };
-                                                setData({ ...data, whatsNext: w });
-                                            }}
-                                            className={inputClass}
+                                        <div className="flex-1 grid grid-cols-2 gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Label"
+                                                value={item.label}
+                                                onChange={(e) => {
+                                                    const f = [...(data.favourites || [])];
+                                                    f[index] = { ...item, label: e.target.value };
+                                                    setData({ ...data, favourites: f });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Description (optional)"
+                                                value={item.description || ""}
+                                                onChange={(e) => {
+                                                    const f = [...(data.favourites || [])];
+                                                    f[index] = { ...item, description: e.target.value };
+                                                    setData({ ...data, favourites: f });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => setData({ ...data, favourites: (data.favourites || []).filter((_, i) => i !== index) })}
                                         >
-                                            <option value="Planning">Planning</option>
-                                            <option value="In Progress">In Progress</option>
-                                            <option value="Done">Done</option>
-                                        </select>
+                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                        </Button>
                                     </div>
-                                    <div>
-                                        <label className="block text-xs font-bold mb-1 text-zinc-500">Description (optional)</label>
-                                        <input
-                                            type="text"
-                                            value={item.description || ""}
-                                            onChange={(e) => {
-                                                const w = [...(data.whatsNext || [])];
-                                                w[index] = { ...item, description: e.target.value };
-                                                setData({ ...data, whatsNext: w });
-                                            }}
-                                            className={inputClass}
-                                        />
-                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() => setData({ ...data, favourites: [...(data.favourites || []), { label: "", description: "" }] })}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm favourite
+                            </Button>
+                            <SaveButton saving={saving === "favourites"} message={message.favourites || ""} onSave={() => handleSave("favourites")} />
+                        </div>
+                    </div>
+                    </motion.section>
+
+                    {/* Achievements Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.1 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                            Achievements
+                        </h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("achievements") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("achievements") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("achievements")}
+                                        title={isSectionHidden("achievements") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("achievements") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
                                 </div>
                             </div>
-                        ))}
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
+                                {data.achievements.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3"
+                                    >
+                                        <div className="flex justify-between items-center gap-2">
+                                            <MoveButtons
+                                                index={index}
+                                                total={data.achievements.length}
+                                                onMove={(from, to) => setData({ ...data, achievements: swap(data.achievements, from, to) })}
+                                            />
+                                            <span className="font-bold text-sm">
+                                                Achievement {index + 1}
+                                            </span>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() =>
+                                                    setData({
+                                                        ...data,
+                                                        achievements:
+                                                            data.achievements.filter(
+                                                                (_, i) => i !== index
+                                                            ),
+                                                    })
+                                                }
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">
+                                                Image
+                                            </label>
+                                            <ImageUpload
+                                                value={item.imageUrl || ""}
+                                                onChange={(url) => {
+                                                    const a = [...data.achievements];
+                                                    a[index] = {
+                                                        ...item,
+                                                        imageUrl: url,
+                                                    };
+                                                    setData({
+                                                        ...data,
+                                                        achievements: a,
+                                                    });
+                                                }}
+                                                folder="achievements"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">
+                                                Title
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const a = [...data.achievements];
+                                                    a[index] = {
+                                                        ...item,
+                                                        title: e.target.value,
+                                                    };
+                                                    setData({
+                                                        ...data,
+                                                        achievements: a,
+                                                    });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-sm font-bold mb-1">
+                                                    Issuer
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={item.issuer}
+                                                    onChange={(e) => {
+                                                        const a = [
+                                                            ...data.achievements,
+                                                        ];
+                                                        a[index] = {
+                                                            ...item,
+                                                            issuer: e.target.value,
+                                                        };
+                                                        setData({
+                                                            ...data,
+                                                            achievements: a,
+                                                        });
+                                                    }}
+                                                    className={inputClass}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-bold mb-1">
+                                                    Date
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={item.date}
+                                                    onChange={(e) => {
+                                                        const a = [
+                                                            ...data.achievements,
+                                                        ];
+                                                        a[index] = {
+                                                            ...item,
+                                                            date: e.target.value,
+                                                        };
+                                                        setData({
+                                                            ...data,
+                                                            achievements: a,
+                                                        });
+                                                    }}
+                                                    className={inputClass}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">
+                                                Description (optional)
+                                            </label>
+                                            <textarea
+                                                value={item.description || ""}
+                                                onChange={(e) => {
+                                                    const a = [...data.achievements];
+                                                    a[index] = {
+                                                        ...item,
+                                                        description: e.target.value,
+                                                    };
+                                                    setData({
+                                                        ...data,
+                                                        achievements: a,
+                                                    });
+                                                }}
+                                                className={`${inputClass} min-h-[60px]`}
+                                                rows={2}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">
+                                                URL (optional)
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={item.url || ""}
+                                                onChange={(e) => {
+                                                    const a = [...data.achievements];
+                                                    a[index] = {
+                                                        ...item,
+                                                        url: e.target.value,
+                                                    };
+                                                    setData({
+                                                        ...data,
+                                                        achievements: a,
+                                                    });
+                                                }}
+                                                className={inputClass}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() =>
+                                    setData({
+                                        ...data,
+                                        achievements: [
+                                            ...data.achievements,
+                                            {
+                                                title: "",
+                                                issuer: "",
+                                                date: "",
+                                                description: "",
+                                            },
+                                        ],
+                                    })
+                                }
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm achievement
+                            </Button>
+                            <SaveButton
+                                saving={saving === "achievements"}
+                                message={message.achievements || ""}
+                                onSave={() => handleSave("achievements")}
+                            />
+                        </div>
                     </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() => setData({ ...data, whatsNext: [...(data.whatsNext || []), { title: "", status: "Planning", description: "" }] })}
+                    </motion.section>
+
+                    {/* Beyond Code Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.15 }}
                     >
-                        <Plus className="w-4 h-4" />
-                        Thêm kế hoạch
-                    </Button>
-                    <SaveButton saving={saving === "whatsNext"} message={message.whatsNext || ""} onSave={() => handleSave("whatsNext")} />
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                            Skills Beyond Code
+                        </h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("beyondCode") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("beyondCode")}
+                                        title={isSectionHidden("beyondCode") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("beyondCode") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <ExploreItemListEditor
+                                items={data.beyondCode || []}
+                                onChange={(items) => setData({ ...data, beyondCode: items })}
+                                folder="beyond-code"
+                                itemLabel="Item"
+                            />
+                            <SaveButton
+                                saving={saving === "beyondCode"}
+                                message={message.beyondCode || ""}
+                                onSave={() => handleSave("beyondCode")}
+                            />
+                        </div>
+                    </div>
+                    </motion.section>
+                </div>
+
+                {/* Column 2: Currently, More & More, Stories, What's Next */}
+                <div className="space-y-6 sm:space-y-8">
+                    {/* Currently Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                            Currently
+                        </h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("currently") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("currently") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("currently")}
+                                        title={isSectionHidden("currently") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("currently") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-2 sm:space-y-3">
+                                {data.currently.map((item, index) => (
+                                    <div
+                                        key={index}
+                                        className="flex gap-2 items-center border border-zinc-200 rounded-lg bg-zinc-50/50 p-2.5 sm:p-3"
+                                    >
+                                        <MoveButtons
+                                            index={index}
+                                            total={data.currently.length}
+                                            onMove={(from, to) => setData({ ...data, currently: swap(data.currently, from, to) })}
+                                        />                                <div className="flex-1 grid grid-cols-2 gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Label (e.g. Learning)"
+                                                value={item.label}
+                                                onChange={(e) => {
+                                                    const c = [...data.currently];
+                                                    c[index] = {
+                                                        ...item,
+                                                        label: e.target.value,
+                                                    };
+                                                    setData({
+                                                        ...data,
+                                                        currently: c,
+                                                    });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Value"
+                                                value={item.value}
+                                                onChange={(e) => {
+                                                    const c = [...data.currently];
+                                                    c[index] = {
+                                                        ...item,
+                                                        value: e.target.value,
+                                                    };
+                                                    setData({
+                                                        ...data,
+                                                        currently: c,
+                                                    });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() =>
+                                                setData({
+                                                    ...data,
+                                                    currently: data.currently.filter(
+                                                        (_, i) => i !== index
+                                                    ),
+                                                })
+                                            }
+                                        >
+                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() =>
+                                    setData({
+                                        ...data,
+                                        currently: [
+                                            ...data.currently,
+                                            { label: "", value: "" },
+                                        ],
+                                    })
+                                }
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm mục
+                            </Button>
+                            <SaveButton
+                                saving={saving === "currently"}
+                                message={message.currently || ""}
+                                onSave={() => handleSave("currently")}
+                            />
+                        </div>
+                    </div>
+                    </motion.section>
+
+                    {/* More & More Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("moreAndMore") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("moreAndMore") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("moreAndMore")}
+                                        title={isSectionHidden("moreAndMore") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("moreAndMore") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-2 sm:space-y-3">
+                                {(data.moreAndMore || []).map((item, index) => (
+                                    <div key={index} className="flex gap-2 items-center border border-zinc-200 rounded-lg bg-zinc-50/50 p-2.5 sm:p-3">
+                                        <MoveButtons
+                                            index={index}
+                                            total={(data.moreAndMore || []).length}
+                                            onMove={(from, to) => setData({ ...data, moreAndMore: swap(data.moreAndMore || [], from, to) })}
+                                        />
+                                        <div className="flex-1 space-y-2">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Label (e.g. Font)"
+                                                    value={item.label}
+                                                    onChange={(e) => {
+                                                        const m = [...(data.moreAndMore || [])];
+                                                        m[index] = { ...item, label: e.target.value };
+                                                        setData({ ...data, moreAndMore: m });
+                                                    }}
+                                                    className={inputClass}
+                                                />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Description (e.g. Inter)"
+                                                    value={item.description || ""}
+                                                    onChange={(e) => {
+                                                        const m = [...(data.moreAndMore || [])];
+                                                        m[index] = { ...item, description: e.target.value };
+                                                        setData({ ...data, moreAndMore: m });
+                                                    }}
+                                                    className={inputClass}
+                                                />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="URL (optional, e.g. https://...)"
+                                                value={item.url || ""}
+                                                onChange={(e) => {
+                                                    const m = [...(data.moreAndMore || [])];
+                                                    m[index] = { ...item, url: e.target.value };
+                                                    setData({ ...data, moreAndMore: m });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => setData({ ...data, moreAndMore: (data.moreAndMore || []).filter((_, i) => i !== index) })}
+                                        >
+                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() => setData({ ...data, moreAndMore: [...(data.moreAndMore || []), { label: "", description: "", url: "" }] })}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm mục
+                            </Button>
+                            <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
+                        </div>
+                    </div>
+                    </motion.section>
+
+                    {/* Stories Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("stories") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("stories") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("stories")}
+                                        title={isSectionHidden("stories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("stories") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
+                                {(data.stories || []).map((item, index) => (
+                                    <div key={index} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
+                                        <div className="flex justify-between items-center gap-2">
+                                            <MoveButtons
+                                                index={index}
+                                                total={(data.stories || []).length}
+                                                onMove={(from, to) => setData({ ...data, stories: swap(data.stories || [], from, to) })}
+                                            />
+                                            <span className="font-bold text-sm">Story {index + 1}</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setData({ ...data, stories: (data.stories || []).filter((_, i) => i !== index) })}
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Title</label>
+                                            <input
+                                                type="text"
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const s = [...(data.stories || [])];
+                                                    s[index] = { ...item, title: e.target.value };
+                                                    setData({ ...data, stories: s });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Date (optional)</label>
+                                            <input
+                                                type="text"
+                                                value={item.date || ""}
+                                                onChange={(e) => {
+                                                    const s = [...(data.stories || [])];
+                                                    s[index] = { ...item, date: e.target.value };
+                                                    setData({ ...data, stories: s });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Content</label>
+                                            <textarea
+                                                value={item.content}
+                                                onChange={(e) => {
+                                                    const s = [...(data.stories || [])];
+                                                    s[index] = { ...item, content: e.target.value };
+                                                    setData({ ...data, stories: s });
+                                                }}
+                                                className={`${inputClass} min-h-[100px]`}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", date: "" }] })}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm story
+                            </Button>
+                            <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
+                        </div>
+                    </div>
+                    </motion.section>
+
+                    {/* What's Next Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("whatsNext") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("whatsNext") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("whatsNext")}
+                                        title={isSectionHidden("whatsNext") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("whatsNext") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
+                                {(data.whatsNext || []).map((item, index) => (
+                                    <div key={index} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
+                                        <div className="flex justify-between items-center gap-2">
+                                            <MoveButtons
+                                                index={index}
+                                                total={(data.whatsNext || []).length}
+                                                onMove={(from, to) => setData({ ...data, whatsNext: swap(data.whatsNext || [], from, to) })}
+                                            />
+                                            <div className="flex-1">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Title"
+                                                    value={item.title}
+                                                    onChange={(e) => {
+                                                        const w = [...(data.whatsNext || [])];
+                                                        w[index] = { ...item, title: e.target.value };
+                                                        setData({ ...data, whatsNext: w });
+                                                    }}
+                                                    className={inputClass}
+                                                />
+                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setData({ ...data, whatsNext: (data.whatsNext || []).filter((_, i) => i !== index) })}
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                            <div>
+                                                <label className="block text-xs font-bold mb-1 text-zinc-500">Status</label>
+                                                <select
+                                                    value={item.status}
+                                                    onChange={(e) => {
+                                                        const w = [...(data.whatsNext || [])];
+                                                        w[index] = { ...item, status: e.target.value as any };
+                                                        setData({ ...data, whatsNext: w });
+                                                    }}
+                                                    className={inputClass}
+                                                >
+                                                    <option value="Planning">Planning</option>
+                                                    <option value="In Progress">In Progress</option>
+                                                    <option value="Done">Done</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs font-bold mb-1 text-zinc-500">Description (optional)</label>
+                                                <input
+                                                    type="text"
+                                                    value={item.description || ""}
+                                                    onChange={(e) => {
+                                                        const w = [...(data.whatsNext || [])];
+                                                        w[index] = { ...item, description: e.target.value };
+                                                        setData({ ...data, whatsNext: w });
+                                                    }}
+                                                    className={inputClass}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() => setData({ ...data, whatsNext: [...(data.whatsNext || []), { title: "", status: "Planning", description: "" }] })}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm kế hoạch
+                            </Button>
+                            <SaveButton saving={saving === "whatsNext"} message={message.whatsNext || ""} onSave={() => handleSave("whatsNext")} />
+                        </div>
+                    </div>
+                    </motion.section>
                 </div>
             </div>
-            </motion.section>
 
             {/* If You're Reading Closely Section */}
             <motion.section
@@ -1139,7 +1246,7 @@ export function AdminExplorePage() {
                         />
                     </div>
 
-                    <div className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                    <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4">
                         <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
                             Impact / People
                         </h3>
@@ -1151,7 +1258,7 @@ export function AdminExplorePage() {
                         />
                     </div>
 
-                    <div className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                    <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4">
                         <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
                             Lessons / Failed
                         </h3>
@@ -1163,7 +1270,7 @@ export function AdminExplorePage() {
                         />
                     </div>
 
-                    <div className="border-2 border-black rounded-lg bg-white p-3 sm:p-4">
+                    <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4">
                         <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
                             Off the Record
                         </h3>
@@ -1180,114 +1287,6 @@ export function AdminExplorePage() {
                         message={message.readingClosely || ""}
                         onSave={() => handleSave("readingClosely")}
                     />
-                </div>
-            </div>
-            </motion.section>
-
-            {/* More & More Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.5 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
-            >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("moreAndMore") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("moreAndMore") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("moreAndMore")}
-                                title={isSectionHidden("moreAndMore") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("moreAndMore") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-4">
-                    <div className="space-y-2 sm:space-y-3">
-                        {(data.moreAndMore || []).map((item, index) => (
-                            <div key={index} className="flex gap-2 items-center border-2 border-black rounded-lg bg-white p-2.5 sm:p-3">
-                                <MoveButtons
-                                    index={index}
-                                    total={(data.moreAndMore || []).length}
-                                    onMove={(from, to) => setData({ ...data, moreAndMore: swap(data.moreAndMore || [], from, to) })}
-                                />
-                                <div className="flex-1 space-y-2">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Label (e.g. Font)"
-                                            value={item.label}
-                                            onChange={(e) => {
-                                                const m = [...(data.moreAndMore || [])];
-                                                m[index] = { ...item, label: e.target.value };
-                                                setData({ ...data, moreAndMore: m });
-                                            }}
-                                            className={inputClass}
-                                        />
-                                        <input
-                                            type="text"
-                                            placeholder="Description (e.g. Inter)"
-                                            value={item.description || ""}
-                                            onChange={(e) => {
-                                                const m = [...(data.moreAndMore || [])];
-                                                m[index] = { ...item, description: e.target.value };
-                                                setData({ ...data, moreAndMore: m });
-                                            }}
-                                            className={inputClass}
-                                        />
-                                    </div>
-                                    <input
-                                        type="text"
-                                        placeholder="URL (optional, e.g. https://...)"
-                                        value={item.url || ""}
-                                        onChange={(e) => {
-                                            const m = [...(data.moreAndMore || [])];
-                                            m[index] = { ...item, url: e.target.value };
-                                            setData({ ...data, moreAndMore: m });
-                                        }}
-                                        className={inputClass}
-                                    />
-                                </div>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => setData({ ...data, moreAndMore: (data.moreAndMore || []).filter((_, i) => i !== index) })}
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="mt-3"
-                        onClick={() => setData({ ...data, moreAndMore: [...(data.moreAndMore || []), { label: "", description: "", url: "" }] })}
-                    >
-                        <Plus className="w-4 h-4" />
-                        Thêm mục
-                    </Button>
-                    <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
                 </div>
             </div>
             </motion.section>

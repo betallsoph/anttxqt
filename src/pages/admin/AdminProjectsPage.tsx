@@ -16,7 +16,7 @@ import { Plus, Trash2, Save, Loader2, X, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
-    "w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300";
+    "w-full border border-zinc-300 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all";
 
 const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Concept", "Retired"];
 
@@ -238,7 +238,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 <div className="space-y-4">
                                     {/* Images */}
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="border-2 border-black rounded-lg bg-white p-3">
+                                        <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3">
                                             <label className="block text-sm font-bold mb-1">App Icon / Logo</label>
                                             <ImageUpload
                                                 value={project.iconUrl || ""}
@@ -247,7 +247,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                             />
                                             <p className="text-xs text-zinc-500 mt-2">Dùng cho thẻ {itemLabel} ở trang chủ</p>
                                         </div>
-                                        <div className="border-2 border-black rounded-lg bg-white p-3">
+                                        <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3">
                                             <label className="block text-sm font-bold mb-1">Banner Image</label>
                                             <ImageUpload
                                                 value={project.imageUrl || ""}
@@ -259,7 +259,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     </div>
 
                                     {/* General Settings */}
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-50 p-4 border-2 border-black rounded-lg">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-zinc-50/50 p-4 border border-zinc-200 rounded-lg">
                                         <div>
                                             <label className="block text-sm font-bold mb-1">ID (URL slug)</label>
                                             <input
@@ -305,10 +305,10 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     </div>
 
                                     {/* Bilingual & Multilingual Content (Stacked vertically to prevent squishing) */}
-                                    <div className="space-y-6 bg-zinc-50 p-4 border-2 border-black rounded-lg">
+                                    <div className="space-y-6 bg-zinc-50/50 p-4 border border-zinc-200 rounded-lg">
                                         
                                         {/* Toggles Container */}
-                                        <div className="space-y-3 pb-4 border-b border-black/10">
+                                        <div className="space-y-3 pb-4 border-b border-zinc-200">
                                             {/* Vietnamese Enable Toggle */}
                                             <div className="flex items-center justify-between">
                                                 <div>
@@ -318,12 +318,12 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => updateProject(index, { showVi: !project.showVi })}
-                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-black transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                        project.showVi ? "bg-green-300" : "bg-zinc-200"
+                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-zinc-300 transition-colors duration-200 ease-in-out focus:outline-none ${
+                                                        project.showVi ? "bg-green-500" : "bg-zinc-200"
                                                     }`}
                                                 >
                                                     <span
-                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full border-r-2 border-b-2 border-black bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                                                             project.showVi ? "translate-x-5" : "translate-x-0"
                                                         }`}
                                                     />
@@ -331,7 +331,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                             </div>
 
                                             {/* Arabic Enable Toggle */}
-                                            <div className="flex items-center justify-between pt-2 border-t border-black/5">
+                                            <div className="flex items-center justify-between pt-2 border-t border-zinc-200">
                                                 <div>
                                                     <span className="block text-sm font-bold">Bản Tiếng Ả Rập MSA (Arabic)</span>
                                                     <span className="block text-[10px] text-zinc-500">Bật bản soạn thảo và hiển thị nút "tiếng Ả Rập MSA"</span>
@@ -339,12 +339,12 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 <button
                                                     type="button"
                                                     onClick={() => updateProject(index, { showAr: !project.showAr })}
-                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-black transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                        project.showAr ? "bg-green-300" : "bg-zinc-200"
+                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-zinc-300 transition-colors duration-200 ease-in-out focus:outline-none ${
+                                                        project.showAr ? "bg-green-500" : "bg-zinc-200"
                                                     }`}
                                                 >
                                                     <span
-                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full border-r-2 border-b-2 border-black bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${
                                                             project.showAr ? "translate-x-5" : "translate-x-0"
                                                         }`}
                                                     />
@@ -560,7 +560,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     </div>
 
                                     {/* Classification & Taxonomy */}
-                                    <div className="space-y-4 bg-zinc-50 p-4 border-2 border-black rounded-lg">
+                                    <div className="space-y-4 bg-zinc-50/50 p-4 border border-zinc-200 rounded-lg">
                                         {/* Roles */}
                                         <div>
                                             <label className="block text-sm font-bold mb-1">Roles / Job Types (Nhãn tuyển dụng màu xanh dương)</label>
@@ -681,7 +681,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                         <label className="block text-sm font-bold mb-1">Gallery Images</label>
                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                             {(project.images || []).map((_, imgIndex) => (
-                                                <div key={imgIndex} className="border-2 border-black rounded-lg bg-white p-3 flex flex-col justify-between">
+                                                <div key={imgIndex} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 flex flex-col justify-between">
                                                     <div className="flex justify-between items-center mb-1">
                                                         <span className="text-xs font-bold text-zinc-500">Ảnh {imgIndex + 1}</span>
                                                         <Button
