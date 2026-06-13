@@ -22,7 +22,7 @@ export function Layout() {
             {/* Gradient Overlay for better readability */}
             <div className="fixed inset-0 -z-10 bg-gradient-to-b from-white/80 via-white/60 to-white/80 pointer-events-none" />
 
-            <Header />
+            {!isAdmin && <Header />}
 
             <main className="flex-1">
                 <div className={`${widthClass} mx-auto py-6 sm:py-8`}>
