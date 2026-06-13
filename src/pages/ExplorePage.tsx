@@ -274,10 +274,21 @@ function CollapsibleMoreSection({
                     <span className="text-xl sm:text-2xl font-bold">
                         More & More
                     </span>
-                    <motion.span
-                        style={{ scaleX: highlightScaleX }}
-                        className="absolute bottom-1 left-0 right-0 h-2 sm:h-2.5 bg-blue-200/70 -z-10 origin-left rounded-sm"
-                    />
+                    <svg
+                        viewBox="0 0 100 12"
+                        preserveAspectRatio="none"
+                        className="absolute -bottom-1 left-0 right-0 h-3 sm:h-4 w-full -z-10 pointer-events-none"
+                    >
+                        <motion.path
+                            d="M 1,5 C 30,3 70,3 99,5 C 70,9 30,9 5,10 C 35,10 70,9 95,8"
+                            fill="none"
+                            stroke="rgba(147, 197, 253, 0.85)"
+                            strokeWidth={3}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            style={{ pathLength: highlightScaleX }}
+                        />
+                    </svg>
                 </span>
                 <motion.div
                     animate={{
