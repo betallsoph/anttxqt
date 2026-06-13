@@ -281,7 +281,7 @@ function CollapsibleMoreSection({
                             strokeLinejoin="round"
                             initial={{ pathLength: 0 }}
                             whileInView={{ pathLength: 1 }}
-                            viewport={{ once: false, margin: "-10px" }}
+                            viewport={{ once: false, margin: "0px 0px -90px 0px" }}
                             transition={{ duration: 0.85, ease: [0.47, 0, 0.745, 0.715], delay: 0.15 }}
                         />
                     </svg>
