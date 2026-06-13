@@ -250,7 +250,7 @@ export function ExplorePage() {
     const highlightRef = useRef<HTMLSpanElement>(null);
     const { scrollYProgress } = useScroll({
         target: highlightRef,
-        offset: ["start end", "end 75%"]
+        offset: ["start end", "start 30%"]
     });
     const highlightScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
