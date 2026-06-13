@@ -28,6 +28,13 @@ export interface Project {
     keyFeaturesVi?: string[];
     fullDescriptionVi?: string;
     showVi?: boolean;
+    // Arabic translation fields (written manually by admin)
+    titleAr?: string;
+    descriptionAr?: string;
+    storyBehindAr?: string;
+    keyFeaturesAr?: string[];
+    fullDescriptionAr?: string;
+    showAr?: boolean;
 }
 
 export type CollectionType = "products" | "projects";
@@ -173,6 +180,9 @@ export async function saveProjectsData(type: CollectionType, projects: Project[]
         }
         if (project.keyFeaturesVi) {
             project.keyFeaturesVi = project.keyFeaturesVi.filter((f: string) => f.trim() !== "");
+        }
+        if (project.keyFeaturesAr) {
+            project.keyFeaturesAr = project.keyFeaturesAr.filter((f: string) => f.trim() !== "");
         }
         return project;
     });

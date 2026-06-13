@@ -304,27 +304,52 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                         </div>
                                     </div>
 
-                                    {/* Bilingual Content (Stacked vertically to prevent squishing) */}
+                                    {/* Bilingual & Multilingual Content (Stacked vertically to prevent squishing) */}
                                     <div className="space-y-6 bg-zinc-50 p-4 border-2 border-black rounded-lg">
-                                        {/* Vietnamese Enable Toggle */}
-                                        <div className="flex items-center justify-between pb-4 border-b border-black/10">
-                                            <div>
-                                                <span className="block text-sm font-bold">Bản Tiếng Việt</span>
-                                                <span className="block text-[10px] text-zinc-500">Hiển thị nút "Xem bản tiếng Việt" trên trang chi tiết</span>
-                                            </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => updateProject(index, { showVi: !project.showVi })}
-                                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-black transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                    project.showVi ? "bg-green-300" : "bg-zinc-200"
-                                                }`}
-                                            >
-                                                <span
-                                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full border-r-2 border-b-2 border-black bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                        project.showVi ? "translate-x-5" : "translate-x-0"
+                                        
+                                        {/* Toggles Container */}
+                                        <div className="space-y-3 pb-4 border-b border-black/10">
+                                            {/* Vietnamese Enable Toggle */}
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <span className="block text-sm font-bold">Bản Tiếng Việt</span>
+                                                    <span className="block text-[10px] text-zinc-500">Bật bản soạn thảo và hiển thị nút "Xem bản tiếng Việt"</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateProject(index, { showVi: !project.showVi })}
+                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-black transition-colors duration-200 ease-in-out focus:outline-none ${
+                                                        project.showVi ? "bg-green-300" : "bg-zinc-200"
                                                     }`}
-                                                />
-                                            </button>
+                                                >
+                                                    <span
+                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full border-r-2 border-b-2 border-black bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                            project.showVi ? "translate-x-5" : "translate-x-0"
+                                                        }`}
+                                                    />
+                                                </button>
+                                            </div>
+
+                                            {/* Arabic Enable Toggle */}
+                                            <div className="flex items-center justify-between pt-2 border-t border-black/5">
+                                                <div>
+                                                    <span className="block text-sm font-bold">Bản Tiếng Ả Rập MSA (Arabic)</span>
+                                                    <span className="block text-[10px] text-zinc-500">Bật bản soạn thảo và hiển thị nút "tiếng Ả Rập MSA"</span>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => updateProject(index, { showAr: !project.showAr })}
+                                                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-black transition-colors duration-200 ease-in-out focus:outline-none ${
+                                                        project.showAr ? "bg-green-300" : "bg-zinc-200"
+                                                    }`}
+                                                >
+                                                    <span
+                                                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full border-r-2 border-b-2 border-black bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                            project.showAr ? "translate-x-5" : "translate-x-0"
+                                                        }`}
+                                                    />
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {/* English Version */}
@@ -395,69 +420,143 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                         </div>
 
                                         {/* Vietnamese Version */}
-                                        <div className="space-y-4 pt-4 border-t border-black/10">
-                                            <div className="border-b border-black/10 pb-1">
-                                                <h4 className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Bản Tiếng Việt</h4>
-                                            </div>
+                                        {project.showVi && (
+                                            <div className="space-y-4 pt-4 border-t border-black/10">
+                                                <div className="border-b border-black/10 pb-1">
+                                                    <h4 className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Bản Tiếng Việt</h4>
+                                                </div>
 
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">Title (VI)</label>
-                                                <input
-                                                    type="text"
-                                                    value={project.titleVi || ""}
-                                                    onChange={(e) => updateProject(index, { titleVi: e.target.value })}
-                                                    className={inputClass}
-                                                    placeholder="Tiêu đề tiếng Việt..."
-                                                />
-                                            </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold mb-1">Title (VI)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={project.titleVi || ""}
+                                                        onChange={(e) => updateProject(index, { titleVi: e.target.value })}
+                                                        className={inputClass}
+                                                        placeholder="Tiêu đề tiếng Việt..."
+                                                    />
+                                                </div>
 
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">Short Description (VI - lists page)</label>
-                                                <textarea
-                                                    value={project.descriptionVi || ""}
-                                                    onChange={(e) => updateProject(index, { descriptionVi: e.target.value })}
-                                                    className={`${inputClass} min-h-[60px]`}
-                                                    rows={2}
-                                                    placeholder="Mô tả ngắn tiếng Việt..."
-                                                />
-                                            </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold mb-1">Short Description (VI - lists page)</label>
+                                                    <textarea
+                                                        value={project.descriptionVi || ""}
+                                                        onChange={(e) => updateProject(index, { descriptionVi: e.target.value })}
+                                                        className={`${inputClass} min-h-[60px]`}
+                                                        rows={2}
+                                                        placeholder="Mô tả ngắn tiếng Việt..."
+                                                    />
+                                                </div>
 
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">Full Description (VI - details page)</label>
-                                                <textarea
-                                                    value={project.fullDescriptionVi || ""}
-                                                    onChange={(e) => updateProject(index, { fullDescriptionVi: e.target.value })}
-                                                    className={`${inputClass} min-h-[100px]`}
-                                                    rows={3}
-                                                    placeholder="Mô tả chi tiết tiếng Việt..."
-                                                />
-                                            </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold mb-1">Full Description (VI - details page)</label>
+                                                    <textarea
+                                                        value={project.fullDescriptionVi || ""}
+                                                        onChange={(e) => updateProject(index, { fullDescriptionVi: e.target.value })}
+                                                        className={`${inputClass} min-h-[100px]`}
+                                                        rows={3}
+                                                        placeholder="Mô tả chi tiết tiếng Việt..."
+                                                    />
+                                                </div>
 
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">The Story Behind (VI - details page)</label>
-                                                <textarea
-                                                    value={project.storyBehindVi || ""}
-                                                    onChange={(e) => updateProject(index, { storyBehindVi: e.target.value })}
-                                                    className={`${inputClass} min-h-[100px]`}
-                                                    rows={3}
-                                                    placeholder="Câu chuyện phía sau tiếng Việt..."
-                                                />
-                                            </div>
+                                                <div>
+                                                    <label className="block text-sm font-bold mb-1">The Story Behind (VI - details page)</label>
+                                                    <textarea
+                                                        value={project.storyBehindVi || ""}
+                                                        onChange={(e) => updateProject(index, { storyBehindVi: e.target.value })}
+                                                        className={`${inputClass} min-h-[100px]`}
+                                                        rows={3}
+                                                        placeholder="Câu chuyện phía sau tiếng Việt..."
+                                                    />
+                                                </div>
 
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">Key Features (VI - details page)</label>
-                                                <textarea
-                                                    value={(project.keyFeaturesVi || []).join("\n")}
-                                                    onChange={(e) => {
-                                                        const features = e.target.value.split("\n");
-                                                        updateProject(index, { keyFeaturesVi: features });
-                                                    }}
-                                                    className={`${inputClass} min-h-[100px] leading-relaxed`}
-                                                    rows={4}
-                                                    placeholder="Mỗi dòng là một tính năng..."
-                                                />
+                                                <div>
+                                                    <label className="block text-sm font-bold mb-1">Key Features (VI - details page)</label>
+                                                    <textarea
+                                                        value={(project.keyFeaturesVi || []).join("\n")}
+                                                        onChange={(e) => {
+                                                            const features = e.target.value.split("\n");
+                                                            updateProject(index, { keyFeaturesVi: features });
+                                                        }}
+                                                        className={`${inputClass} min-h-[100px] leading-relaxed`}
+                                                        rows={4}
+                                                        placeholder="Mỗi dòng là một tính năng..."
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
+
+                                        {/* Arabic Version (Modern Standard Arabic - RTL editing optimized) */}
+                                        {project.showAr && (
+                                            <div className="space-y-4 pt-4 border-t border-black/10 text-right" dir="rtl">
+                                                <div className="border-b border-black/10 pb-1 text-right">
+                                                    <h4 className="text-xs font-bold text-zinc-700 uppercase tracking-wider">Bản Tiếng Ả Rập MSA (Arabic)</h4>
+                                                </div>
+
+                                                <div className="text-right">
+                                                    <label className="block text-sm font-bold mb-1 text-right">Title (AR)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={project.titleAr || ""}
+                                                        onChange={(e) => updateProject(index, { titleAr: e.target.value })}
+                                                        className={`${inputClass} text-right`}
+                                                        placeholder="العنوان باللغة العربية..."
+                                                        dir="rtl"
+                                                    />
+                                                </div>
+
+                                                <div className="text-right">
+                                                    <label className="block text-sm font-bold mb-1 text-right">Short Description (AR - lists page)</label>
+                                                    <textarea
+                                                        value={project.descriptionAr || ""}
+                                                        onChange={(e) => updateProject(index, { descriptionAr: e.target.value })}
+                                                        className={`${inputClass} min-h-[60px] text-right`}
+                                                        rows={2}
+                                                        placeholder="الوصف القصير باللغة العربية..."
+                                                        dir="rtl"
+                                                    />
+                                                </div>
+
+                                                <div className="text-right">
+                                                    <label className="block text-sm font-bold mb-1 text-right">Full Description (AR - details page)</label>
+                                                    <textarea
+                                                        value={project.fullDescriptionAr || ""}
+                                                        onChange={(e) => updateProject(index, { fullDescriptionAr: e.target.value })}
+                                                        className={`${inputClass} min-h-[100px] text-right`}
+                                                        rows={3}
+                                                        placeholder="الوصف الكامل باللغة العربية..."
+                                                        dir="rtl"
+                                                    />
+                                                </div>
+
+                                                <div className="text-right">
+                                                    <label className="block text-sm font-bold mb-1 text-right">The Story Behind (AR - details page)</label>
+                                                    <textarea
+                                                        value={project.storyBehindAr || ""}
+                                                        onChange={(e) => updateProject(index, { storyBehindAr: e.target.value })}
+                                                        className={`${inputClass} min-h-[100px] text-right`}
+                                                        rows={3}
+                                                        placeholder="قصة المشروع باللغة العربية..."
+                                                        dir="rtl"
+                                                    />
+                                                </div>
+
+                                                <div className="text-right">
+                                                    <label className="block text-sm font-bold mb-1 text-right">Key Features (AR - details page)</label>
+                                                    <textarea
+                                                        value={(project.keyFeaturesAr || []).join("\n")}
+                                                        onChange={(e) => {
+                                                            const features = e.target.value.split("\n");
+                                                            updateProject(index, { keyFeaturesAr: features });
+                                                        }}
+                                                        className={`${inputClass} min-h-[100px] leading-relaxed text-right`}
+                                                        rows={4}
+                                                        placeholder="الميزات الرئيسية (سطر لكل ميزة)..."
+                                                        dir="rtl"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Classification & Taxonomy */}
