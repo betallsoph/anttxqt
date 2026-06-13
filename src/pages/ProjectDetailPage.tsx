@@ -7,6 +7,7 @@ import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
 import { parseBoldText } from "@/lib/utils";
 
 interface ProjectTranslation {
+    title?: string;
     description?: string;
     storyBehind?: string;
     keyFeatures?: string[];
@@ -103,9 +104,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     }
 
     const translation = translations[project.id];
-    const storyBehindText = (isVietnamese && translation?.storyBehind) || project.storyBehind;
-    const keyFeaturesList = (isVietnamese && translation?.keyFeatures) || project.keyFeatures;
-    const fullDescriptionText = (isVietnamese && translation?.fullDescription) || project.fullDescription;
+    const titleText = (isVietnamese && (project.titleVi || translation?.title)) || project.title;
+    const storyBehindText = (isVietnamese && (project.storyBehindVi || translation?.storyBehind)) || project.storyBehind;
+    const keyFeaturesList = (isVietnamese && (project.keyFeaturesVi || translation?.keyFeatures)) || project.keyFeatures;
+    const fullDescriptionText = (isVietnamese && (project.fullDescriptionVi || translation?.fullDescription)) || project.fullDescription;
 
     return (
         <div className="space-y-8">
@@ -138,13 +140,12 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
                         <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                     </div>
-                    {/* Language Switcher Button */}
+                    {/* Language Switcher Link (styled like dive in my story) */}
                     <button
                         onClick={() => setIsVietnamese(!isVietnamese)}
-                        className="text-[10px] sm:text-xs font-bold px-2 py-1 border-2 border-black bg-white rounded shadow-[1.5px_1.5px_0px_0px_rgba(0,0,0,1)] hover:bg-zinc-50 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer flex items-center gap-1 select-none"
+                        className="text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-blue-600 hover:underline transition-colors cursor-pointer select-none"
                     >
-                        <span>🌐</span>
-                        <span>{isVietnamese ? "English Version" : "Xem bản tiếng Việt"}</span>
+                        {isVietnamese ? "view english version" : "xem bản tiếng việt"}
                     </button>
                 </div>
 
@@ -162,7 +163,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                 <div className="p-4 sm:p-6">
                     {/* Title */}
-                    <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{project.title}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{titleText}</h1>
 
                     {/* Status & Quick Links */}
                     <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap mb-4 sm:mb-6">

@@ -21,6 +21,12 @@ export interface Project {
     iconUrl?: string; // Small app icon or logo
     imageUrl?: string; // Wide banner image
     images?: string[]; // Gallery images
+    // Vietnamese translation fields (written manually by admin)
+    titleVi?: string;
+    descriptionVi?: string;
+    storyBehindVi?: string;
+    keyFeaturesVi?: string[];
+    fullDescriptionVi?: string;
 }
 
 export type CollectionType = "products" | "projects";
@@ -160,10 +166,12 @@ export function useProjectsData(type: CollectionType) {
 export async function saveProjectsData(type: CollectionType, projects: Project[]) {
     const cleaned = JSON.parse(JSON.stringify(projects));
     
-    // Clean up empty lines from keyFeatures
     const processed = cleaned.map((project: any) => {
         if (project.keyFeatures) {
             project.keyFeatures = project.keyFeatures.filter((f: string) => f.trim() !== "");
+        }
+        if (project.keyFeaturesVi) {
+            project.keyFeaturesVi = project.keyFeaturesVi.filter((f: string) => f.trim() !== "");
         }
         return project;
     });

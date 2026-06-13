@@ -255,8 +255,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 </div>
                             </div>
 
-                            {/* ID + Title */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {/* General Settings */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-zinc-50 p-4 border-2 border-black rounded-lg">
                                 <div>
                                     <label className="block text-sm font-bold mb-1">ID (URL slug)</label>
                                     <input
@@ -268,200 +268,17 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold mb-1">Title</label>
-                                    <input
-                                        type="text"
-                                        value={project.title}
-                                        onChange={(e) => {
-                                            const updates: Partial<Project> = { title: e.target.value };
-                                            if (!project.id) {
-                                                updates.id = generateId(e.target.value);
-                                            }
-                                            updateProject(index, updates);
-                                        }}
+                                    <label className="block text-sm font-bold mb-1">Status</label>
+                                    <select
+                                        value={project.status}
+                                        onChange={(e) => updateProject(index, { status: e.target.value as ProjectStatus })}
                                         className={inputClass}
-                                    />
+                                    >
+                                        {statusOptions.map((s) => (
+                                            <option key={s} value={s}>{s === "Retired" ? "Sunsetting - Retired" : s}</option>
+                                        ))}
+                                    </select>
                                 </div>
-                            </div>
-
-                            {/* Description */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Description (Hiển thị ở trang danh sách)</label>
-                                <textarea
-                                    value={project.description}
-                                    onChange={(e) => updateProject(index, { description: e.target.value })}
-                                    className={`${inputClass} min-h-[60px]`}
-                                    rows={2}
-                                  />
-                            </div>
-
-                            {/* Full Description */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Full Description (Hiển thị ở trang chi tiết)</label>
-                                <textarea
-                                    value={project.fullDescription || ""}
-                                    onChange={(e) => updateProject(index, { fullDescription: e.target.value })}
-                                    className={`${inputClass} min-h-[80px]`}
-                                    rows={3}
-                                />
-                            </div>
-
-                            {/* The Story Behind */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">The Story Behind (Hiển thị ở trang chi tiết)</label>
-                                <textarea
-                                    value={project.storyBehind || ""}
-                                    onChange={(e) => updateProject(index, { storyBehind: e.target.value })}
-                                    className={`${inputClass} min-h-[80px]`}
-                                    rows={3}
-                                />
-                            </div>
-
-                            {/* Status */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Status</label>
-                                <select
-                                    value={project.status}
-                                    onChange={(e) => updateProject(index, { status: e.target.value as ProjectStatus })}
-                                    className={inputClass}
-                                >
-                                    {statusOptions.map((s) => (
-                                        <option key={s} value={s}>{s === "Retired" ? "Sunsetting - Retired" : s}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            {/* Roles */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Roles / Job Types (Nhãn tuyển dụng màu xanh dương)</label>
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
-                                    {(project.roles || []).map((role, roleIndex) => (
-                                        <span
-                                            key={roleIndex}
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded text-blue-800"
-                                        >
-                                            {role}
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const newRoles = (project.roles || []).filter((_, i) => i !== roleIndex);
-                                                    updateProject(index, { roles: newRoles });
-                                                }}
-                                                className="hover:text-red-500 transition-colors ml-1"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Nhập role rồi Enter (Ví dụ: Web, Mobile, DevOps...)"
-                                    className={inputClass}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            const val = e.currentTarget.value.trim();
-                                            if (val) {
-                                                updateProject(index, { roles: [...(project.roles || []), val] });
-                                                e.currentTarget.value = "";
-                                            }
-                                        }
-                                    }}
-                                />
-                            </div>
-
-                            {/* Topics */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Topics (Hashtag chủ đề màu xám)</label>
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
-                                    {(project.topics || []).map((topic, topicIndex) => (
-                                        <span
-                                            key={topicIndex}
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium bg-zinc-100 border border-zinc-300 text-zinc-600 rounded"
-                                        >
-                                            #{topic.toLowerCase().replace(/\s+/g, "-")}
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
-                                                    updateProject(index, { topics: newTopics });
-                                                }}
-                                                className="hover:text-red-500 transition-colors ml-1"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Nhập topic rồi Enter (Ví dụ: property-management...)"
-                                    className={inputClass}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            const val = e.currentTarget.value.trim();
-                                            if (val) {
-                                                updateProject(index, { topics: [...(project.topics || []), val] });
-                                                e.currentTarget.value = "";
-                                            }
-                                        }
-                                    }}
-                                />
-                            </div>
-
-                            {/* Tags */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Tags</label>
-                                <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2">
-                                    {project.tags.map((tag, tagIndex) => (
-                                        <span
-                                            key={tagIndex}
-                                            className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
-                                        >
-                                            {tag}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeTag(index, tagIndex)}
-                                                className="hover:text-red-500 transition-colors"
-                                            >
-                                                <X className="w-3 h-3" />
-                                            </button>
-                                        </span>
-                                    ))}
-                                </div>
-                                <input
-                                    type="text"
-                                    placeholder="Nhập tag rồi Enter"
-                                    className={inputClass}
-                                    onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                            e.preventDefault();
-                                            addTag(index, e.currentTarget.value);
-                                            e.currentTarget.value = "";
-                                        }
-                                    }}
-                                />
-                            </div>
-
-                            {/* Key Features */}
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Key Features</label>
-                                <textarea
-                                    value={(project.keyFeatures || []).join("\n")}
-                                    onChange={(e) => {
-                                        const features = e.target.value.split("\n");
-                                        updateProject(index, { keyFeatures: features });
-                                    }}
-                                    className={`${inputClass} min-h-[80px] leading-relaxed`}
-                                    rows={4}
-                                    placeholder="Mỗi dòng là một tính năng nổi bật..."
-                                />
-                            </div>
-
-                            {/* URLs */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
                                     <label className="block text-sm font-bold mb-1">GitHub URL</label>
                                     <input
@@ -480,6 +297,258 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                         onChange={(e) => updateProject(index, { liveUrl: e.target.value || undefined })}
                                         className={inputClass}
                                         placeholder="https://..."
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Bilingual Content (Side-by-side on desktop) */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-50 p-4 border-2 border-black rounded-lg">
+                                {/* Left Column: English (Default) */}
+                                <div className="space-y-4">
+                                    <div className="border-b-2 border-black pb-1">
+                                        <h4 className="text-sm font-bold text-zinc-700 uppercase tracking-wider">English Version</h4>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Title (EN)</label>
+                                        <input
+                                            type="text"
+                                            value={project.title}
+                                            onChange={(e) => {
+                                                const updates: Partial<Project> = { title: e.target.value };
+                                                if (!project.id) {
+                                                    updates.id = generateId(e.target.value);
+                                                }
+                                                updateProject(index, updates);
+                                            }}
+                                            className={inputClass}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Short Description (EN - lists page)</label>
+                                        <textarea
+                                            value={project.description}
+                                            onChange={(e) => updateProject(index, { description: e.target.value })}
+                                            className={`${inputClass} min-h-[60px]`}
+                                            rows={2}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Full Description (EN - details page)</label>
+                                        <textarea
+                                            value={project.fullDescription || ""}
+                                            onChange={(e) => updateProject(index, { fullDescription: e.target.value })}
+                                            className={`${inputClass} min-h-[100px]`}
+                                            rows={3}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">The Story Behind (EN - details page)</label>
+                                        <textarea
+                                            value={project.storyBehind || ""}
+                                            onChange={(e) => updateProject(index, { storyBehind: e.target.value })}
+                                            className={`${inputClass} min-h-[100px]`}
+                                            rows={3}
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Key Features (EN - details page)</label>
+                                        <textarea
+                                            value={(project.keyFeatures || []).join("\n")}
+                                            onChange={(e) => {
+                                                const features = e.target.value.split("\n");
+                                                updateProject(index, { keyFeatures: features });
+                                            }}
+                                            className={`${inputClass} min-h-[100px] leading-relaxed`}
+                                            rows={4}
+                                            placeholder="Mỗi dòng là một tính năng..."
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Right Column: Vietnamese */}
+                                <div className="space-y-4">
+                                    <div className="border-b-2 border-black pb-1">
+                                        <h4 className="text-sm font-bold text-zinc-700 uppercase tracking-wider">Bản Tiếng Việt</h4>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Title (VI)</label>
+                                        <input
+                                            type="text"
+                                            value={project.titleVi || ""}
+                                            onChange={(e) => updateProject(index, { titleVi: e.target.value })}
+                                            className={inputClass}
+                                            placeholder="Tiêu đề tiếng Việt..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Short Description (VI - lists page)</label>
+                                        <textarea
+                                            value={project.descriptionVi || ""}
+                                            onChange={(e) => updateProject(index, { descriptionVi: e.target.value })}
+                                            className={`${inputClass} min-h-[60px]`}
+                                            rows={2}
+                                            placeholder="Mô tả ngắn tiếng Việt..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Full Description (VI - details page)</label>
+                                        <textarea
+                                            value={project.fullDescriptionVi || ""}
+                                            onChange={(e) => updateProject(index, { fullDescriptionVi: e.target.value })}
+                                            className={`${inputClass} min-h-[100px]`}
+                                            rows={3}
+                                            placeholder="Mô tả chi tiết tiếng Việt..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">The Story Behind (VI - details page)</label>
+                                        <textarea
+                                            value={project.storyBehindVi || ""}
+                                            onChange={(e) => updateProject(index, { storyBehindVi: e.target.value })}
+                                            className={`${inputClass} min-h-[100px]`}
+                                            rows={3}
+                                            placeholder="Câu chuyện phía sau tiếng Việt..."
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-bold mb-1">Key Features (VI - details page)</label>
+                                        <textarea
+                                            value={(project.keyFeaturesVi || []).join("\n")}
+                                            onChange={(e) => {
+                                                const features = e.target.value.split("\n");
+                                                updateProject(index, { keyFeaturesVi: features });
+                                            }}
+                                            className={`${inputClass} min-h-[100px] leading-relaxed`}
+                                            rows={4}
+                                            placeholder="Mỗi dòng là một tính năng..."
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Classification & Taxonomy (Grid layout for desktop) */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-zinc-50 p-4 border-2 border-black rounded-lg">
+                                {/* Roles */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">Roles / Job Types (Nhãn tuyển dụng màu xanh dương)</label>
+                                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 min-h-[32px]">
+                                        {(project.roles || []).map((role, roleIndex) => (
+                                            <span
+                                                key={roleIndex}
+                                                className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-blue-100 border border-blue-300 rounded text-blue-800"
+                                            >
+                                                {role}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newRoles = (project.roles || []).filter((_, i) => i !== roleIndex);
+                                                        updateProject(index, { roles: newRoles });
+                                                    }}
+                                                    className="hover:text-red-500 transition-colors ml-1 cursor-pointer"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Nhập role rồi Enter (Ví dụ: Web, Mobile...)"
+                                        className={inputClass}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                const val = e.currentTarget.value.trim();
+                                                if (val) {
+                                                    updateProject(index, { roles: [...(project.roles || []), val] });
+                                                    e.currentTarget.value = "";
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Topics */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">Topics (Hashtag chủ đề màu xám)</label>
+                                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 min-h-[32px]">
+                                        {(project.topics || []).map((topic, topicIndex) => (
+                                            <span
+                                                key={topicIndex}
+                                                className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium bg-zinc-100 border border-zinc-300 text-zinc-600 rounded"
+                                            >
+                                                #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
+                                                        updateProject(index, { topics: newTopics });
+                                                    }}
+                                                    className="hover:text-red-500 transition-colors ml-1 cursor-pointer"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Nhập topic rồi Enter (Ví dụ: techforgood...)"
+                                        className={inputClass}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                const val = e.currentTarget.value.trim();
+                                                if (val) {
+                                                    updateProject(index, { topics: [...(project.topics || []), val] });
+                                                    e.currentTarget.value = "";
+                                                }
+                                            }
+                                        }}
+                                    />
+                                </div>
+
+                                {/* Tags */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">Tags (Công nghệ chính)</label>
+                                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-2 min-h-[32px]">
+                                        {project.tags.map((tag, tagIndex) => (
+                                            <span
+                                                key={tagIndex}
+                                                className="inline-flex items-center gap-1 px-2 sm:px-3 py-0.5 sm:py-1 text-[10px] sm:text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
+                                            >
+                                                {tag}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeTag(index, tagIndex)}
+                                                    className="hover:text-red-500 transition-colors ml-1 cursor-pointer"
+                                                >
+                                                    <X className="w-3 h-3" />
+                                                </button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <input
+                                        type="text"
+                                        placeholder="Nhập tag rồi Enter"
+                                        className={inputClass}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter") {
+                                                e.preventDefault();
+                                                addTag(index, e.currentTarget.value);
+                                                e.currentTarget.value = "";
+                                            }
+                                        }}
                                     />
                                 </div>
                             </div>
