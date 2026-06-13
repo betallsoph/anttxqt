@@ -95,7 +95,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
         let finalId = (project.id || "").trim();
 
         if (!finalTitle) {
-            setMessages((prev) => ({ ...prev, [index]: "Lỗi: Title không được để trống!" }));
+            setMessages((prev) => ({ ...prev, [index]: "Error: Title cannot be empty!" }));
             setTimeout(() => setMessages((prev) => ({ ...prev, [index]: "" })), 4000);
             return;
         }
@@ -103,7 +103,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
         if (!finalId) {
             finalId = generateId(finalTitle);
             if (!finalId) {
-                setMessages((prev) => ({ ...prev, [index]: "Lỗi: Không thể tự tạo ID từ Title!" }));
+                setMessages((prev) => ({ ...prev, [index]: "Error: Cannot auto-generate ID from Title!" }));
                 setTimeout(() => setMessages((prev) => ({ ...prev, [index]: "" })), 4000);
                 return;
             }
@@ -117,10 +117,10 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
         setMessages((prev) => ({ ...prev, [index]: "" }));
         try {
             await saveProjectsData(type, projects);
-            setMessages((prev) => ({ ...prev, [index]: "Đã lưu thành công!" }));
+            setMessages((prev) => ({ ...prev, [index]: "Saved successfully!" }));
         } catch (err) {
             console.error(err);
-            setMessages((prev) => ({ ...prev, [index]: "Lỗi khi lưu!" }));
+            setMessages((prev) => ({ ...prev, [index]: "Error saving!" }));
         } finally {
             setSavingIndex(null);
             setTimeout(() => setMessages((prev) => ({ ...prev, [index]: "" })), 3000);
@@ -160,7 +160,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
             <div className="flex items-center justify-center py-24">
                 <div className="text-center space-y-3">
                     <Loader2 className="w-8 h-8 animate-spin mx-auto text-zinc-500" />
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Đang tải danh sách {title}...</p>
+                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Loading {title} list...</p>
                 </div>
             </div>
         );
@@ -197,7 +197,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                 <div>
                     <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900">{title} Manager</h2>
                     <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mt-0.5">
-                        Danh sách có <span className="font-bold text-zinc-900">{projects.length}</span> {itemLabel}s
+                        <span className="font-bold text-zinc-900">{projects.length}</span> {itemLabel}s available
                     </p>
                 </div>
                 <Button
@@ -218,7 +218,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                     }}
                 >
                     <Plus className="w-4 h-4 mr-1.5" />
-                    Thêm {itemLabel} mới
+                    Add new {itemLabel}
                 </Button>
             </motion.div>
 
@@ -233,7 +233,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                             <Search className="w-4 h-4 absolute left-3 top-3 text-zinc-400" />
                             <input
                                 type="text"
-                                placeholder="Tìm theo tên, thẻ tag..."
+                                placeholder="Search by name, tags..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
@@ -248,9 +248,9 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className="w-full bg-white border border-zinc-300 rounded-lg px-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
                             >
-                                <option value="all">Tất cả trạng thái</option>
-                                <option value="visible">Đang hiển thị</option>
-                                <option value="hidden">Đang ẩn</option>
+                                <option value="all">All Statuses</option>
+                                <option value="visible">Visible</option>
+                                <option value="hidden">Hidden</option>
                                 {statusOptions.map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
@@ -293,7 +293,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                         )}
                                         
                                         <div className="truncate flex-1">
-                                            <p className="font-semibold text-sm text-zinc-900 truncate">{proj.title || `Chưa đặt tên (${proj.originalIndex + 1})`}</p>
+                                            <p className="font-semibold text-sm text-zinc-900 truncate">{proj.title || `Unnamed (${proj.originalIndex + 1})`}</p>
                                             
                                             <div className="flex flex-wrap items-center gap-1.5 mt-1">
                                                 <span className={`text-[10px] font-medium border px-1.5 py-0.5 rounded-full ${statusStyles[proj.status]}`}>
@@ -301,7 +301,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 </span>
                                                 {proj.hidden && (
                                                     <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                                        <EyeOff className="w-3 h-3" /> Ẩn
+                                                        <EyeOff className="w-3 h-3" /> Hidden
                                                     </span>
                                                 )}
                                                 
@@ -337,7 +337,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                         
                         {filteredProjects.length === 0 && (
                             <div className="p-8 text-center border border-dashed border-zinc-200 rounded-xl text-zinc-500 text-sm bg-zinc-50/50">
-                                Không tìm thấy {itemLabel} nào.
+                                No {itemLabel}s found.
                             </div>
                         )}
                     </div>
@@ -379,12 +379,12 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 {project.hidden ? (
                                                     <>
                                                         <EyeOff className="w-3.5 h-3.5" />
-                                                        TRẠNG THÁI: ĐANG ẨN
+                                                        STATUS: HIDDEN
                                                     </>
                                                 ) : (
                                                     <>
                                                         <Eye className="w-3.5 h-3.5" />
-                                                        TRẠNG THÁI: CÔNG KHAI
+                                                        STATUS: PUBLIC
                                                     </>
                                                 )}
                                             </Button>
@@ -400,7 +400,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 gap-1.5 text-xs font-semibold"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
-                                                XÓA {itemLabel.toUpperCase()}
+                                                DELETE {itemLabel.toUpperCase()}
                                             </Button>
                                         </div>
 
@@ -413,7 +413,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                     onChange={(url) => updateProject(index, { iconUrl: url })}
                                                     folder="projects"
                                                 />
-                                                <p className="text-[10px] text-zinc-400 mt-2 font-medium">Hiển thị thu nhỏ ở danh sách công việc chính.</p>
+                                                <p className="text-[10px] text-zinc-400 mt-2 font-medium">Thumbnail shown in the main list.</p>
                                             </div>
                                             <div className="border border-zinc-200 rounded-xl bg-zinc-50/50 p-4">
                                                 <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-zinc-700">Banner Image</label>
@@ -422,13 +422,13 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                     onChange={(url) => updateProject(index, { imageUrl: url })}
                                                     folder="projects"
                                                 />
-                                                <p className="text-[10px] text-zinc-400 mt-2 font-medium">Bản rộng 16:9 hiển thị ở đầu trang chi tiết.</p>
+                                                <p className="text-[10px] text-zinc-400 mt-2 font-medium">16:9 banner shown at the top of detail page.</p>
                                             </div>
                                         </div>
 
                                         {/* SECTION B: Core Settings (Metadata & Links) */}
                                         <div className="border border-zinc-200 p-4 rounded-xl bg-zinc-50/50 space-y-4">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Cấu hình liên kết & Metadata</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Link Configuration & Metadata</h3>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                                 <div>
                                                     <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">ID (URL slug)</label>
@@ -442,7 +442,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 </div>
 
                                                 <div>
-                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Trạng thái (Status)</label>
+                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Status</label>
                                                     <select
                                                         value={project.status}
                                                         onChange={(e) => updateProject(index, { status: e.target.value as ProjectStatus })}
@@ -508,7 +508,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 {activeLangTab === "en" && (
                                                     <div className="space-y-4">
                                                         <div>
-                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Tiêu đề dự án (Title - EN)</label>
+                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Title (EN)</label>
                                                             <input
                                                                 type="text"
                                                                 value={project.title}
@@ -524,7 +524,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         </div>
 
                                                         <div>
-                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Mô tả ngắn (Short Description - EN)</label>
+                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Short Description (EN)</label>
                                                             <textarea
                                                                 value={project.description}
                                                                 onChange={(e) => updateProject(index, { description: e.target.value })}
@@ -534,7 +534,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         </div>
 
                                                         <div>
-                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Mô tả chi tiết (Full Description - EN)</label>
+                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Full Description (EN)</label>
                                                             <textarea
                                                                 value={project.fullDescription || ""}
                                                                 onChange={(e) => updateProject(index, { fullDescription: e.target.value })}
@@ -544,7 +544,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         </div>
 
                                                         <div>
-                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Câu chuyện phía sau (Story Behind - EN)</label>
+                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Story Behind (EN)</label>
                                                             <textarea
                                                                 value={project.storyBehind || ""}
                                                                 onChange={(e) => updateProject(index, { storyBehind: e.target.value })}
@@ -554,7 +554,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         </div>
 
                                                         <div>
-                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Tính năng nổi bật (Key Features - EN) (Mỗi dòng một ý)</label>
+                                                            <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Key Features (EN) (One per line)</label>
                                                             <textarea
                                                                 value={(project.keyFeatures || []).join("\n")}
                                                                 onChange={(e) => {
@@ -575,8 +575,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         {/* Vietnamese Enable Toggle */}
                                                         <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
                                                             <div>
-                                                                <span className="block text-xs font-bold uppercase text-zinc-700">Kích hoạt bản dịch tiếng Việt</span>
-                                                                <span className="block text-[10px] text-zinc-500 font-medium uppercase mt-0.5">Hiển thị tùy chọn chuyển ngôn ngữ ở trang chi tiết</span>
+                                                                <span className="block text-xs font-bold uppercase text-zinc-700">Enable Vietnamese Translation</span>
+                                                                <span className="block text-[10px] text-zinc-500 font-medium uppercase mt-0.5">Show language switcher on the detail page</span>
                                                             </div>
                                                             <button
                                                                 type="button"
@@ -596,7 +596,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         {project.showVi ? (
                                                             <div className="space-y-4 animate-fadeIn">
                                                                 <div>
-                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Tiêu đề dự án (Title - VI)</label>
+                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Title (VI)</label>
                                                                     <input
                                                                         type="text"
                                                                         value={project.titleVi || ""}
@@ -607,7 +607,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                 </div>
 
                                                                 <div>
-                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Mô tả ngắn (Short Description - VI)</label>
+                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Short Description (VI)</label>
                                                                     <textarea
                                                                         value={project.descriptionVi || ""}
                                                                         onChange={(e) => updateProject(index, { descriptionVi: e.target.value })}
@@ -618,7 +618,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                 </div>
 
                                                                 <div>
-                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Mô tả chi tiết (Full Description - VI)</label>
+                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Full Description (VI)</label>
                                                                     <textarea
                                                                         value={project.fullDescriptionVi || ""}
                                                                         onChange={(e) => updateProject(index, { fullDescriptionVi: e.target.value })}
@@ -629,7 +629,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                 </div>
 
                                                                 <div>
-                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Câu chuyện phía sau (Story Behind - VI)</label>
+                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Story Behind (VI)</label>
                                                                     <textarea
                                                                         value={project.storyBehindVi || ""}
                                                                         onChange={(e) => updateProject(index, { storyBehindVi: e.target.value })}
@@ -640,7 +640,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                 </div>
 
                                                                 <div>
-                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Tính năng nổi bật (Key Features - VI) (Mỗi dòng một ý)</label>
+                                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Key Features (VI) (One per line)</label>
                                                                     <textarea
                                                                         value={(project.keyFeaturesVi || []).join("\n")}
                                                                         onChange={(e) => {
@@ -655,7 +655,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                             </div>
                                                         ) : (
                                                             <div className="py-8 text-center text-xs text-zinc-400 bg-zinc-50/50 rounded-lg border border-dashed border-zinc-200">
-                                                                Bản dịch Tiếng Việt đang TẮT. Kích hoạt ở trên để bắt đầu soạn thảo.
+                                                                Vietnamese translation is OFF. Enable above to edit.
                                                             </div>
                                                         )}
                                                     </div>
@@ -667,8 +667,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         {/* Arabic Enable Toggle */}
                                                         <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
                                                             <div>
-                                                                <span className="block text-xs font-bold uppercase text-zinc-700">Kích hoạt bản dịch tiếng Ả Rập (MSA)</span>
-                                                                <span className="block text-[10px] text-zinc-500 font-medium uppercase mt-0.5">Hiển thị tùy chọn chuyển sang tiếng Ả Rập (RTL)</span>
+                                                                <span className="block text-xs font-bold uppercase text-zinc-700">Enable Arabic (MSA) Translation</span>
+                                                                <span className="block text-[10px] text-zinc-500 font-medium uppercase mt-0.5">Show Arabic switcher on the detail page</span>
                                                             </div>
                                                             <button
                                                                 type="button"
@@ -752,7 +752,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                             </div>
                                                         ) : (
                                                             <div className="py-8 text-center text-xs text-zinc-400 bg-zinc-50/50 rounded-lg border border-dashed border-zinc-200">
-                                                                Bản dịch Tiếng Ả Rập đang TẮT. Kích hoạt ở trên để bắt đầu soạn thảo.
+                                                                Arabic translation is OFF. Enable above to edit.
                                                             </div>
                                                         )}
                                                     </div>
@@ -762,11 +762,11 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                         {/* SECTION D: Taxonomy & Classifications (Roles, Topics, Tags) */}
                                         <div className="space-y-4 bg-zinc-50/50 p-4 border border-zinc-200 rounded-xl">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Phân loại & Từ khóa</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Taxonomy & Classification</h3>
                                             
                                             {/* Roles */}
                                             <div>
-                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Vai trò / Nhiệm vụ (Roles - Nhãn xanh dương)</label>
+                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Roles / Job Types (Blue label)</label>
                                                 <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
                                                     {(project.roles || []).map((role, roleIndex) => (
                                                         <span
@@ -789,7 +789,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 </div>
                                                 <input
                                                     type="text"
-                                                    placeholder="Nhập role mới rồi nhấn Enter (e.g. Lead Dev, Designer)..."
+                                                    placeholder="Enter new role and press Enter (e.g. Lead Dev, Designer)..."
                                                     className={inputClass}
                                                     onKeyDown={(e) => {
                                                         if (e.key === "Enter") {
@@ -809,7 +809,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                             {/* Topics */}
                                             <div>
-                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Hashtag chủ đề (Topics - Nhãn xám)</label>
+                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Topics / Hashtags (Gray label)</label>
                                                 <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
                                                     {(project.topics || []).map((topic, topicIndex) => (
                                                         <span
@@ -832,7 +832,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 </div>
                                                 <input
                                                     type="text"
-                                                    placeholder="Nhập topic mới rồi nhấn Enter (e.g. automation, education)..."
+                                                    placeholder="Enter new topic and press Enter (e.g. automation, education)..."
                                                     className={inputClass}
                                                     onKeyDown={(e) => {
                                                         if (e.key === "Enter") {
@@ -852,7 +852,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                             {/* Tags */}
                                             <div>
-                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Công nghệ chính (Tags - Nhãn đen)</label>
+                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Tech Stack / Tags (Black label)</label>
                                                 <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
                                                     {(project.tags || []).map((tag, tagIndex) => (
                                                         <span
@@ -872,7 +872,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 </div>
                                                 <input
                                                     type="text"
-                                                    placeholder="Nhập tag công nghệ rồi nhấn Enter (e.g. React, Docker)..."
+                                                    placeholder="Enter tech tag and press Enter (e.g. React, Docker)..."
                                                     className={inputClass}
                                                     onKeyDown={(e) => {
                                                         if (e.key === "Enter") {
@@ -887,13 +887,13 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                         {/* SECTION E: Gallery Images Grid */}
                                         <div className="border border-zinc-200 p-4 rounded-xl bg-zinc-50/50 space-y-4">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-850 border-b border-zinc-100 pb-2">Thư viện ảnh chi tiết (Gallery Images)</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-805 border-b border-zinc-100 pb-2">Gallery Images</h3>
                                             
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                                 {(project.images || []).map((imgUrl, imgIndex) => (
                                                     <div key={imgIndex} className="border border-zinc-200 rounded-xl bg-white p-3 flex flex-col justify-between">
                                                         <div className="flex justify-between items-center mb-2">
-                                                            <span className="text-[10px] font-bold text-zinc-400">ẢNH {imgIndex + 1}</span>
+                                                            <span className="text-[10px] font-bold text-zinc-400">IMAGE {imgIndex + 1}</span>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
@@ -928,7 +928,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 }}
                                             >
                                                 <Plus className="w-4 h-4 mr-1.5" />
-                                                Thêm ảnh thư viện mới
+                                                Add new gallery image
                                             </Button>
                                         </div>
                                     </div>
@@ -942,11 +942,11 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                             className="font-semibold cursor-pointer"
                                         >
                                             {savingIndex === index ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Save className="w-4 h-4 mr-1.5" />}
-                                            {savingIndex === index ? "Đang lưu..." : "Lưu thay đổi"}
+                                            {savingIndex === index ? "Saving..." : "Save changes"}
                                         </Button>
                                         {messages[index] && (
                                             <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${
-                                                messages[index].includes("thành công") 
+                                                messages[index].includes("successfully") 
                                                     ? "bg-green-50 border-green-200 text-green-700" 
                                                     : "bg-red-50 border-red-200 text-red-700"
                                             }`}>
@@ -960,8 +960,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                     ) : (
                         <div className="h-full min-h-[300px] flex flex-col items-center justify-center border border-dashed border-zinc-200 rounded-xl p-6 bg-zinc-50/50 text-zinc-400 text-center">
                             <FolderOpen className="w-10 h-10 mb-2 text-zinc-300 animate-pulse" />
-                            <p className="font-semibold text-sm">Chưa có {itemLabel} nào được chọn</p>
-                            <p className="text-xs text-zinc-400 mt-1">Chọn một mục từ danh sách bên trái hoặc nhấn nút Thêm mới ở trên.</p>
+                            <p className="font-semibold text-sm">No {itemLabel} selected</p>
+                            <p className="text-xs text-zinc-400 mt-1">Select an item from the left list or click Add new above.</p>
                         </div>
                     )}
                 </div>
