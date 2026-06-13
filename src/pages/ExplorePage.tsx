@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
@@ -250,13 +250,6 @@ function CollapsibleMoreSection({
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
     const [isButtonHovered, setIsButtonHovered] = useState(false);
 
-    const highlightRef = useRef<HTMLSpanElement>(null);
-    const { scrollYProgress } = useScroll({
-        target: highlightRef,
-        offset: ["start 98%", "start 88%"]
-    });
-    const highlightScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
-
     return (
         <motion.section
             initial={{ opacity: 0, y: 20 }}
@@ -270,7 +263,7 @@ function CollapsibleMoreSection({
                 onClick={() => setIsMoreExpanded(!isMoreExpanded)}
                 className="w-full flex items-center justify-between text-left border-b-2 border-black pb-2 mb-4 group cursor-pointer focus:outline-none"
             >
-                <span ref={highlightRef} className="relative isolate inline-block">
+                <span className="relative isolate inline-block">
                     <span className="text-xl sm:text-2xl font-bold">
                         More & More
                     </span>
@@ -286,7 +279,10 @@ function CollapsibleMoreSection({
                             strokeWidth={3}
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            style={{ pathLength: highlightScaleX }}
+                            initial={{ pathLength: 0 }}
+                            whileInView={{ pathLength: 1 }}
+                            viewport={{ once: false, margin: "-10px" }}
+                            transition={{ duration: 0.85, ease: [0.47, 0, 0.745, 0.715], delay: 0.15 }}
                         />
                     </svg>
                 </span>
