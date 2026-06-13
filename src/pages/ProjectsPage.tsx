@@ -64,27 +64,27 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                         </DelayedLink>
 
                         {/* macOS Window Header */}
-                        <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black relative z-20 pointer-events-none">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                        <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black relative z-20 pointer-events-none">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                            </div>
+                            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0" />
                         </div>
 
                         <div className="p-4 sm:p-6 relative z-20 pointer-events-none">
                             {/* Header: Icon + Title */}
-                            <div className="flex items-start justify-between mb-3 sm:mb-4">
-                                <div className="flex items-center gap-3 sm:gap-4">
-                                    {/* Icon — only shown when set */}
-                                    {project.iconUrl && (
-                                        <img 
-                                            src={project.iconUrl} 
-                                            alt={project.title} 
-                                            className="h-10 sm:h-12 w-auto max-w-[120px] sm:max-w-[140px] object-contain flex-shrink-0 rounded-lg drop-shadow-[0_2px_5px_rgba(0,0,0,0.1)] hover:scale-105 transition-transform duration-200 pointer-events-auto" 
-                                        />
-                                    )}
-                                    <h3 className="text-lg sm:text-xl font-bold">{project.title}</h3>
-                                </div>
-                                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 mt-2 sm:mt-3 text-zinc-400 group-hover:text-black group-hover:translate-x-1 transition-all flex-shrink-0" />
+                            <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                                {/* Icon — only shown when set */}
+                                {project.iconUrl && (
+                                    <img 
+                                        src={project.iconUrl} 
+                                        alt={project.title} 
+                                        className="h-10 sm:h-12 w-auto max-w-[120px] sm:max-w-[140px] object-contain flex-shrink-0 rounded-lg drop-shadow-[0_2px_5px_rgba(0,0,0,0.1)] hover:scale-105 transition-transform duration-200 pointer-events-auto" 
+                                    />
+                                )}
+                                <h3 className="text-lg sm:text-xl font-bold">{project.title}</h3>
                             </div>
 
                             {/* Description */}
