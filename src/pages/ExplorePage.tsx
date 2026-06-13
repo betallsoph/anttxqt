@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
@@ -247,6 +247,13 @@ export function ExplorePage() {
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
     const [isButtonHovered, setIsButtonHovered] = useState(false);
 
+    const highlightRef = useRef<HTMLSpanElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: highlightRef,
+        offset: ["start end", "end 75%"]
+    });
+    const highlightScaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
     const isSectionHidden = (sectionName: string) => {
         return (data.hiddenSections || []).includes(sectionName);
     };
@@ -392,28 +399,25 @@ export function ExplorePage() {
                         onClick={() => setIsMoreExpanded(!isMoreExpanded)}
                         className="w-full flex items-center justify-between text-left border-b-2 border-black pb-2 mb-4 group cursor-pointer focus:outline-none"
                     >
-                        <span className="relative isolate inline-block">
+                        <span ref={highlightRef} className="relative isolate inline-block">
                             <span className="text-xl sm:text-2xl font-bold">
                                 More & More
                             </span>
                             <motion.span
-                                initial={{ scaleX: 0 }}
-                                whileInView={{ scaleX: 1 }}
-                                viewport={{ once: true, margin: "-50px" }}
-                                transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
-                                className="absolute bottom-1 left-0 right-0 h-2 sm:h-2.5 bg-yellow-200/70 -z-10 origin-left rounded-sm"
+                                style={{ scaleX: highlightScaleX }}
+                                className="absolute bottom-1 left-0 right-0 h-2 sm:h-2.5 bg-blue-200/70 -z-10 origin-left rounded-sm"
                             />
                         </span>
                         <motion.div
                             animate={{
                                 rotate: isButtonHovered
-                                    ? (isMoreExpanded ? [180, 165, 195, 165, 195, 180] : [0, -15, 15, -15, 15, 0])
+                                    ? (isMoreExpanded ? [180, 160, 200, 160, 200, 170, 190, 180] : [0, -20, 20, -20, 20, -10, 10, 0])
                                     : (isMoreExpanded ? 180 : 0),
                                 color: isButtonHovered ? "#2563eb" : "#71717a"
                             }}
                             transition={{
                                 rotate: {
-                                    duration: isButtonHovered ? 0.55 : 0.3,
+                                    duration: isButtonHovered ? 0.6 : 0.35,
                                     ease: "easeInOut"
                                 },
                                 color: {
