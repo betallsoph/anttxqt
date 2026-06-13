@@ -27,6 +27,7 @@ export interface Project {
     storyBehindVi?: string;
     keyFeaturesVi?: string[];
     fullDescriptionVi?: string;
+    showVi?: boolean;
 }
 
 export type CollectionType = "products" | "projects";

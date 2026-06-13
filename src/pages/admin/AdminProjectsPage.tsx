@@ -306,6 +306,27 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                     {/* Bilingual Content (Stacked vertically to prevent squishing) */}
                                     <div className="space-y-6 bg-zinc-50 p-4 border-2 border-black rounded-lg">
+                                        {/* Vietnamese Enable Toggle */}
+                                        <div className="flex items-center justify-between pb-4 border-b border-black/10">
+                                            <div>
+                                                <span className="block text-sm font-bold">Bản Tiếng Việt</span>
+                                                <span className="block text-[10px] text-zinc-500">Hiển thị nút "Xem bản tiếng Việt" trên trang chi tiết</span>
+                                            </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => updateProject(index, { showVi: !project.showVi })}
+                                                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-black transition-colors duration-200 ease-in-out focus:outline-none ${
+                                                    project.showVi ? "bg-green-300" : "bg-zinc-200"
+                                                }`}
+                                            >
+                                                <span
+                                                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full border-r-2 border-b-2 border-black bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                                                        project.showVi ? "translate-x-5" : "translate-x-0"
+                                                    }`}
+                                                />
+                                            </button>
+                                        </div>
+
                                         {/* English Version */}
                                         <div className="space-y-4">
                                             <div className="border-b border-black/10 pb-1">

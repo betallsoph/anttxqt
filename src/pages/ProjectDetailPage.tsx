@@ -97,7 +97,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                     </div>
                     {/* Language Switcher Link (styled like dive in my story) */}
-                    {hasVietnameseData && (
+                    {project.showVi && hasVietnameseData && (
                         <button
                             onClick={() => setIsVietnamese(!isVietnamese)}
                             className="text-[10px] sm:text-xs font-mono font-bold text-zinc-400 hover:text-blue-600 hover:underline transition-colors cursor-pointer select-none"
