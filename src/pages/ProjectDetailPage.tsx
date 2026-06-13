@@ -209,7 +209,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                             {/* Trigger Button */}
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="relative z-40 flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold text-black bg-white border-2 border-black rounded shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:bg-zinc-50 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer select-none"
+                                className="relative z-40 flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold text-black bg-white border-2 border-black rounded shadow-secondary hover:bg-zinc-50 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all cursor-pointer select-none"
                             >
                                 <Globe className="w-3.5 h-3.5 text-zinc-500" />
                                 <span>{activeLangItem.name}</span>
@@ -218,7 +218,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                             {/* Dropdown Options List */}
                             {isDropdownOpen && (
-                                <div className="absolute right-0 mt-1.5 w-48 bg-white border-2 border-black rounded-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-1.5 z-40 overflow-hidden min-w-[170px]">
+                                <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-lg shadow-secondary py-1 z-40 overflow-hidden min-w-[170px]">
                                     {availableLanguages.map((langItem) => {
                                         const isActive = langItem.key === lang;
                                         return (
@@ -228,10 +228,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                                     setLang(langItem.key);
                                                     setIsDropdownOpen(false);
                                                 }}
-                                                className={`w-full text-left px-3 py-1.5 text-xs font-mono font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
+                                                className={`w-full text-left px-3 py-2 text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
                                                     isActive 
-                                                        ? "bg-zinc-100 text-black border-l-4 border-black pl-2" 
-                                                        : "text-zinc-600 hover:bg-zinc-50 hover:text-black"
+                                                        ? "bg-blue-300 text-black" 
+                                                        : "text-zinc-700 hover:bg-zinc-50 hover:text-black"
                                                 }`}
                                             >
                                                 <span className="text-sm select-none">{langItem.flag}</span>
