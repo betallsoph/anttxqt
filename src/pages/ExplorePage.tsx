@@ -53,16 +53,16 @@ function ExploreItemModal({
                     <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[70vh]">
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                    <h3 className="font-bold text-lg sm:text-2xl">
-                                        {item.title}
-                                    </h3>
-                                    {item.since && (
-                                        <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
+                                <h3 className="font-bold text-lg sm:text-2xl">
+                                    {item.title}
+                                </h3>
+                                {item.since && (
+                                    <div className="mt-1.5">
+                                        <span className="inline-block text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
                                             since {item.since}
                                         </span>
-                                    )}
-                                </div>
+                                    </div>
+                                )}
                                 {item.summary && (
                                     <p className="text-sm sm:text-base text-zinc-500 mt-1">
                                         {item.summary}
