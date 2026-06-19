@@ -610,7 +610,7 @@ export function ExplorePage() {
                                     </h3>
                                 </div>
                                 <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-16 h-5 overflow-hidden">
-                                    <ArrowRight className="absolute right-[48px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[48px]" />
+                                    <ArrowRight className="absolute -left-6 opacity-0 w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:opacity-100 group-hover:text-blue-500 group-hover:translate-x-[72px]" />
                                     <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
                                         {item.date}
                                     </span>
