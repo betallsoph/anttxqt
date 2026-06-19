@@ -165,7 +165,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const fullDescriptionText = (suffix && (project[`fullDescription${suffix}`] as string)) || project.fullDescription;
 
     return (
-        <div className="space-y-8">
+        <div className={`space-y-8 ${lang === "vi" ? "font-vietnamese" : ""}`}>
             {/* Back Button */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
