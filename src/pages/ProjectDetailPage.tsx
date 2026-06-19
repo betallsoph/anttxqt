@@ -176,8 +176,8 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     onClick={handleBack}
                     className="group inline-flex items-center gap-2 text-zinc-600 hover:text-black transition-colors cursor-pointer"
                 >
-                    {getLabel("back")}
                     <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
+                    {getLabel("back")}
                 </button>
             </motion.div>
 
