@@ -602,16 +602,19 @@ export function ExplorePage() {
                             <button
                                 key={index}
                                 onClick={() => setSelectedAchievement(item)}
-                                className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white hover:bg-blue-50 transition-all duration-200 group text-left cursor-pointer"
+                                className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white transition-all duration-200 group text-left cursor-pointer"
                             >
                                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-                                    <h3 className="font-bold text-sm sm:text-base truncate">
+                                    <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
                                         {item.title}
                                     </h3>
                                 </div>
-                                <span className="text-xs text-zinc-400 flex-shrink-0 ml-3">
-                                    {item.date}
-                                </span>
+                                <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-16 h-5 overflow-hidden">
+                                    <ArrowRight className="absolute right-[48px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[48px]" />
+                                    <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
+                                        {item.date}
+                                    </span>
+                                </div>
                             </button>
                         ))}
                     </div>
