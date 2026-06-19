@@ -174,7 +174,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
             >
                 <button
                     onClick={handleBack}
-                    className="group inline-flex items-center gap-2 text-zinc-600 hover:text-black transition-colors cursor-pointer"
+                    className="group inline-flex items-center gap-2 font-bold text-zinc-600 hover:text-black transition-colors cursor-pointer"
                 >
                     <ArrowLeft className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" />
                     {getLabel("back")}
@@ -461,8 +461,8 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     onClick={handleBack}
                     className="group inline-flex items-center gap-2 px-6 py-3 font-bold text-black border-2 border-black rounded-lg bg-blue-300 shadow-secondary active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all duration-200 cursor-pointer"
                 >
-                    {getLabel("back")}
                     <ArrowLeft className="w-5 h-5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:-translate-x-1" />
+                    {getLabel("back")}
                 </button>
             </motion.div>
         </div>
