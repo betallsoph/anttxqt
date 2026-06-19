@@ -11,7 +11,7 @@ const navItems = [
 export function Header() {
     return (
         <header className="w-full py-6 sm:py-8">
-            <div className="max-w-2xl mx-auto px-5 sm:px-6">
+            <div className="max-w-3xl mx-auto px-5 sm:px-6">
                 {/* Avatar */}
                 <div className="mb-4 sm:mb-6 flex justify-center">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border-[3px] sm:border-[4px] border-black overflow-hidden bg-blue-200">

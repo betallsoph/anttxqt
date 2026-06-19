@@ -6,7 +6,7 @@ import { InteractiveGridPattern } from "@/components/ui/interactive-grid-pattern
 export function Layout() {
     const location = useLocation();
     const isAdmin = location.pathname.startsWith("/admin");
-    const widthClass = isAdmin ? "max-w-6xl px-6 sm:px-8" : "max-w-2xl px-5 sm:px-6";
+    const widthClass = isAdmin ? "max-w-6xl px-6 sm:px-8" : "max-w-3xl px-5 sm:px-6";
 
     return (
         <div className="min-h-screen flex flex-col relative overflow-hidden">
