@@ -80,7 +80,7 @@ function ExploreItemModal({
                         {item.story && (
                             <div className="space-y-2 pt-1">
                                 <h4 className="text-xs sm:text-sm font-bold text-blue-600">
-                                    My Story
+                                    The Backstory
                                 </h4>
                                 <div className="space-y-3">
                                     {item.story.split("\n").map((paragraph, idx) => {
