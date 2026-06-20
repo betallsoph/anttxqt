@@ -5,11 +5,11 @@ import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type ProjectStatus, type CollectionType } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<ProjectStatus, string> = {
-    Production: "bg-zinc-200 text-green-700 border-zinc-400",
-    Staging: "bg-zinc-200 text-blue-700 border-zinc-400",
-    "In Development": "bg-zinc-200 text-red-700 border-zinc-400",
-    Concept: "bg-zinc-200 text-purple-700 border-zinc-400",
-    Retired: "bg-zinc-200 text-pink-700 border-zinc-400",
+    Production: "bg-zinc-100 text-green-600 border-zinc-200",
+    Staging: "bg-zinc-100 text-blue-600 border-zinc-200",
+    "In Development": "bg-zinc-100 text-red-600 border-zinc-200",
+    Concept: "bg-zinc-100 text-purple-600 border-zinc-200",
+    Retired: "bg-zinc-100 text-pink-600 border-zinc-200",
 };
 
 
