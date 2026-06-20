@@ -36,11 +36,11 @@ const langList: readonly LangItem[] = [
 
 
 const statusStyles: Record<string, string> = {
-    Production: "bg-green-200 text-green-800 border-green-400",
-    Staging: "bg-sky-200 text-sky-800 border-sky-400",
-    "In Development": "bg-amber-200 text-amber-800 border-amber-400",
-    Concept: "bg-purple-200 text-purple-800 border-purple-400",
-    Retired: "bg-zinc-200 text-zinc-800 border-zinc-400",
+    Production: "bg-zinc-200 text-green-700 border-zinc-400",
+    Staging: "bg-zinc-200 text-blue-700 border-zinc-400",
+    "In Development": "bg-zinc-200 text-red-700 border-zinc-400",
+    Concept: "bg-zinc-200 text-purple-700 border-zinc-400",
+    Retired: "bg-zinc-200 text-pink-700 border-zinc-400",
 };
 
 export function ProjectDetailPage({ type }: { type: CollectionType }) {

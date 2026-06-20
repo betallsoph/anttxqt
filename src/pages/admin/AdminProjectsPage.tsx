@@ -32,11 +32,11 @@ const inputClass =
 const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Concept", "Retired"];
 
 const statusStyles: Record<ProjectStatus, string> = {
-    Production: "bg-green-50 text-green-800 border-green-200",
-    Staging: "bg-sky-50 text-sky-800 border-sky-200",
-    "In Development": "bg-amber-50 text-amber-800 border-amber-200",
-    Concept: "bg-purple-50 text-purple-800 border-purple-200",
-    Retired: "bg-zinc-50 text-zinc-800 border-zinc-200",
+    Production: "bg-zinc-50 text-green-700 border-zinc-200",
+    Staging: "bg-zinc-50 text-blue-700 border-zinc-200",
+    "In Development": "bg-zinc-50 text-red-700 border-zinc-200",
+    Concept: "bg-zinc-50 text-purple-700 border-zinc-200",
+    Retired: "bg-zinc-50 text-pink-700 border-zinc-200",
 };
 
 interface LangItem {
