@@ -1031,19 +1031,6 @@ export function AdminExplorePage() {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold mb-1">Date (optional)</label>
-                                            <input
-                                                type="text"
-                                                value={item.date || ""}
-                                                onChange={(e) => {
-                                                    const s = [...(data.stories || [])];
-                                                    s[index] = { ...item, date: e.target.value };
-                                                    setData({ ...data, stories: s });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                        </div>
-                                        <div>
                                             <label className="block text-sm font-bold mb-1">Content</label>
                                             <textarea
                                                 value={item.content}
@@ -1055,6 +1042,50 @@ export function AdminExplorePage() {
                                                 className={`${inputClass} min-h-[100px]`}
                                             />
                                         </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Topics / Hashtags (optional)</label>
+                                            <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                                                {(item.topics || []).map((topic, topicIndex) => (
+                                                    <span
+                                                        key={topicIndex}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
+                                                    >
+                                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const s = [...(data.stories || [])];
+                                                                s[index] = { ...item, topics: (item.topics || []).filter((_, i) => i !== topicIndex) };
+                                                                setData({ ...data, stories: s });
+                                                            }}
+                                                            className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
+                                                className={inputClass}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault();
+                                                        const val = e.currentTarget.value.trim();
+                                                        if (val) {
+                                                            const cur = item.topics || [];
+                                                            if (!cur.includes(val)) {
+                                                                const s = [...(data.stories || [])];
+                                                                s[index] = { ...item, topics: [...cur, val] };
+                                                                setData({ ...data, stories: s });
+                                                            }
+                                                            e.currentTarget.value = "";
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -1062,7 +1093,7 @@ export function AdminExplorePage() {
                                 variant="ghost"
                                 size="sm"
                                 className="mt-3"
-                                onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", date: "" }] })}
+                                onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", topics: [] }] })}
                             >
                                 <Plus className="w-4 h-4" />
                                 Thêm story

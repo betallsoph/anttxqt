@@ -37,7 +37,7 @@ export interface ExploreData {
     stories: {
         title: string;
         content: string;
-        date?: string;
+        topics?: string[];
     }[];
     whatsNext: {
         title: string;
