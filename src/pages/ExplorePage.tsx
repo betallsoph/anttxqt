@@ -404,15 +404,33 @@ function CollapsibleMoreSection({
                         <div className="space-y-3 pt-6 first:pt-0">
                             <h3 className="text-base sm:text-lg font-bold text-zinc-900">Stories</h3>
                             {data.stories && data.stories.length > 0 ? (
-                                <div className="space-y-4">
+                                <div className="border-t-2 border-black/10">
                                     {data.stories.map((story, index) => (
-                                        <div key={index} className="border-2 border-black rounded-lg bg-white p-4 sm:p-5">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <h4 className="font-bold text-lg">{story.title}</h4>
-                                                {story.date && <span className="text-xs text-zinc-500 font-medium">{story.date}</span>}
+                                        <button
+                                            key={index}
+                                            onClick={() => setSelectedExploreItem({
+                                                title: story.title,
+                                                summary: "",
+                                                story: story.content,
+                                                since: story.date,
+                                            })}
+                                            className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
+                                        >
+                                            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                                <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
+                                                    {(index + 1).toString().padStart(2, "0")}
+                                                </span>
+                                                <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
+                                                    {story.title}
+                                                </h3>
                                             </div>
-                                            <p className="text-sm sm:text-base text-zinc-700 whitespace-pre-wrap">{story.content}</p>
-                                        </div>
+                                            <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
+                                                <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
+                                                <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
+                                                    read the story
+                                                </span>
+                                            </div>
+                                        </button>
                                     ))}
                                 </div>
                             ) : (
