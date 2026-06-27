@@ -5,6 +5,7 @@ import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
 
 type Achievement = ExploreData["achievements"][number];
+type Story = ExploreData["stories"][number];
 
 function ComingSoon() {
     return (
@@ -105,6 +106,78 @@ function ExploreItemModal({
                                         className="px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
                                     >
                                         {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    );
+}
+
+function StoryModal({
+    story,
+    onClose,
+}: {
+    story: Story;
+    onClose: () => void;
+}) {
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                onClick={onClose}
+            >
+                <div className="absolute inset-0 bg-black/40" />
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative w-auto max-w-3xl min-w-[300px] sm:min-w-[500px] max-h-[90vh] flex flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                >
+                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[80vh]">
+                        <div className="flex items-start justify-between gap-3">
+                            <h3 className="font-bold text-lg sm:text-2xl min-w-0">
+                                {story.title}
+                            </h3>
+                            <button
+                                onClick={onClose}
+                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-black bg-white hover:bg-zinc-100 transition-colors"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        {story.content && (
+                            <div className="space-y-3 pt-1">
+                                {story.content.split("\n").map((paragraph, idx) => {
+                                    if (!paragraph.trim()) {
+                                        return <div key={idx} className="h-2" />;
+                                    }
+                                    return (
+                                        <p key={idx} className="text-sm sm:text-base text-zinc-700 leading-relaxed">
+                                            {paragraph}
+                                        </p>
+                                    );
+                                })}
+                            </div>
+                        )}
+
+                        {story.topics && story.topics.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2">
+                                {story.topics.map((topic) => (
+                                    <span
+                                        key={topic}
+                                        className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200 break-words"
+                                    >
+                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
                                     </span>
                                 ))}
                             </div>
@@ -242,10 +315,12 @@ function CollapsibleMoreSection({
     data,
     isSectionHidden,
     setSelectedExploreItem,
+    setSelectedStory,
 }: {
     data: ExploreData;
     isSectionHidden: (sectionName: string) => boolean;
     setSelectedExploreItem: (item: ExploreItem) => void;
+    setSelectedStory: (story: Story) => void;
 }) {
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
     const [isButtonHovered, setIsButtonHovered] = useState(false);
@@ -408,12 +483,7 @@ function CollapsibleMoreSection({
                                     {data.stories.map((story, index) => (
                                         <button
                                             key={index}
-                                            onClick={() => setSelectedExploreItem({
-                                                title: story.title,
-                                                summary: "",
-                                                story: story.content,
-                                                since: story.date,
-                                            })}
+                                            onClick={() => setSelectedStory(story)}
                                             className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
                                         >
                                             <div className="flex items-center gap-3 sm:gap-4 min-w-0">
@@ -536,6 +606,8 @@ export function ExplorePage() {
         useState<Achievement | null>(null);
     const [selectedExploreItem, setSelectedExploreItem] =
         useState<ExploreItem | null>(null);
+    const [selectedStory, setSelectedStory] =
+        useState<Story | null>(null);
 
 
     const isSectionHidden = (sectionName: string) => {
@@ -678,6 +750,7 @@ export function ExplorePage() {
                     data={data}
                     isSectionHidden={isSectionHidden}
                     setSelectedExploreItem={setSelectedExploreItem}
+                    setSelectedStory={setSelectedStory}
                 />
             )}
 
@@ -694,6 +767,14 @@ export function ExplorePage() {
                 <ExploreItemModal
                     item={selectedExploreItem}
                     onClose={() => setSelectedExploreItem(null)}
+                />
+            )}
+
+            {/* Story Detail Modal */}
+            {selectedStory && (
+                <StoryModal
+                    story={selectedStory}
+                    onClose={() => setSelectedStory(null)}
                 />
             )}
         </div>
