@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, Globe, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
-import { useProjectsData, type CollectionType } from "@/hooks/useProjectsData";
+import { useProjectsData, type CollectionType, formatExternalUrl } from "@/hooks/useProjectsData";
 import { parseBoldText } from "@/lib/utils";
 
 interface LangItem {
@@ -270,7 +270,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                         {project.githubUrl && (
                             <a
-                                href={project.githubUrl}
+                                href={formatExternalUrl(project.githubUrl)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-zinc-100 border border-zinc-300 rounded hover:bg-zinc-200 transition-colors"
@@ -283,7 +283,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                         {project.liveUrl && (
                             <a
-                                href={project.liveUrl}
+                                href={formatExternalUrl(project.liveUrl)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors"
@@ -394,10 +394,11 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 <div className={`flex flex-col sm:flex-row gap-2 sm:gap-4 ${isRtl ? "flex-row-reverse" : ""}`}>
                                     {project.githubUrl && (
                                         <a
-                                            href={project.githubUrl}
+                                            href={formatExternalUrl(project.githubUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 text-sm sm:text-base font-bold bg-zinc-100 border border-zinc-300 rounded-lg hover:bg-zinc-200 transition-colors"
+                                            title="View code on GitHub"
                                         >
                                             <Github className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                             {getLabel("github")}
@@ -405,10 +406,11 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                     )}
                                     {project.liveUrl && (
                                         <a
-                                            href={project.liveUrl}
+                                            href={formatExternalUrl(project.liveUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold bg-zinc-100 border-2 border-black rounded-md hover:bg-zinc-200 transition-colors"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 text-sm sm:text-base font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                            title="Visit live website"
                                         >
                                             <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                             {getLabel("live")}

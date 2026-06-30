@@ -42,6 +42,12 @@ export interface Project {
 
 export type CollectionType = "products" | "projects";
 
+export const formatExternalUrl = (url: string | undefined): string | undefined => {
+    if (!url) return undefined;
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    return `https://${url}`;
+};
+
 export const defaultProducts: Project[] = [
     {
         id: "roomieverse",

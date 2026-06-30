@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { DelayedLink } from "@/components/ui/delayed-link";
 import { ArrowRight, Github, ExternalLink } from "lucide-react";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
-import { useProjectsData, type ProjectStatus, type CollectionType } from "@/hooks/useProjectsData";
+import { useProjectsData, type ProjectStatus, type CollectionType, formatExternalUrl } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<ProjectStatus, string> = {
     Production: "bg-zinc-50 text-green-500 border-zinc-200",
@@ -102,7 +102,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
 
                                     {project.githubUrl && (
                                         <a
-                                            href={project.githubUrl}
+                                            href={formatExternalUrl(project.githubUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center gap-1 px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold bg-zinc-100 border border-zinc-300 rounded hover:bg-zinc-200 transition-colors pointer-events-auto"
@@ -115,7 +115,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
 
                                     {project.liveUrl && (
                                         <a
-                                            href={project.liveUrl}
+                                            href={formatExternalUrl(project.liveUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="inline-flex items-center gap-1 px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors pointer-events-auto"
