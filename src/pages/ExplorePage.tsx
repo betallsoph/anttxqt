@@ -25,7 +25,7 @@ function ResumeGroupRow({ group }: { group: any }) {
         <div className="border-2 border-black rounded-lg bg-white p-3.5 sm:p-4 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-3">
-                    <div className="p-2 bg-pink-50 border border-zinc-200 rounded-lg text-pink-500 flex-shrink-0">
+                    <div className="p-2 bg-blue-50 border border-zinc-200 rounded-lg text-blue-500 flex-shrink-0">
                         <FileText className="w-5 h-5" />
                     </div>
                     <div>
@@ -42,7 +42,7 @@ function ResumeGroupRow({ group }: { group: any }) {
                             href={formatExternalUrl(newest.url)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-pink-50 border border-pink-200 text-pink-600 rounded hover:bg-pink-100 transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors cursor-pointer"
                         >
                             <Download className="w-3.5 h-3.5" />
                             ver {newest.versionName} (newest)
