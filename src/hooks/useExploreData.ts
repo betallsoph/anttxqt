@@ -11,6 +11,17 @@ export interface ExploreItem {
     tags?: string[];
 }
 
+export interface ResumeVersion {
+    versionName: string;
+    url: string;
+}
+
+export interface ResumeGroup {
+    name: string;
+    description?: string;
+    versions: ResumeVersion[];
+}
+
 export interface ExploreData {
     hiddenSections?: string[];
     intro: {
@@ -53,6 +64,7 @@ export interface ExploreData {
         description?: string;
         url?: string;
     }[];
+    resumes?: ResumeGroup[];
 }
 
 export const defaultExploreData: ExploreData = {
@@ -125,6 +137,7 @@ export const defaultExploreData: ExploreData = {
             url: "https://example.com/cv-uiux-designer.pdf"
         }
     ],
+    resumes: [],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");

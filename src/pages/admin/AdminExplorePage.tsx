@@ -10,6 +10,7 @@ import {
 } from "@/hooks/useExploreData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { PdfUpload } from "@/components/ui/pdf-upload";
 import { Plus, Trash2, Save, Loader2, X, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
@@ -860,7 +861,7 @@ export function AdminExplorePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.5 }}
                     >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">My Resumés</h2>
                         <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("moreAndMore") ? "opacity-75 bg-zinc-50" : ""}`}>
                             {/* macOS Window Header */}
                             <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
@@ -891,59 +892,143 @@ export function AdminExplorePage() {
                                     </Button>
                                 </div>
                             </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div className="space-y-2 sm:space-y-3">
-                                {(data.moreAndMore || []).map((item, index) => (
-                                    <div key={index} className="flex gap-2 items-center border border-zinc-200 rounded-lg bg-zinc-50/50 p-2.5 sm:p-3">
-                                        <MoveButtons
-                                            index={index}
-                                            total={(data.moreAndMore || []).length}
-                                            onMove={(from, to) => setData({ ...data, moreAndMore: swap(data.moreAndMore || [], from, to) })}
-                                        />
-                                        <div className="flex-1 space-y-2">
-                                            <div className="grid grid-cols-2 gap-2">
+                            <div className="p-4 sm:p-6 space-y-6">
+                            <div className="space-y-4 sm:space-y-6">
+                                {(data.resumes || []).map((group, groupIndex) => (
+                                    <div key={groupIndex} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-4">
+                                        <div className="flex justify-between items-center gap-2">
+                                            <MoveButtons
+                                                index={groupIndex}
+                                                total={(data.resumes || []).length}
+                                                onMove={(from, to) => setData({ ...data, resumes: swap(data.resumes || [], from, to) })}
+                                            />
+                                            <span className="font-bold text-sm">
+                                                Nhóm CV {groupIndex + 1}
+                                            </span>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setData({ ...data, resumes: (data.resumes || []).filter((_, i) => i !== groupIndex) })}
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                            <div>
+                                                <label className="block text-xs font-bold mb-1">Tên nhóm CV (e.g. Software Developer CV)</label>
                                                 <input
                                                     type="text"
-                                                    placeholder="Label (e.g. Font)"
-                                                    value={item.label}
+                                                    value={group.name}
                                                     onChange={(e) => {
-                                                        const m = [...(data.moreAndMore || [])];
-                                                        m[index] = { ...item, label: e.target.value };
-                                                        setData({ ...data, moreAndMore: m });
+                                                        const r = [...(data.resumes || [])];
+                                                        r[groupIndex] = { ...group, name: e.target.value };
+                                                        setData({ ...data, resumes: r });
                                                     }}
                                                     className={inputClass}
-                                                />
-                                                <input
-                                                    type="text"
-                                                    placeholder="Description (e.g. Inter)"
-                                                    value={item.description || ""}
-                                                    onChange={(e) => {
-                                                        const m = [...(data.moreAndMore || [])];
-                                                        m[index] = { ...item, description: e.target.value };
-                                                        setData({ ...data, moreAndMore: m });
-                                                    }}
-                                                    className={inputClass}
+                                                    placeholder="Tên nhóm CV"
                                                 />
                                             </div>
-                                            <input
-                                                type="text"
-                                                placeholder="URL (optional, e.g. https://...)"
-                                                value={item.url || ""}
-                                                onChange={(e) => {
-                                                    const m = [...(data.moreAndMore || [])];
-                                                    m[index] = { ...item, url: e.target.value };
-                                                    setData({ ...data, moreAndMore: m });
-                                                }}
-                                                className={inputClass}
-                                            />
+                                            <div>
+                                                <label className="block text-xs font-bold mb-1">Mô tả (e.g. English version, Tiếng Việt...)</label>
+                                                <input
+                                                    type="text"
+                                                    value={group.description || ""}
+                                                    onChange={(e) => {
+                                                        const r = [...(data.resumes || [])];
+                                                        r[groupIndex] = { ...group, description: e.target.value };
+                                                        setData({ ...data, resumes: r });
+                                                    }}
+                                                    className={inputClass}
+                                                    placeholder="Mô tả nhóm CV"
+                                                />
+                                            </div>
                                         </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => setData({ ...data, moreAndMore: (data.moreAndMore || []).filter((_, i) => i !== index) })}
-                                        >
-                                            <Trash2 className="w-4 h-4 text-red-500" />
-                                        </Button>
+
+                                        {/* Versions list */}
+                                        <div className="space-y-3 pt-2 pl-4 border-l-2 border-zinc-200">
+                                            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Các phiên bản CV</h4>
+                                            
+                                            <div className="space-y-3">
+                                                {(group.versions || []).map((ver, verIndex) => (
+                                                    <div key={verIndex} className="flex gap-2 items-center border border-zinc-200 rounded bg-white p-2.5">
+                                                        <MoveButtons
+                                                            index={verIndex}
+                                                            total={(group.versions || []).length}
+                                                            onMove={(from, to) => {
+                                                                const r = [...(data.resumes || [])];
+                                                                r[groupIndex] = {
+                                                                    ...group,
+                                                                    versions: swap(group.versions || [], from, to)
+                                                                };
+                                                                setData({ ...data, resumes: r });
+                                                            }}
+                                                        />
+                                                        <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-zinc-500 mb-1">Tên phiên bản (e.g. 07/2026)</label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={ver.versionName}
+                                                                    onChange={(e) => {
+                                                                        const r = [...(data.resumes || [])];
+                                                                        const versions = [...(group.versions || [])];
+                                                                        versions[verIndex] = { ...ver, versionName: e.target.value };
+                                                                        r[groupIndex] = { ...group, versions };
+                                                                        setData({ ...data, resumes: r });
+                                                                    }}
+                                                                    className={inputClass}
+                                                                    placeholder="e.g. 07/2026"
+                                                                />
+                                                            </div>
+                                                            <div>
+                                                                <label className="block text-[10px] font-bold text-zinc-500 mb-1">File PDF (R2)</label>
+                                                                <PdfUpload
+                                                                    value={ver.url}
+                                                                    onChange={(url) => {
+                                                                        const r = [...(data.resumes || [])];
+                                                                        const versions = [...(group.versions || [])];
+                                                                        versions[verIndex] = { ...ver, url };
+                                                                        r[groupIndex] = { ...group, versions };
+                                                                        setData({ ...data, resumes: r });
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => {
+                                                                const r = [...(data.resumes || [])];
+                                                                r[groupIndex] = {
+                                                                    ...group,
+                                                                    versions: (group.versions || []).filter((_, i) => i !== verIndex)
+                                                                };
+                                                                setData({ ...data, resumes: r });
+                                                            }}
+                                                        >
+                                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const r = [...(data.resumes || [])];
+                                                    r[groupIndex] = {
+                                                        ...group,
+                                                        versions: [...(group.versions || []), { versionName: "", url: "" }]
+                                                    };
+                                                    setData({ ...data, resumes: r });
+                                                }}
+                                            >
+                                                <Plus className="w-3.5 h-3.5" />
+                                                Thêm phiên bản
+                                            </Button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -951,10 +1036,10 @@ export function AdminExplorePage() {
                                 variant="ghost"
                                 size="sm"
                                 className="mt-3"
-                                onClick={() => setData({ ...data, moreAndMore: [...(data.moreAndMore || []), { label: "", description: "", url: "" }] })}
+                                onClick={() => setData({ ...data, resumes: [...(data.resumes || []), { name: "", description: "", versions: [] }] })}
                             >
                                 <Plus className="w-4 h-4" />
-                                Thêm mục
+                                Thêm nhóm CV
                             </Button>
                             <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
                         </div>
