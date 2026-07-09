@@ -22,10 +22,10 @@ function ResumeGroupRow({ group }: { group: any }) {
     const older = group.versions?.slice(1) || [];
 
     return (
-        <div className="border-2 border-black rounded-lg bg-zinc-50 p-3.5 sm:p-4 space-y-3 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all">
+        <div className="border-2 border-black rounded-lg bg-white p-3.5 sm:p-4 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-3">
-                    <div className="p-2 bg-pink-50 border-2 border-black rounded-lg text-pink-500 flex-shrink-0">
+                    <div className="p-2 bg-pink-50 border border-zinc-200 rounded-lg text-pink-500 flex-shrink-0">
                         <FileText className="w-5 h-5" />
                     </div>
                     <div>
@@ -42,7 +42,7 @@ function ResumeGroupRow({ group }: { group: any }) {
                             href={formatExternalUrl(newest.url)}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-pink-100 hover:bg-pink-200 border-2 border-black rounded text-zinc-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[1px] active:translate-y-[1px] active:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-pink-50 border border-pink-200 text-pink-600 rounded hover:bg-pink-100 transition-colors cursor-pointer"
                         >
                             <Download className="w-3.5 h-3.5" />
                             ver {newest.versionName} (newest)
