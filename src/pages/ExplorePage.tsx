@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "motion/react";
-import { X, ExternalLink, ArrowRight, ChevronDown, FileText, Download } from "lucide-react";
+import { X, ExternalLink, ArrowRight, ChevronDown, FileText, Download, Eye } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
 import { formatExternalUrl } from "@/hooks/useProjectsData";
@@ -38,15 +38,29 @@ function ResumeGroupRow({ group }: { group: any }) {
                 
                 <div className="flex flex-wrap items-center gap-2">
                     {newest ? (
-                        <a
-                            href={formatExternalUrl(newest.url)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors cursor-pointer"
-                        >
-                            <Download className="w-3.5 h-3.5" />
-                            ver {newest.versionName} (newest)
-                        </a>
+                        <div className="flex items-center gap-2">
+                            <a
+                                href={formatExternalUrl(newest.url)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors cursor-pointer"
+                                title="Xem CV"
+                            >
+                                <Eye className="w-3.5 h-3.5" />
+                                Xem (ver {newest.versionName})
+                            </a>
+                            <a
+                                href={formatExternalUrl(newest.url)}
+                                download
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border border-zinc-300 rounded text-zinc-700 cursor-pointer"
+                                title="Tải CV"
+                            >
+                                <Download className="w-3.5 h-3.5" />
+                                Tải về
+                            </a>
+                        </div>
                     ) : (
                         <span className="text-xs text-zinc-400 italic">Chưa có file</span>
                     )}
