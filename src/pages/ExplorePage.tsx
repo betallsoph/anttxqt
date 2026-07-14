@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "motion/react";
-import { X, ExternalLink, ArrowRight, ChevronDown, FileText, Download, Eye } from "lucide-react";
+import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
 import { formatExternalUrl } from "@/hooks/useProjectsData";
@@ -21,54 +21,62 @@ function ResumeGroupRow({ group }: { group: any }) {
     const newest = group.versions?.[0];
     const older = group.versions?.slice(1) || [];
 
+    const openNewest = () => {
+        if (!newest?.url) return;
+        window.open(formatExternalUrl(newest.url), "_blank", "noopener,noreferrer");
+    };
+
     return (
-        <div className="border-2 border-black rounded-lg bg-white p-3.5 sm:p-4 space-y-3">
+        <div
+            role={newest ? "button" : undefined}
+            tabIndex={newest ? 0 : undefined}
+            onClick={newest ? openNewest : undefined}
+            onKeyDown={
+                newest
+                    ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              openNewest();
+                          }
+                      }
+                    : undefined
+            }
+            className={`border-2 border-black rounded-lg bg-white p-3.5 sm:p-4 space-y-3 transition-colors ${
+                newest ? "hover:bg-blue-50 cursor-pointer" : ""
+            }`}
+        >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="flex items-start gap-3">
-                    <div className="p-2 bg-blue-50 border border-zinc-200 rounded-lg text-blue-500 flex-shrink-0">
-                        <FileText className="w-5 h-5" />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-sm sm:text-base text-zinc-950">{group.name}</h4>
-                        {group.description && (
-                            <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">{group.description}</p>
-                        )}
-                    </div>
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-2">
+                <div>
+                    <h4 className="font-bold text-sm sm:text-base text-zinc-950">{group.name}</h4>
+                    {group.description && (
+                        <p className="text-xs sm:text-sm text-zinc-500 mt-0.5">{group.description}</p>
+                    )}
                     {newest ? (
-                        <div className="flex items-center gap-2">
-                            <a
-                                href={formatExternalUrl(newest.url)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors cursor-pointer"
-                                title="Xem CV"
-                            >
-                                <Eye className="w-3.5 h-3.5" />
-                                Xem (ver {newest.versionName})
-                            </a>
-                            <a
-                                href={formatExternalUrl(newest.url)}
-                                download
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border border-zinc-300 rounded text-zinc-700 cursor-pointer"
-                                title="Tải CV"
-                            >
-                                <Download className="w-3.5 h-3.5" />
-                                Tải về
-                            </a>
-                        </div>
+                        <p className="text-xs text-zinc-400 mt-0.5">nhấn vào để xem</p>
                     ) : (
-                        <span className="text-xs text-zinc-400 italic">Chưa có file</span>
+                        <p className="text-xs text-zinc-400 italic mt-0.5">Chưa có file</p>
+                    )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    {newest && (
+                        <a
+                            href={formatExternalUrl(newest.url)}
+                            download
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border-2 border-black rounded text-zinc-900 cursor-pointer"
+                            title="Tải CV"
+                        >
+                            Tải về
+                        </a>
                     )}
 
                     {older.length > 0 && (
                         <button
+                            type="button"
                             onClick={() => setExpanded(!expanded)}
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border border-zinc-300 rounded text-zinc-700 cursor-pointer"
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border-2 border-black rounded text-zinc-900 cursor-pointer"
                         >
                             {expanded ? "Hide history" : `History (${older.length})`}
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
@@ -78,7 +86,10 @@ function ResumeGroupRow({ group }: { group: any }) {
             </div>
 
             {expanded && older.length > 0 && (
-                <div className="pt-3 border-t border-dashed border-zinc-200 space-y-2 pl-2 sm:pl-12 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div
+                    className="pt-3 border-t-2 border-dashed border-black/20 space-y-2 animate-in fade-in slide-in-from-top-1 duration-200"
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Older Versions</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {older.map((ver: any, idx: number) => (
@@ -87,7 +98,7 @@ function ResumeGroupRow({ group }: { group: any }) {
                                 href={formatExternalUrl(ver.url)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="flex items-center justify-between p-2 text-xs border border-zinc-200 hover:border-black rounded bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-900 transition-all cursor-pointer"
+                                className="flex items-center justify-between p-2 text-xs border-2 border-black rounded bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-900 transition-all cursor-pointer"
                             >
                                 <span className="font-semibold">ver {ver.versionName}</span>
                                 <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
