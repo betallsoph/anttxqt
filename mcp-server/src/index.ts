@@ -112,7 +112,7 @@ server.registerTool("upsert_item", {
     if (pos >= 0) { arr[pos] = { ...arr[pos], ...item }; mode = "update"; }
     else {
       if (!item.id) throw new Error("Thêm mới projects/products cần item.id (unique).");
-      arr.push(item); mode = "append";
+      arr.push(item); pos = arr.length - 1; mode = "append";
     }
   } else { // key=index
     if (index != null) {
