@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
 
 type Achievement = ExploreData["achievements"][number];
@@ -601,7 +602,7 @@ function CollapsibleMoreSection({
 }
 
 export function ExplorePage() {
-    const { data, loading } = useExploreData();
+    const { data, loading, error, missing, retry } = useExploreData();
     const [selectedAchievement, setSelectedAchievement] =
         useState<Achievement | null>(null);
     const [selectedExploreItem, setSelectedExploreItem] =
@@ -617,6 +618,19 @@ export function ExplorePage() {
     if (loading) {
         return (
             <LoadingScreen />
+        );
+    }
+
+    if (error) {
+        return <ErrorScreen onRetry={retry} />;
+    }
+
+    if (missing) {
+        return (
+            <ErrorScreen
+                title="This content no longer exists"
+                message="The Explore page has been removed."
+            />
         );
     }
 

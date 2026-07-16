@@ -1,14 +1,29 @@
 import { motion } from "motion/react";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { useHomepageData } from "@/hooks/useHomepageData";
 import { parseBoldText } from "@/lib/utils";
 
 export function HomePage() {
-    const { data, loading } = useHomepageData();
+    const { data, loading, error, missing, retry } = useHomepageData();
 
     if (loading) {
         return (
             <LoadingScreen />
+        );
+    }
+
+    if (error) {
+        return <ErrorScreen onRetry={retry} />;
+    }
+
+    if (missing) {
+        return (
+            <ErrorScreen
+                title="This content no longer exists"
+                message="The homepage content has been removed."
+                onRetry={retry}
+            />
         );
     }
 
