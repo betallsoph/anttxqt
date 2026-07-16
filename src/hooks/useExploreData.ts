@@ -57,74 +57,22 @@ export interface ExploreData {
 
 export const defaultExploreData: ExploreData = {
     intro: {
-        title: "Explore",
-        description:
-            "A space for thoughts, experiments, and discoveries beyond projects.",
+// Intentionally empty. This only guarantees the shape when a Firestore doc is
+// missing a field — never put real-looking content here. It renders on the live
+// site whenever a fetch comes back short, and the admin form can save it as truth.
+        title: "",
+        description: "",
     },
-    achievements: [
-        {
-            title: "Dean's List",
-            issuer: "RMIT University",
-            date: "2024",
-            description:
-                "Recognized for outstanding academic performance.",
-        },
-        {
-            title: "First Place — Hackathon",
-            issuer: "RMIT Hackathon 2024",
-            date: "2024",
-            description:
-                "Won first place with a real-time collaboration tool.",
-        },
-        {
-            title: "AWS Certified Cloud Practitioner",
-            issuer: "Amazon Web Services",
-            date: "2023",
-            description:
-                "Foundational cloud computing certification.",
-            url: "https://aws.amazon.com/certification/",
-        },
-    ],
+    achievements: [],
     currently: [],
-    favourites: [
-        { label: "Rust", description: "Systems programming & performance" },
-        { label: "Design Systems", description: "Typography, spacing, consistency" },
-        { label: "Cloud Native", description: "Serverless, edge computing" },
-        { label: "Open Source", description: "Building in public" },
-    ],
-    beyondCode: [
-        {
-            title: "Marathon Running",
-            summary: "Training for endurance and discipline.",
-            story: "Running long distances is my way of clearing my mind, building mental resilience, and maintaining peak physical condition. It has taught me the value of consistency, pacing, and incremental progress, which directly applies to how I tackle complex engineering projects.",
-            since: "2024",
-            tags: ["Endurance", "Fitness"]
-        },
-        {
-            title: "Landscape Photography",
-            summary: "Capturing light, perspectives, and visual stories.",
-            story: "Photography is my main creative outlet outside of programming. Playing with cameras, lenses, and editing tools keeps my creative instincts sharp. It trains my eyes for composition, lighting, and detail, which directly influences my UI/UX design work.",
-            since: "2023",
-            tags: ["Creative", "Art"]
-        }
-    ],
+    favourites: [],
+    beyondCode: [],
     stories: [],
     whatsNext: [],
     impactPeople: [],
     lessonsFailed: [],
     offTheRecord: [],
-    moreAndMore: [
-        {
-            label: "Resumé",
-            description: "Software Developer CV",
-            url: "https://example.com/cv-software-developer.pdf"
-        },
-        {
-            label: "Resumé",
-            description: "UI/UX Designer CV",
-            url: "https://example.com/cv-uiux-designer.pdf"
-        }
-    ],
+    moreAndMore: [],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");

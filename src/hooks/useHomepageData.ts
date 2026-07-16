@@ -33,60 +33,17 @@ export interface HomepageData {
 
 export const defaultHomepageData: HomepageData = {
     hero: {
-        greeting: "Hello!",
-        name: "An T. Tran",
-        bio: [
-            "I'm a software developer focused on building reliable and user-focused applications.",
-            "Alongside development, I'm interested in media and digital communication—exploring how content, visuals, and storytelling can enhance the way products are presented and experienced.",
-        ],
-        email: "hello@anttxqt.dev",
+// Intentionally empty. This only guarantees the shape when a Firestore doc is
+// missing a field — never put real-looking content here. It renders on the live
+// site whenever a fetch comes back short, and the admin form can save it as truth.
+        greeting: "",
+        name: "",
+        bio: [],
+        email: "",
     },
-    skillCategories: [
-        {
-            name: "Frontend",
-            items: ["React", "Next.js", "TypeScript", "Tailwind CSS"],
-        },
-        {
-            name: "Backend",
-            items: ["Node.js", "PostgreSQL", "Firebase", "REST APIs"],
-        },
-        {
-            name: "Design & Tools",
-            items: ["Figma", "Git", "Docker", "Vercel"],
-        },
-    ],
-    links: [
-        { label: "Email", url: "mailto:hello@anttxqt.dev" },
-        { label: "GitHub", url: "https://github.com/anttxqt" },
-        { label: "LinkedIn", url: "https://linkedin.com/in/anttxqt" },
-        { label: "Twitter", url: "https://twitter.com/anttxqt" },
-    ],
-    experiences: [
-        {
-            role: "Software Developer Intern",
-            company: "FPT Software",
-            period: "2024 - Present",
-            location: "Ho Chi Minh City, Vietnam",
-            description: [
-                "Collaborated with senior engineers to implement new core features for a web-based document collaboration platform.",
-                "Optimized database queries and API endpoints, improving load times by 20% across key dashboards.",
-                "Participated in Agile sprint planning, daily standups, and rigorous team code reviews."
-            ],
-            hidden: false
-        },
-        {
-            role: "Frontend Developer",
-            company: "RMIT FinTech Club",
-            period: "2023 - 2024",
-            location: "RMIT University Vietnam",
-            description: [
-                "Designed and engineered interactive financial tools and landing pages to promote campus fintech initiatives.",
-                "Styled modern responsive user interfaces from scratch using custom CSS layouts and utility classes.",
-                "Integrated state management and unified API fetching patterns for real-time portfolio dashboards."
-            ],
-            hidden: false
-        }
-    ]
+    skillCategories: [],
+    links: [],
+    experiences: [],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "homepage");
