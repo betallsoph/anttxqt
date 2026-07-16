@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useState, useEffect, useCallback } from "react";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { getDocWithRetry } from "@/lib/firestore-utils";
+import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
 
 export type ProjectStatus = "Production" | "Staging" | "In Development" | "Concept" | "Retired";
 
@@ -49,47 +51,49 @@ export const defaultProducts: Project[] = [];
 export const defaultProjectsList: Project[] = [];
 
 export function useProjectsData(type: CollectionType) {
-    const defaultData = type === "products" ? defaultProducts : defaultProjectsList;
-    const [projects, setProjects] = useState<Project[]>(defaultData);
+    const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [missing, setMissing] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
+
+    const retry = useCallback(() => {
+        setLoading(true);
+        setError(null);
+        setMissing(false);
+        setReloadKey((key) => key + 1);
+    }, []);
 
     useEffect(() => {
-        setLoading(true);
-        const docRef = doc(db, "siteConfig", type);
-        getDoc(docRef)
+        let cancelled = false;
+
+        getDocWithRetry(doc(db, "siteConfig", type))
             .then((snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    if (data.items) {
-                        const items = data.items as Project[];
-                        // Automatic migration to clean up old mixed data
-                        if (type === "projects" && items.some(i => i.id === "roomieverse")) {
-                            console.log("Migrating old projects data...");
-                            setProjects(defaultProjectsList);
-                            setDoc(docRef, { items: defaultProjectsList });
-                        } else if (type === "products" && items.length === 0) {
-                            setProjects(defaultProducts);
-                            setDoc(docRef, { items: defaultProducts });
-                        } else {
-                            setProjects(items);
-                        }
-                    } else {
-                        setProjects(defaultData);
-                    }
-                } else {
-                    setProjects(defaultData);
+                if (cancelled) return;
+                if (!snapshot.exists()) {
+                    setMissing(true);
+                    return;
                 }
+                const items = snapshot.data().items;
+                setProjects(Array.isArray(items) ? (items as Project[]) : []);
             })
             .catch((err) => {
+                if (cancelled) return;
                 console.error(`Failed to fetch ${type}:`, err);
-                setError(err.message);
-                setProjects(defaultData);
+                setError(err instanceof Error ? err.message : String(err));
             })
-            .finally(() => setLoading(false));
-    }, [type]);
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
 
-    return { projects, loading, error };
+        return () => {
+            cancelled = true;
+        };
+    }, [type, reloadKey]);
+
+    useRetryOnVisible(error !== null, retry);
+
+    return { projects, loading, error, missing, retry };
 }
 
 export async function saveProjectsData(type: CollectionType, projects: Project[]) {

@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useState, useEffect, useCallback } from "react";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { getDocWithRetry } from "@/lib/firestore-utils";
+import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
 
 export interface ExploreItem {
     title: string;
@@ -55,11 +57,11 @@ export interface ExploreData {
     }[];
 }
 
-export const defaultExploreData: ExploreData = {
-    intro: {
 // Intentionally empty. This only guarantees the shape when a Firestore doc is
 // missing a field — never put real-looking content here. It renders on the live
 // site whenever a fetch comes back short, and the admin form can save it as truth.
+export const defaultExploreData: ExploreData = {
+    intro: {
         title: "",
         description: "",
     },
@@ -81,22 +83,45 @@ export function useExploreData() {
     const [data, setData] = useState<ExploreData>(defaultExploreData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [missing, setMissing] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
-    useEffect(() => {
-        getDoc(DOCUMENT_REF)
-            .then((snapshot) => {
-                if (snapshot.exists()) {
-                    setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
-                }
-            })
-            .catch((err) => {
-                console.error("Failed to fetch explore data:", err);
-                setError(err.message);
-            })
-            .finally(() => setLoading(false));
+    const retry = useCallback(() => {
+        setLoading(true);
+        setError(null);
+        setMissing(false);
+        setReloadKey((key) => key + 1);
     }, []);
 
-    return { data, loading, error };
+    useEffect(() => {
+        let cancelled = false;
+
+        getDocWithRetry(DOCUMENT_REF)
+            .then((snapshot) => {
+                if (cancelled) return;
+                if (!snapshot.exists()) {
+                    setMissing(true);
+                    return;
+                }
+                setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
+            })
+            .catch((err) => {
+                if (cancelled) return;
+                console.error("Failed to fetch explore data:", err);
+                setError(err instanceof Error ? err.message : String(err));
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [reloadKey]);
+
+    useRetryOnVisible(error !== null, retry);
+
+    return { data, loading, error, missing, retry };
 }
 
 export async function saveExploreData(data: ExploreData) {
