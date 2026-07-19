@@ -6,7 +6,7 @@ import "aos/dist/aos.css";
 import { Layout } from "@/components/layout";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { HomePage, ProjectsPage, ProjectDetailPage, ExplorePage, NotFoundPage } from "@/pages";
-import { AdminHomePage, AdminProjectsPage, AdminExplorePage } from "@/pages/admin";
+import { AdminHomePage, AdminProjectsPage, AdminExplorePage, AdminNotesPage, AdminPlannerPage } from "@/pages/admin";
 
 function App() {
   useEffect(() => {
@@ -34,6 +34,8 @@ function App() {
             <Route path="products" element={<AdminProjectsPage type="products" />} />
             <Route path="projects" element={<AdminProjectsPage type="projects" />} />
             <Route path="explore" element={<AdminExplorePage />} />
+            <Route path="notes" element={<AdminNotesPage />} />
+            <Route path="planner" element={<AdminPlannerPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Route>
