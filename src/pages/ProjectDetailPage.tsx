@@ -321,14 +321,14 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </div>
                     )}
 
-                    {/* Full Description */}
-                    {fullDescriptionText && (
+                    {/* How I Built It */}
+                    {howIBuiltText?.trim() && (
                         <div className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("description")}
+                                {getLabel("howIBuilt")}
                             </h3>
                             <div className="space-y-3 sm:space-y-4">
-                                {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
                                     <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                         {parseBoldText(para.trim())}
                                     </p>
@@ -354,14 +354,14 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </div>
                     )}
 
-                    {/* How I Built It */}
-                    {howIBuiltText?.trim() && (
+                    {/* Full Description */}
+                    {fullDescriptionText && (
                         <div className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("howIBuilt")}
+                                {getLabel("description")}
                             </h3>
                             <div className="space-y-3 sm:space-y-4">
-                                {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
                                     <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                         {parseBoldText(para.trim())}
                                     </p>
