@@ -52,9 +52,9 @@ export function AdminNotesPage() {
             const saved = await saveNote(draft);
             setSelectedId(saved.id);
             setDraft({ ...saved, tags: saved.tags ?? [] });
-            setMessage("Đã lưu vào MongoDB TakeNote.");
+            setMessage("Saved to TakeNote MongoDB.");
         } catch (err) {
-            setMessage(err instanceof Error ? err.message : "Lỗi khi lưu.");
+            setMessage(err instanceof Error ? err.message : "Failed to save.");
         } finally {
             setSaving(false);
             setTimeout(() => setMessage(""), 3000);
@@ -63,13 +63,13 @@ export function AdminNotesPage() {
 
     const handleDelete = async () => {
         if (!draft) return;
-        if (!confirm("Xóa note này khỏi TakeNote DB?")) return;
+        if (!confirm("Delete this note from TakeNote DB?")) return;
         try {
             await removeNote(draft.id);
             setSelectedId(null);
             setDraft(null);
         } catch (err) {
-            setMessage(err instanceof Error ? err.message : "Lỗi khi xóa.");
+            setMessage(err instanceof Error ? err.message : "Failed to delete.");
         }
     };
 
@@ -95,21 +95,21 @@ export function AdminNotesPage() {
                         Notes
                     </h3>
                     <p className="text-sm text-zinc-600 mt-1">
-                        Ghi nhanh idea từ admin — đồng bộ thẳng MongoDB TakeNote.
+                        Quick ideas from admin — synced directly to TakeNote MongoDB.
                     </p>
                 </div>
                 <Button size="sm" onClick={handleCreate}>
                     <Plus className="w-4 h-4" />
-                    Note mới
+                    New note
                 </Button>
             </motion.section>
 
             {error && (
                 <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4 text-sm text-red-700">
-                    <p className="font-bold mb-1">Không kết nối được TakeNote DB</p>
+                    <p className="font-bold mb-1">Could not connect to TakeNote DB</p>
                     <p>{error}</p>
                     <button type="button" onClick={reload} className="mt-2 underline font-bold">
-                        Thử lại
+                        Retry
                     </button>
                 </div>
             )}
@@ -117,11 +117,11 @@ export function AdminNotesPage() {
             <div className="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-4">
                 <div className="border-2 border-black rounded-lg bg-white overflow-hidden">
                     <div className="px-3 py-2 border-b-2 border-black bg-zinc-100 text-xs font-bold uppercase">
-                        Gần đây
+                        Recent
                     </div>
                     <div className="max-h-[520px] overflow-y-auto divide-y divide-zinc-100">
                         {notes.length === 0 ? (
-                            <p className="p-4 text-sm text-zinc-500">Chưa có note nào.</p>
+                            <p className="p-4 text-sm text-zinc-500">No notes yet.</p>
                         ) : (
                             notes.map((note) => (
                                 <button
@@ -147,7 +147,7 @@ export function AdminNotesPage() {
                 <div className="border-2 border-black rounded-lg bg-white p-4 sm:p-5 space-y-4">
                     {!draft ? (
                         <p className="text-sm text-zinc-500 py-8 text-center">
-                            Chọn một note hoặc tạo note mới.
+                            Select a note or create a new one.
                         </p>
                     ) : (
                         <>
@@ -160,7 +160,7 @@ export function AdminNotesPage() {
                                     value={draft.title}
                                     onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                                     className={inputClass}
-                                    placeholder="Idea cho project..."
+                                    placeholder="Project idea..."
                                 />
                             </div>
 
@@ -172,7 +172,7 @@ export function AdminNotesPage() {
                                     value={draft.content}
                                     onChange={(e) => setDraft({ ...draft, content: e.target.value })}
                                     className={`${inputClass} min-h-[280px] leading-relaxed`}
-                                    placeholder="Viết note ở đây..."
+                                    placeholder="Write your note here..."
                                 />
                             </div>
 
@@ -210,16 +210,19 @@ export function AdminNotesPage() {
                                     ) : (
                                         <Save className="w-4 h-4" />
                                     )}
-                                    Lưu
+                                    Save
                                 </Button>
                                 <Button size="sm" variant="noShadow" onClick={handleDelete}>
                                     <Trash2 className="w-4 h-4" />
-                                    Xóa
+                                    Delete
                                 </Button>
                                 {message && (
                                     <span
                                         className={`text-sm font-bold ${
-                                            message.includes("Lỗi") ? "text-red-500" : "text-green-600"
+                                            message.toLowerCase().includes("fail") ||
+                                            message.toLowerCase().includes("error")
+                                                ? "text-red-500"
+                                                : "text-green-600"
                                         }`}
                                     >
                                         {message}

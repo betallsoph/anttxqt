@@ -13,7 +13,7 @@ export class TakeNoteApiError extends Error {
 async function getAuthHeaders(): Promise<HeadersInit> {
     const user = auth.currentUser;
     if (!user) {
-        throw new TakeNoteApiError("Bạn cần đăng nhập admin trước.", 401);
+        throw new TakeNoteApiError("Admin login required.", 401);
     }
 
     const token = await user.getIdToken();

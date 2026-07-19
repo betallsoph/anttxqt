@@ -25,7 +25,7 @@ export function useAdminNotes() {
             })
             .catch((err) => {
                 if (!cancelled) {
-                    setError(err instanceof TakeNoteApiError ? err.message : "Không tải được notes.");
+                    setError(err instanceof TakeNoteApiError ? err.message : "Failed to load notes.");
                 }
             })
             .finally(() => {
