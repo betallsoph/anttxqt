@@ -135,3 +135,144 @@
   background: rgb(147, 197, 253);
   color: black;
 }
+
+/* Neobrutal button tap depth + spring transitions (roomio-style) */
+.btn-neo-primary {
+  --tap-depth: 5px;
+  --tap-shadow: var(--shadow-primary);
+}
+
+.btn-neo-secondary {
+  --tap-depth: 5px;
+  --tap-shadow: var(--shadow-primary);
+}
+
+.btn-neo-tap-secondary {
+  --tap-depth: 1px;
+  --tap-shadow: var(--shadow-secondary);
+}
+
+:where(button, a, [role="button"]):where(
+  .btn-neo-primary,
+  .btn-neo-secondary,
+  .btn-neo-tap-secondary,
+  [class*="shadow-primary"],
+  [class*="shadow-secondary"]
+) {
+  transition-property: background-color, border-color, color, opacity, transform, box-shadow;
+  transition-duration: 150ms, 150ms, 150ms, 150ms, 200ms, 200ms;
+  transition-timing-function:
+    ease, ease, ease, ease, cubic-bezier(0.34, 1.56, 0.64, 1), cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+:where(button, a, [role="button"]):where(
+  .btn-neo-primary,
+  .btn-neo-secondary
+):hover:not(:disabled):not(:active) {
+  transform: translate(5px, 5px);
+  box-shadow: none;
+}
+
+:where(button, a, [role="button"]):where(
+  .btn-neo-primary,
+  .btn-neo-secondary,
+  .btn-neo-tap-secondary,
+  [class*="shadow-primary"],
+  [class*="shadow-secondary"]
+):active:not(:disabled) {
+  transform: translate(var(--tap-depth, 1px), var(--tap-depth, 1px)) !important;
+  box-shadow: none !important;
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease !important;
+}
+
+/* Radial hover reveal for toolbar / modal action buttons */
+:is(.toolbar-action, .modal-action) {
+  --hover-x: 50%;
+  --hover-y: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+:is(.toolbar-action, .modal-action)::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: #fff;
+  clip-path: circle(0 at var(--hover-x) var(--hover-y));
+  content: "";
+  transition: clip-path 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:is(.toolbar-action, .modal-action):not(:disabled):hover::before {
+  clip-path: circle(160% at var(--hover-x) var(--hover-y));
+}
+
+:is(.toolbar-action-label, .modal-action-label) {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  transform-origin: center;
+  transition: color 150ms ease;
+}
+
+:is(.toolbar-action, .modal-action):not(:disabled):hover
+  :is(.toolbar-action-label, .modal-action-label) {
+  color: #2563eb;
+  font-weight: 900;
+  animation: toolbar-action-label-pop 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal-action > svg,
+.toolbar-action > svg {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes toolbar-action-label-pop {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  52% {
+    transform: scale(1.08);
+  }
+}
+
+.tap-bounce {
+  animation: tap-bounce 250ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.tap-sink {
+  transform: translate(var(--tap-depth, 1px), var(--tap-depth, 1px)) !important;
+  box-shadow: none !important;
+  transition:
+    transform 80ms ease,
+    box-shadow 80ms ease !important;
+}
+
+@keyframes tap-bounce {
+  0% {
+    transform: translate(var(--tap-depth, 1px), var(--tap-depth, 1px));
+    box-shadow: none;
+  }
+  1% {
+    transform: translate(
+      calc(var(--tap-depth, 1px) - 0.05px),
+      calc(var(--tap-depth, 1px) - 0.05px)
+    );
+    box-shadow: var(--tap-shadow, var(--shadow-secondary));
+  }
+  50% {
+    transform: translate(-0.5px, -0.5px);
+    box-shadow: var(--tap-shadow, var(--shadow-secondary));
+  }
+  100% {
+    transform: translate(0, 0);
+    box-shadow: var(--tap-shadow, var(--shadow-secondary));
+  }
+}
