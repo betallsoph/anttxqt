@@ -108,7 +108,7 @@ export function AdminPlannerPage() {
                         Personal task planner — shared TakeNote MongoDB.
                     </p>
                 </div>
-                <Button size="sm" onClick={() => handleCreate("todo")}>
+                <Button variant="toolbar" size="sm" onClick={() => handleCreate("todo")}>
                     <Plus className="w-4 h-4" />
                     New task
                 </Button>
@@ -230,7 +230,7 @@ export function AdminPlannerPage() {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <Button size="sm" onClick={handleSave} disabled={saving}>
+                                <Button variant="action" size="sm" onClick={handleSave} disabled={saving}>
                                     {saving ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
@@ -238,7 +238,7 @@ export function AdminPlannerPage() {
                                     )}
                                     Save
                                 </Button>
-                                <Button size="sm" variant="noShadow" onClick={handleDelete}>
+                                <Button variant="secondary" size="sm" onClick={handleDelete}>
                                     <Trash2 className="w-4 h-4" />
                                     Delete
                                 </Button>

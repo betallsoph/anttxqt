@@ -98,7 +98,7 @@ export function AdminNotesPage() {
                         Quick ideas from admin — synced directly to TakeNote MongoDB.
                     </p>
                 </div>
-                <Button size="sm" onClick={handleCreate}>
+                <Button variant="toolbar" size="sm" onClick={handleCreate}>
                     <Plus className="w-4 h-4" />
                     New note
                 </Button>
@@ -204,7 +204,7 @@ export function AdminNotesPage() {
                             )}
 
                             <div className="flex items-center gap-3 pt-2">
-                                <Button size="sm" onClick={handleSave} disabled={saving}>
+                                <Button variant="action" size="sm" onClick={handleSave} disabled={saving}>
                                     {saving ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
@@ -212,7 +212,7 @@ export function AdminNotesPage() {
                                     )}
                                     Save
                                 </Button>
-                                <Button size="sm" variant="noShadow" onClick={handleDelete}>
+                                <Button variant="secondary" size="sm" onClick={handleDelete}>
                                     <Trash2 className="w-4 h-4" />
                                     Delete
                                 </Button>
