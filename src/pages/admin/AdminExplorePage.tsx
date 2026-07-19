@@ -28,7 +28,7 @@ function SaveButton({
 }) {
     return (
         <div className="flex items-center gap-3 pt-4">
-            <Button onClick={onSave} disabled={saving} size="sm">
+            <Button variant="action" onClick={onSave} disabled={saving} size="sm">
                 {saving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
@@ -191,7 +191,7 @@ function ExploreItemListEditor({
                 ))}
             </div>
             <Button
-                variant="ghost"
+                variant="action"
                 size="sm"
                 className="mt-3"
                 onClick={() =>
@@ -418,7 +418,7 @@ export function AdminExplorePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() => setData({ ...data, favourites: [...(data.favourites || []), { label: "", description: "" }] })}
@@ -638,7 +638,7 @@ export function AdminExplorePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() =>
@@ -830,7 +830,7 @@ export function AdminExplorePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() =>
@@ -1014,7 +1014,7 @@ export function AdminExplorePage() {
                                             </div>
 
                                             <Button
-                                                variant="ghost"
+                                                variant="action"
                                                 size="sm"
                                                 onClick={() => {
                                                     const r = [...(data.resumes || [])];
@@ -1033,7 +1033,7 @@ export function AdminExplorePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() => setData({ ...data, resumes: [...(data.resumes || []), { name: "", description: "", versions: [] }] })}
@@ -1175,7 +1175,7 @@ export function AdminExplorePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", topics: [] }] })}
@@ -1291,7 +1291,7 @@ export function AdminExplorePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() => setData({ ...data, whatsNext: [...(data.whatsNext || []), { title: "", status: "Planning", description: "" }] })}

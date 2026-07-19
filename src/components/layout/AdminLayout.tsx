@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTapBounce } from "@/hooks/useTapBounce";
 import { ALLOWED_ADMIN_EMAILS } from "@/lib/admin-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -88,6 +89,7 @@ function LoginForm() {
 
 export function AdminLayout() {
     const { user, loading, signOut } = useAuth();
+    useTapBounce(Boolean(user));
 
     if (loading) {
         return (
@@ -116,7 +118,7 @@ export function AdminLayout() {
                 <p className="text-sm text-zinc-600">
                     Tài khoản của bạn không được phép truy cập trang admin.
                 </p>
-                <Button variant="noShadow" size="sm" onClick={signOut}>
+                <Button variant="secondary" size="sm" onClick={signOut}>
                     <LogOut className="w-4 h-4" />
                     Đăng xuất
                 </Button>

@@ -229,6 +229,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                     </p>
                 </div>
                 <Button
+                    variant="toolbar"
                     size="sm"
                     className="cursor-pointer font-semibold"
                     onClick={() => {
@@ -838,7 +839,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                             </div>
                                             
                                             <Button
-                                                variant="ghost"
+                                                variant="action"
                                                 size="sm"
                                                 className="mt-2 font-semibold text-xs border border-zinc-200"
                                                 onClick={() => {
@@ -853,7 +854,8 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
 
                                     {/* Sticky Save Footer */}
                                     <div className="flex items-center gap-3 p-4 sm:px-6 sm:py-4 bg-zinc-50 border-t border-zinc-200">
-                                        <Button 
+                                        <Button
+                                            variant="action"
                                             onClick={() => handleSave(index)} 
                                             disabled={savingIndex === index} 
                                             size="sm"

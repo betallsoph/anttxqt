@@ -18,7 +18,7 @@ const inputClass =
 function SaveButton({ saving, message, onSave }: { saving: boolean; message: string; onSave: () => void }) {
     return (
         <div className="flex items-center gap-3 pt-4">
-            <Button onClick={onSave} disabled={saving} size="sm">
+            <Button variant="action" onClick={onSave} disabled={saving} size="sm">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 {saving ? "Đang lưu..." : "Lưu"}
             </Button>
@@ -165,7 +165,7 @@ export function AdminHomePage() {
                                     ))}
                                 </div>
                                 <Button
-                                    variant="ghost"
+                                    variant="action"
                                     size="sm"
                                     className="mt-2"
                                     onClick={() =>
@@ -330,7 +330,7 @@ export function AdminHomePage() {
                                 </div>
 
                                 <Button
-                                    variant="ghost"
+                                    variant="action"
                                     size="sm"
                                     className="mt-3"
                                     onClick={() =>
@@ -429,7 +429,7 @@ export function AdminHomePage() {
                                                 </div>
                                             ))}
                                             <Button
-                                                variant="ghost"
+                                                variant="action"
                                                 size="sm"
                                                 onClick={() => {
                                                     const cats = [...data.skillCategories];
@@ -445,7 +445,7 @@ export function AdminHomePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() =>
@@ -534,7 +534,7 @@ export function AdminHomePage() {
                                 ))}
                             </div>
                             <Button
-                                variant="ghost"
+                                variant="action"
                                 size="sm"
                                 className="mt-3"
                                 onClick={() => setData({ ...data, links: [...data.links, { label: "", url: "" }] })}
