@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { DelayedLink } from "@/components/ui/delayed-link";
 import { ArrowRight, Github, ExternalLink } from "lucide-react";
 import { LoadingScreen } from "@/components/ui/LoadingScreen";
+import { ErrorScreen } from "@/components/ui/ErrorScreen";
 import { useProjectsData, type ProjectStatus, type CollectionType, formatExternalUrl } from "@/hooks/useProjectsData";
 
 const statusStyles: Record<ProjectStatus, string> = {
@@ -15,7 +16,7 @@ const statusStyles: Record<ProjectStatus, string> = {
 
 
 export function ProjectsPage({ type }: { type: CollectionType }) {
-    const { projects, loading } = useProjectsData(type);
+    const { projects, loading, error, missing, retry } = useProjectsData(type);
     const visibleProjects = projects.filter((p) => !p.hidden);
     const title = type === "products" ? "Products" : "Projects";
     const itemLabel = type === "products" ? "products" : "projects";
@@ -26,6 +27,19 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
     if (loading) {
         return (
             <LoadingScreen />
+        );
+    }
+
+    if (error) {
+        return <ErrorScreen onRetry={retry} />;
+    }
+
+    if (missing) {
+        return (
+            <ErrorScreen
+                title="This content no longer exists"
+                message={`The ${itemLabel} list has been removed.`}
+            />
         );
     }
 

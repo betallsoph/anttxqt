@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useState, useEffect, useCallback } from "react";
+import { doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { getDocWithRetry } from "@/lib/firestore-utils";
+import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
 
 export interface ExploreItem {
     title: string;
@@ -67,76 +69,24 @@ export interface ExploreData {
     resumes?: ResumeGroup[];
 }
 
+// Intentionally empty. This only guarantees the shape when a Firestore doc is
+// missing a field — never put real-looking content here. It renders on the live
+// site whenever a fetch comes back short, and the admin form can save it as truth.
 export const defaultExploreData: ExploreData = {
     intro: {
-        title: "Explore",
-        description:
-            "A space for thoughts, experiments, and discoveries beyond projects.",
+        title: "",
+        description: "",
     },
-    achievements: [
-        {
-            title: "Dean's List",
-            issuer: "RMIT University",
-            date: "2024",
-            description:
-                "Recognized for outstanding academic performance.",
-        },
-        {
-            title: "First Place — Hackathon",
-            issuer: "RMIT Hackathon 2024",
-            date: "2024",
-            description:
-                "Won first place with a real-time collaboration tool.",
-        },
-        {
-            title: "AWS Certified Cloud Practitioner",
-            issuer: "Amazon Web Services",
-            date: "2023",
-            description:
-                "Foundational cloud computing certification.",
-            url: "https://aws.amazon.com/certification/",
-        },
-    ],
+    achievements: [],
     currently: [],
-    favourites: [
-        { label: "Rust", description: "Systems programming & performance" },
-        { label: "Design Systems", description: "Typography, spacing, consistency" },
-        { label: "Cloud Native", description: "Serverless, edge computing" },
-        { label: "Open Source", description: "Building in public" },
-    ],
-    beyondCode: [
-        {
-            title: "Marathon Running",
-            summary: "Training for endurance and discipline.",
-            story: "Running long distances is my way of clearing my mind, building mental resilience, and maintaining peak physical condition. It has taught me the value of consistency, pacing, and incremental progress, which directly applies to how I tackle complex engineering projects.",
-            since: "2024",
-            tags: ["Endurance", "Fitness"]
-        },
-        {
-            title: "Landscape Photography",
-            summary: "Capturing light, perspectives, and visual stories.",
-            story: "Photography is my main creative outlet outside of programming. Playing with cameras, lenses, and editing tools keeps my creative instincts sharp. It trains my eyes for composition, lighting, and detail, which directly influences my UI/UX design work.",
-            since: "2023",
-            tags: ["Creative", "Art"]
-        }
-    ],
+    favourites: [],
+    beyondCode: [],
     stories: [],
     whatsNext: [],
     impactPeople: [],
     lessonsFailed: [],
     offTheRecord: [],
-    moreAndMore: [
-        {
-            label: "Resumé",
-            description: "Software Developer CV",
-            url: "https://example.com/cv-software-developer.pdf"
-        },
-        {
-            label: "Resumé",
-            description: "UI/UX Designer CV",
-            url: "https://example.com/cv-uiux-designer.pdf"
-        }
-    ],
+    moreAndMore: [],
     resumes: [],
 };
 
@@ -146,22 +96,45 @@ export function useExploreData() {
     const [data, setData] = useState<ExploreData>(defaultExploreData);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [missing, setMissing] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
-    useEffect(() => {
-        getDoc(DOCUMENT_REF)
-            .then((snapshot) => {
-                if (snapshot.exists()) {
-                    setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
-                }
-            })
-            .catch((err) => {
-                console.error("Failed to fetch explore data:", err);
-                setError(err.message);
-            })
-            .finally(() => setLoading(false));
+    const retry = useCallback(() => {
+        setLoading(true);
+        setError(null);
+        setMissing(false);
+        setReloadKey((key) => key + 1);
     }, []);
 
-    return { data, loading, error };
+    useEffect(() => {
+        let cancelled = false;
+
+        getDocWithRetry(DOCUMENT_REF)
+            .then((snapshot) => {
+                if (cancelled) return;
+                if (!snapshot.exists()) {
+                    setMissing(true);
+                    return;
+                }
+                setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
+            })
+            .catch((err) => {
+                if (cancelled) return;
+                console.error("Failed to fetch explore data:", err);
+                setError(err instanceof Error ? err.message : String(err));
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [reloadKey]);
+
+    useRetryOnVisible(error !== null, retry);
+
+    return { data, loading, error, missing, retry };
 }
 
 export async function saveExploreData(data: ExploreData) {

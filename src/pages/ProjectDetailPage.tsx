@@ -87,13 +87,15 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         const storyKey = `storyBehind${suffix}`;
         const fullDescKey = `fullDescription${suffix}`;
         const featuresKey = `keyFeatures${suffix}`;
+        const howIBuiltKey = `howIBuilt${suffix}`;
 
         return !!(
             project[titleKey]?.trim() ||
             project[descKey]?.trim() ||
             project[storyKey]?.trim() ||
             project[fullDescKey]?.trim() ||
-            (project[featuresKey] && project[featuresKey].length > 0)
+            (project[featuresKey] && project[featuresKey].length > 0) ||
+            project[howIBuiltKey]?.trim()
         );
     };
 
@@ -125,6 +127,11 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 en: "Full Description",
                 vi: "Mô tả chi tiết",
                 ar: "الوصف الكامل",
+            },
+            howIBuilt: {
+                en: "How I Built It",
+                vi: "Cách tôi xây dựng",
+                ar: "كيف بنيته",
             },
             role: {
                 en: "Role",
@@ -163,6 +170,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const storyBehindText = (suffix && (project[`storyBehind${suffix}`] as string)) || project.storyBehind;
     const keyFeaturesList = (suffix && (project[`keyFeatures${suffix}`] as string[])) || project.keyFeatures;
     const fullDescriptionText = (suffix && (project[`fullDescription${suffix}`] as string)) || project.fullDescription;
+    const howIBuiltText = (suffix && (project[`howIBuilt${suffix}`] as string)) || project.howIBuilt;
 
     return (
         <div className={`space-y-8 ${lang === "vi" ? "font-vietnamese" : ""}`}>
@@ -313,6 +321,22 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </div>
                     )}
 
+                    {/* Full Description */}
+                    {fullDescriptionText && (
+                        <div className="mb-6 sm:mb-8">
+                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                {getLabel("description")}
+                            </h3>
+                            <div className="space-y-3 sm:space-y-4">
+                                {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                        {parseBoldText(para.trim())}
+                                    </p>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Key Features */}
                     {keyFeaturesList && keyFeaturesList.length > 0 && (
                         <div className="mb-6 sm:mb-8">
@@ -330,14 +354,14 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </div>
                     )}
 
-                    {/* Full Description */}
-                    {fullDescriptionText && (
+                    {/* How I Built It */}
+                    {howIBuiltText?.trim() && (
                         <div className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("description")}
+                                {getLabel("howIBuilt")}
                             </h3>
                             <div className="space-y-3 sm:space-y-4">
-                                {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
                                     <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                         {parseBoldText(para.trim())}
                                     </p>
