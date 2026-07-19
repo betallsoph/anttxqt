@@ -3,14 +3,20 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-    "inline-flex items-center justify-center rounded-[6px] whitespace-nowrap text-sm font-bold ring-offset-white transition-all gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50",
+    "inline-flex items-center justify-center rounded-[6px] whitespace-nowrap text-sm font-bold ring-offset-white gap-2 cursor-pointer disabled:pointer-events-none disabled:opacity-50 touch-manipulation",
     {
         variants: {
             variant: {
                 default:
-                    "text-black bg-blue-300 border-2 border-black shadow-primary hover:translate-x-[5px] hover:translate-y-[5px] hover:shadow-none",
+                    "btn-neo-primary text-black bg-blue-300 border-2 border-black shadow-primary",
+                secondary:
+                    "btn-neo-secondary text-black bg-white border-2 border-black shadow-primary",
+                toolbar:
+                    "toolbar-action btn-neo-tap-secondary text-black bg-blue-300 border-2 border-black shadow-secondary transition-[transform,box-shadow]",
+                action:
+                    "modal-action btn-neo-tap-secondary text-black bg-blue-300 border-2 border-black shadow-secondary transition-[transform,box-shadow]",
                 oppositeDefault:
-                    "text-black bg-white border-2 border-black shadow-primary hover:translate-x-[5px] hover:translate-y-[5px] hover:shadow-none",
+                    "btn-neo-secondary text-black bg-white border-2 border-black shadow-primary",
                 oppositeNoShadow:
                     "text-blue-400 bg-white border-2 border-blue-400 hover:bg-blue-400 hover:text-white transition-all duration-500",
                 noShadow:
@@ -34,6 +40,14 @@ const buttonVariants = cva(
     }
 )
 
+const actionHoverVariants = new Set(["toolbar", "action"])
+
+function setHoverOrigin(event: React.PointerEvent<HTMLButtonElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    event.currentTarget.style.setProperty("--hover-x", `${event.clientX - bounds.left}px`)
+    event.currentTarget.style.setProperty("--hover-y", `${event.clientY - bounds.top}px`)
+}
+
 export interface ButtonProps
     extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
@@ -41,13 +55,41 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, ...props }, ref) => {
+    ({ className, variant, size, children, onPointerEnter, onPointerMove, ...props }, ref) => {
+        const hasActionHover = variant != null && actionHoverVariants.has(variant)
+
+        const handlePointerEnter = (event: React.PointerEvent<HTMLButtonElement>) => {
+            if (hasActionHover && !props.disabled) {
+                setHoverOrigin(event)
+            }
+            onPointerEnter?.(event)
+        }
+
+        const handlePointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+            if (hasActionHover && !props.disabled) {
+                setHoverOrigin(event)
+            }
+            onPointerMove?.(event)
+        }
+
+        const content = hasActionHover ? (
+            <span className={variant === "toolbar" ? "toolbar-action-label" : "modal-action-label"}>
+                {children}
+            </span>
+        ) : (
+            children
+        )
+
         return (
             <button
                 className={cn(buttonVariants({ variant, size, className }))}
                 ref={ref}
+                onPointerEnter={handlePointerEnter}
+                onPointerMove={handlePointerMove}
                 {...props}
-            />
+            >
+                {content}
+            </button>
         )
     }
 )
