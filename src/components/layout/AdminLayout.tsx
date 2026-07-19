@@ -2,21 +2,18 @@ import { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
 import { motion } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
+import { ALLOWED_ADMIN_EMAILS } from "@/lib/admin-config";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { LogOut, Loader2, ShieldX, Home, FolderOpen, Compass } from "lucide-react";
-
-const ALLOWED_EMAILS = [
-    "hugoddt1234.50@gmail.com",
-    "tranthienann228@gmail.com",
-    "tranthienan12a1ts2022@gmail.com",
-];
+import { LogOut, Loader2, ShieldX, Home, FolderOpen, Compass, StickyNote, CalendarDays } from "lucide-react";
 
 const navItems = [
     { to: "/admin/home", label: "Home", icon: Home },
     { to: "/admin/products", label: "Products", icon: FolderOpen },
     { to: "/admin/projects", label: "Projects", icon: FolderOpen },
     { to: "/admin/explore", label: "Explore", icon: Compass },
+    { to: "/admin/notes", label: "Notes", icon: StickyNote },
+    { to: "/admin/planner", label: "Planner", icon: CalendarDays },
 ];
 
 function LoginForm() {
@@ -30,7 +27,7 @@ function LoginForm() {
         e.preventDefault();
         setError("");
 
-        if (!ALLOWED_EMAILS.includes(email.toLowerCase())) {
+        if (!ALLOWED_ADMIN_EMAILS.includes(email.toLowerCase())) {
             setError("Email không có quyền truy cập.");
             return;
         }
@@ -104,7 +101,7 @@ export function AdminLayout() {
         return <LoginForm />;
     }
 
-    if (!ALLOWED_EMAILS.includes(user.email || "")) {
+    if (!ALLOWED_ADMIN_EMAILS.includes(user.email || "")) {
         return (
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -154,7 +151,7 @@ export function AdminLayout() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.1 }}
-                className="flex gap-2 sm:gap-3"
+                className="flex flex-wrap gap-2 sm:gap-3"
             >
                 {navItems.map(({ to, label, icon: Icon }) => (
                     <NavLink
