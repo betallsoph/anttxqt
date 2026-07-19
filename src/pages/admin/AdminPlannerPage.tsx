@@ -62,9 +62,9 @@ export function AdminPlannerPage() {
             const saved = await saveItem(draft);
             setSelectedId(saved.id);
             setDraft({ ...saved });
-            setMessage("Đã lưu vào MongoDB TakeNote.");
+            setMessage("Saved to TakeNote MongoDB.");
         } catch (err) {
-            setMessage(err instanceof Error ? err.message : "Lỗi khi lưu.");
+            setMessage(err instanceof Error ? err.message : "Failed to save.");
         } finally {
             setSaving(false);
             setTimeout(() => setMessage(""), 3000);
@@ -73,13 +73,13 @@ export function AdminPlannerPage() {
 
     const handleDelete = async () => {
         if (!draft) return;
-        if (!confirm("Xóa task planner này?")) return;
+        if (!confirm("Delete this planner task?")) return;
         try {
             await removeItem(draft.id);
             setSelectedId(null);
             setDraft(null);
         } catch (err) {
-            setMessage(err instanceof Error ? err.message : "Lỗi khi xóa.");
+            setMessage(err instanceof Error ? err.message : "Failed to delete.");
         }
     };
 
@@ -105,21 +105,21 @@ export function AdminPlannerPage() {
                         Planner
                     </h3>
                     <p className="text-sm text-zinc-600 mt-1">
-                        Task planner cá nhân — đọc/ghi cùng MongoDB TakeNote.
+                        Personal task planner — shared TakeNote MongoDB.
                     </p>
                 </div>
                 <Button size="sm" onClick={() => handleCreate("todo")}>
                     <Plus className="w-4 h-4" />
-                    Task mới
+                    New task
                 </Button>
             </motion.section>
 
             {error && (
                 <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4 text-sm text-red-700">
-                    <p className="font-bold mb-1">Không kết nối được TakeNote DB</p>
+                    <p className="font-bold mb-1">Could not connect to TakeNote DB</p>
                     <p>{error}</p>
                     <button type="button" onClick={reload} className="mt-2 underline font-bold">
-                        Thử lại
+                        Retry
                     </button>
                 </div>
             )}
@@ -143,7 +143,7 @@ export function AdminPlannerPage() {
                             </div>
                             <div className="p-2 space-y-2 max-h-[480px] overflow-y-auto">
                                 {grouped[status].length === 0 ? (
-                                    <p className="text-xs text-zinc-400 p-2">Trống</p>
+                                    <p className="text-xs text-zinc-400 p-2">Empty</p>
                                 ) : (
                                     grouped[status].map((item) => (
                                         <button
@@ -169,7 +169,7 @@ export function AdminPlannerPage() {
                 <div className="border-2 border-black rounded-lg bg-white p-4 space-y-4 h-fit">
                     {!draft ? (
                         <p className="text-sm text-zinc-500 py-8 text-center">
-                            Chọn task để chỉnh sửa.
+                            Select a task to edit.
                         </p>
                     ) : (
                         <>
@@ -236,18 +236,21 @@ export function AdminPlannerPage() {
                                     ) : (
                                         <Save className="w-4 h-4" />
                                     )}
-                                    Lưu
+                                    Save
                                 </Button>
                                 <Button size="sm" variant="noShadow" onClick={handleDelete}>
                                     <Trash2 className="w-4 h-4" />
-                                    Xóa
+                                    Delete
                                 </Button>
                             </div>
 
                             {message && (
                                 <p
                                     className={`text-sm font-bold ${
-                                        message.includes("Lỗi") ? "text-red-500" : "text-green-600"
+                                        message.toLowerCase().includes("fail") ||
+                                        message.toLowerCase().includes("error")
+                                            ? "text-red-500"
+                                            : "text-green-600"
                                     }`}
                                 >
                                     {message}

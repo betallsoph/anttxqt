@@ -12,7 +12,7 @@ export function getDb(): Firestore {
     process.env.GOOGLE_APPLICATION_CREDENTIALS;
   if (!path) {
     throw new Error(
-      "Thiếu FIREBASE_SERVICE_ACCOUNT_PATH (hoặc GOOGLE_APPLICATION_CREDENTIALS)."
+      "Missing FIREBASE_SERVICE_ACCOUNT_PATH (or GOOGLE_APPLICATION_CREDENTIALS)."
     );
   }
   const serviceAccount = JSON.parse(readFileSync(resolve(path), "utf8"));
@@ -23,13 +23,13 @@ export function getDb(): Firestore {
 
 const COLLECTION = "siteConfig";
 
-/** Đọc nguyên document siteConfig/<id>. Trả {} nếu chưa tồn tại. */
+/** Read full siteConfig/<id> document. Returns {} if missing. */
 export async function readDoc(id: string): Promise<Record<string, any>> {
   const snap = await getDb().collection(COLLECTION).doc(id).get();
   return snap.exists ? (snap.data() as Record<string, any>) : {};
 }
 
-/** Ghi ĐÈ nguyên document siteConfig/<id> (giống setDoc của app). */
+/** Overwrite full siteConfig/<id> document (same as app setDoc). */
 export async function writeDoc(id: string, data: Record<string, any>): Promise<void> {
   await getDb().collection(COLLECTION).doc(id).set(data);
 }
