@@ -13,6 +13,17 @@ export interface ExploreItem {
     tags?: string[];
 }
 
+export interface ResumeVersion {
+    versionName: string;
+    url: string;
+}
+
+export interface ResumeGroup {
+    name: string;
+    description?: string;
+    versions: ResumeVersion[];
+}
+
 export interface ExploreData {
     hiddenSections?: string[];
     intro: {
@@ -55,6 +66,7 @@ export interface ExploreData {
         description?: string;
         url?: string;
     }[];
+    resumes?: ResumeGroup[];
 }
 
 // Intentionally empty. This only guarantees the shape when a Firestore doc is
@@ -75,6 +87,7 @@ export const defaultExploreData: ExploreData = {
     lessonsFailed: [],
     offTheRecord: [],
     moreAndMore: [],
+    resumes: [],
 };
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");
