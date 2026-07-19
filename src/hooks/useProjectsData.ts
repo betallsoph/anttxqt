@@ -13,6 +13,7 @@ export interface Project {
     description: string;
     fullDescription?: string;
     storyBehind?: string;
+    howIBuilt?: string;
     status: ProjectStatus;
     tags: string[];
     topics?: string[];
@@ -29,6 +30,7 @@ export interface Project {
     storyBehindVi?: string;
     keyFeaturesVi?: string[];
     fullDescriptionVi?: string;
+    howIBuiltVi?: string;
     showVi?: boolean;
     // Arabic translation fields (written manually by admin)
     titleAr?: string;
@@ -36,6 +38,7 @@ export interface Project {
     storyBehindAr?: string;
     keyFeaturesAr?: string[];
     fullDescriptionAr?: string;
+    howIBuiltAr?: string;
     showAr?: boolean;
     // Index signature for dynamic multilingual support
     [key: string]: any;
