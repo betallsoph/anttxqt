@@ -132,7 +132,7 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                                             href={formatExternalUrl(project.liveUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1 px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors pointer-events-auto"
+                                            className="inline-flex items-center gap-1 px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold bg-zinc-50 border border-zinc-200 text-blue-600 rounded hover:bg-zinc-100 transition-colors pointer-events-auto"
                                             title="Visit live website"
                                         >
                                             <ExternalLink className="w-3.5 h-3.5" />
