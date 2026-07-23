@@ -294,7 +294,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 href={formatExternalUrl(project.liveUrl)}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                                className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-zinc-50 border border-zinc-200 text-blue-600 rounded hover:bg-zinc-100 transition-colors"
                                 title="Visit live website"
                             >
                                 <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -433,7 +433,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                             href={formatExternalUrl(project.liveUrl)}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 text-sm sm:text-base font-bold bg-blue-50 border border-blue-200 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:py-2 text-sm sm:text-base font-bold bg-zinc-50 border border-zinc-200 text-blue-600 rounded-lg hover:bg-zinc-100 transition-colors"
                                             title="Visit live website"
                                         >
                                             <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
