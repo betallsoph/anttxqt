@@ -409,8 +409,8 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         </div>
 
 
-                        {/* Links */}
-                        {(project.githubUrl || project.liveUrl) && (
+                        {/* Links — hidden: Live/GitHub already shown in Status & Quick Links above */}
+                        {/* {(project.githubUrl || project.liveUrl) && (
                             <div>
                                 <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                     {getLabel("explore")}
@@ -442,7 +442,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                     )}
                                 </div>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </motion.article>
