@@ -560,6 +560,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                     const descKey = `description${suffix}`;
                                                     const fullDescKey = `fullDescription${suffix}`;
                                                     const storyKey = `storyBehind${suffix}`;
+                                                    const howIBuiltKey = `howIBuilt${suffix}`;
                                                     const featuresKey = `keyFeatures${suffix}`;
 
                                                     return (
@@ -647,6 +648,20 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                             className={`${inputClass} min-h-[100px] leading-relaxed ${lang.dir === "rtl" ? "text-right" : ""}`}
                                                                             rows={3}
                                                                             placeholder={`The story behind in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                                            dir={lang.dir || "ltr"}
+                                                                        />
+                                                                    </div>
+
+                                                                    <div className={lang.dir === "rtl" ? "text-right" : ""}>
+                                                                        <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${lang.dir === "rtl" ? "text-right" : ""}`}>
+                                                                            How I Built It ({lang.key.toUpperCase()})
+                                                                        </label>
+                                                                        <textarea
+                                                                            value={project[howIBuiltKey] || ""}
+                                                                            onChange={(e) => updateProject(index, { [howIBuiltKey]: e.target.value })}
+                                                                            className={`${inputClass} min-h-[100px] leading-relaxed ${lang.dir === "rtl" ? "text-right" : ""}`}
+                                                                            rows={3}
+                                                                            placeholder={`How I built it in ${lang.label.split(" ").slice(1).join(" ")}...`}
                                                                             dir={lang.dir || "ltr"}
                                                                         />
                                                                     </div>
