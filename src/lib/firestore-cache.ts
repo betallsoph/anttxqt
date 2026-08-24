@@ -1,6 +1,8 @@
 import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapshot } from "firebase/firestore";
 
-type GetDocFn = typeof getDoc;
+export type GetDocFn = (
+    ref: DocumentReference<DocumentData>,
+) => Promise<DocumentSnapshot<DocumentData>>;
 
 type CacheEntry = {
     snapshot: DocumentSnapshot<DocumentData>;

@@ -35,8 +35,6 @@ export function useFirestoreSnapshot(ref: DocumentReference<DocumentData>) {
     }
 
     const skipCacheRef = useRef(false);
-    const refRef = useRef(ref);
-    refRef.current = ref;
     const [reloadKey, setReloadKey] = useState(0);
 
     const retry = useCallback(() => {
@@ -47,18 +45,17 @@ export function useFirestoreSnapshot(ref: DocumentReference<DocumentData>) {
     }, [path]);
 
     useEffect(() => {
-        const currentRef = refRef.current;
         const skipCache = skipCacheRef.current;
         skipCacheRef.current = false;
 
-        if (!skipCache && isFreshCachedDoc(currentRef)) {
+        if (!skipCache && isFreshCachedDoc(ref)) {
             return;
         }
 
         const controller = new AbortController();
         let cancelled = false;
 
-        getDocWithRetry(currentRef, { signal: controller.signal, skipCache })
+        getDocWithRetry(ref, { signal: controller.signal, skipCache })
             .then((snapshot) => {
                 if (cancelled || controller.signal.aborted) return;
                 setState({ path, snapshot, loading: false, error: null });
@@ -66,7 +63,7 @@ export function useFirestoreSnapshot(ref: DocumentReference<DocumentData>) {
             .catch((err) => {
                 if (cancelled || controller.signal.aborted || isAbortError(err)) return;
                 console.error(`Failed to fetch ${path}:`, err);
-                if (peekCachedDoc(currentRef)) return;
+                if (peekCachedDoc(ref)) return;
                 setState((current) => ({
                     ...current,
                     loading: false,
@@ -83,7 +80,7 @@ export function useFirestoreSnapshot(ref: DocumentReference<DocumentData>) {
             cancelled = true;
             controller.abort();
         };
-    }, [path, reloadKey]);
+    }, [path, ref, reloadKey]);
 
     useRetryOnVisible(state.error !== null, retry);
 

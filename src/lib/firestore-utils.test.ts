@@ -104,13 +104,21 @@ describe("getDocWithRetry", () => {
             signal: controller.signal,
         });
 
+        await Promise.resolve();
+        assert.equal(calls, 1);
         controller.abort();
-        await assert.rejects(waiter, (err: unknown) => isAbortError(err));
+
+        await assert.rejects(waiter, (err: unknown) => {
+            assert.equal(isAbortError(err), true, String(err));
+            return true;
+        });
         assert.equal(calls, 1);
 
         pending.resolve(snapshot("explore"));
         await pending.promise;
-        assert.ok(peekCachedDoc(ref("siteConfig/explore")));
+        await Promise.resolve();
+        await Promise.resolve();
+        assert.equal(peekCachedDoc(ref("siteConfig/explore")) != null, true);
     });
 
     it("surfaces TimeoutError when getDoc never settles", async () => {

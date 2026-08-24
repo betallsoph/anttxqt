@@ -5,6 +5,7 @@ import {
     isFreshCachedDoc,
     peekCachedDoc,
     rememberCachedDoc,
+    type GetDocFn,
 } from "./firestore-cache";
 
 export { invalidateCachedDoc, isFreshCachedDoc, peekCachedDoc, rememberCachedDoc };
@@ -103,7 +104,7 @@ export interface GetDocWithRetryOptions {
     attempts?: number;
     signal?: AbortSignal;
     skipCache?: boolean;
-    getDocFn?: typeof getDoc;
+    getDocFn?: GetDocFn;
 }
 
 export async function getDocWithRetry(
