@@ -1,7 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getDocWithRetry } from "@/lib/firestore-utils";
+import {
+    getDocWithRetry,
+    invalidateCachedDoc,
+    isAbortError,
+    peekCachedDoc,
+} from "@/lib/firestore-utils";
 import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
 
 export type ProjectStatus = "Production" | "Staging" | "In Development" | "Concept" | "Retired";
@@ -59,46 +64,80 @@ export const defaultProducts: Project[] = [];
 
 export const defaultProjectsList: Project[] = [];
 
+function snapshotToProjects(snapshot: DocumentSnapshot | undefined): Project[] {
+    if (!snapshot?.exists()) return [];
+    const items = snapshot.data().items;
+    return Array.isArray(items) ? (items as Project[]) : [];
+}
+
 export function useProjectsData(type: CollectionType) {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+    const docRef = doc(db, "siteConfig", type);
+    const cached = peekCachedDoc(docRef);
+
+    const [projects, setProjects] = useState<Project[]>(() => snapshotToProjects(cached));
+    const [loading, setLoading] = useState(() => !cached);
     const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(false);
+    const [missing, setMissing] = useState(() => cached !== undefined && !cached.exists());
     const [reloadKey, setReloadKey] = useState(0);
 
+    useLayoutEffect(() => {
+        const snapshot = peekCachedDoc(docRef);
+        if (snapshot?.exists()) {
+            setProjects(snapshotToProjects(snapshot));
+            setMissing(false);
+            setLoading(false);
+        } else if (snapshot) {
+            setProjects([]);
+            setMissing(true);
+            setLoading(false);
+        } else {
+            setProjects([]);
+            setMissing(false);
+            setLoading(true);
+        }
+        setError(null);
+    }, [docRef.path]);
+
     const retry = useCallback(() => {
+        invalidateCachedDoc(doc(db, "siteConfig", type));
         setLoading(true);
         setError(null);
         setMissing(false);
         setReloadKey((key) => key + 1);
-    }, []);
+    }, [type]);
 
     useEffect(() => {
+        const controller = new AbortController();
         let cancelled = false;
 
-        getDocWithRetry(doc(db, "siteConfig", type))
+        getDocWithRetry(docRef, {
+            signal: controller.signal,
+            skipCache: reloadKey > 0,
+        })
             .then((snapshot) => {
                 if (cancelled) return;
                 if (!snapshot.exists()) {
                     setMissing(true);
+                    setProjects([]);
                     return;
                 }
-                const items = snapshot.data().items;
-                setProjects(Array.isArray(items) ? (items as Project[]) : []);
+                setMissing(false);
+                setProjects(snapshotToProjects(snapshot));
             })
             .catch((err) => {
-                if (cancelled) return;
+                if (cancelled || isAbortError(err)) return;
                 console.error(`Failed to fetch ${type}:`, err);
                 setError(err instanceof Error ? err.message : String(err));
             })
             .finally(() => {
-                if (!cancelled) setLoading(false);
+                if (!cancelled && !controller.signal.aborted) setLoading(false);
             });
 
         return () => {
             cancelled = true;
+            controller.abort();
         };
-    }, [type, reloadKey]);
+    }, [docRef, type, reloadKey]);
 
     useRetryOnVisible(error !== null, retry);
 
@@ -107,7 +146,7 @@ export function useProjectsData(type: CollectionType) {
 
 export async function saveProjectsData(type: CollectionType, projects: Project[]) {
     const cleaned = JSON.parse(JSON.stringify(projects));
-    
+
     const processed = cleaned.map((project: any) => {
         // Filter out empty lines in all keyFeatures array fields dynamically
         Object.keys(project).forEach((key) => {
@@ -117,6 +156,8 @@ export async function saveProjectsData(type: CollectionType, projects: Project[]
         });
         return project;
     });
-    
-    await setDoc(doc(db, "siteConfig", type), { items: processed });
+
+    const docRef = doc(db, "siteConfig", type);
+    await setDoc(docRef, { items: processed });
+    invalidateCachedDoc(docRef);
 }

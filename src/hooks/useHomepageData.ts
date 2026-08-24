@@ -1,7 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getDocWithRetry } from "@/lib/firestore-utils";
+import {
+    getDocWithRetry,
+    invalidateCachedDoc,
+    isAbortError,
+    peekCachedDoc,
+} from "@/lib/firestore-utils";
 import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
 
 export interface Experience {
@@ -50,14 +55,21 @@ export const defaultHomepageData: HomepageData = {
 
 const DOCUMENT_REF = doc(db, "siteConfig", "homepage");
 
+function snapshotToHomepageData(snapshot: DocumentSnapshot | undefined): HomepageData {
+    if (!snapshot?.exists()) return defaultHomepageData;
+    return { ...defaultHomepageData, ...snapshot.data() } as HomepageData;
+}
+
 export function useHomepageData() {
-    const [data, setData] = useState<HomepageData>(defaultHomepageData);
-    const [loading, setLoading] = useState(true);
+    const cached = peekCachedDoc(DOCUMENT_REF);
+    const [data, setData] = useState<HomepageData>(() => snapshotToHomepageData(cached));
+    const [loading, setLoading] = useState(() => !cached);
     const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(false);
+    const [missing, setMissing] = useState(() => cached !== undefined && !cached.exists());
     const [reloadKey, setReloadKey] = useState(0);
 
     const retry = useCallback(() => {
+        invalidateCachedDoc(DOCUMENT_REF);
         setLoading(true);
         setError(null);
         setMissing(false);
@@ -65,28 +77,34 @@ export function useHomepageData() {
     }, []);
 
     useEffect(() => {
+        const controller = new AbortController();
         let cancelled = false;
 
-        getDocWithRetry(DOCUMENT_REF)
+        getDocWithRetry(DOCUMENT_REF, {
+            signal: controller.signal,
+            skipCache: reloadKey > 0,
+        })
             .then((snapshot) => {
                 if (cancelled) return;
                 if (!snapshot.exists()) {
                     setMissing(true);
                     return;
                 }
-                setData({ ...defaultHomepageData, ...snapshot.data() } as HomepageData);
+                setMissing(false);
+                setData(snapshotToHomepageData(snapshot));
             })
             .catch((err) => {
-                if (cancelled) return;
+                if (cancelled || isAbortError(err)) return;
                 console.error("Failed to fetch homepage data:", err);
                 setError(err instanceof Error ? err.message : String(err));
             })
             .finally(() => {
-                if (!cancelled) setLoading(false);
+                if (!cancelled && !controller.signal.aborted) setLoading(false);
             });
 
         return () => {
             cancelled = true;
+            controller.abort();
         };
     }, [reloadKey]);
 
@@ -97,7 +115,7 @@ export function useHomepageData() {
 
 export async function saveHomepageData(data: HomepageData) {
     const cleaned = JSON.parse(JSON.stringify(data));
-    
+
     // Clean up empty lines from experience descriptions
     if (cleaned.experiences) {
         cleaned.experiences = cleaned.experiences.map((exp: any) => {
@@ -107,6 +125,7 @@ export async function saveHomepageData(data: HomepageData) {
             return exp;
         });
     }
-    
+
     await setDoc(DOCUMENT_REF, cleaned);
+    invalidateCachedDoc(DOCUMENT_REF);
 }

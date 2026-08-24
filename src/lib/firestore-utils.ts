@@ -1,4 +1,12 @@
 import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapshot } from "firebase/firestore";
+import {
+    getOrStartInflightDoc,
+    invalidateCachedDoc,
+    peekCachedDoc,
+    waitForInflightDoc,
+} from "@/lib/firestore-cache";
+
+export { invalidateCachedDoc, peekCachedDoc };
 
 const DEFAULT_TIMEOUT_MS = 8_000;
 // Two, not three: the timed-out getDoc keeps running in the background and
@@ -21,43 +29,112 @@ export class TimeoutError extends Error {
     }
 }
 
+function createAbortError(): DOMException {
+    return new DOMException("The operation was aborted.", "AbortError");
+}
+
+export function isAbortError(err: unknown): boolean {
+    if (err instanceof DOMException && err.name === "AbortError") return true;
+    return err instanceof Error && err.name === "AbortError";
+}
+
 // getDoc can stay pending forever without ever resolving or rejecting
 // (firebase-js-sdk#5402), typically after the tab is suspended and its
 // connection dies. The SDK has no timeout of its own, so it has to come
 // from here — otherwise a caller's .finally() never runs.
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, ms: number, signal?: AbortSignal): Promise<T> {
     return new Promise<T>((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(createAbortError());
+            return;
+        }
+
         const timer = setTimeout(() => reject(new TimeoutError(ms)), ms);
+
+        const onAbort = () => {
+            clearTimeout(timer);
+            reject(createAbortError());
+        };
+
+        signal?.addEventListener("abort", onAbort, { once: true });
+
         promise.then(
             (value) => {
                 clearTimeout(timer);
+                signal?.removeEventListener("abort", onAbort);
                 resolve(value);
             },
             (err) => {
                 clearTimeout(timer);
+                signal?.removeEventListener("abort", onAbort);
                 reject(err);
             },
         );
     });
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+function abortableSleep(ms: number, signal?: AbortSignal): Promise<void> {
+    return new Promise((resolve, reject) => {
+        if (signal?.aborted) {
+            reject(createAbortError());
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            signal?.removeEventListener("abort", onAbort);
+            resolve();
+        }, ms);
+
+        const onAbort = () => {
+            clearTimeout(timer);
+            signal?.removeEventListener("abort", onAbort);
+            reject(createAbortError());
+        };
+
+        signal?.addEventListener("abort", onAbort, { once: true });
+    });
+}
+
+export interface GetDocWithRetryOptions {
+    timeoutMs?: number;
+    attempts?: number;
+    signal?: AbortSignal;
+    skipCache?: boolean;
+    getDocFn?: typeof getDoc;
+}
 
 export async function getDocWithRetry(
     ref: DocumentReference<DocumentData>,
-    { timeoutMs = DEFAULT_TIMEOUT_MS, attempts = DEFAULT_ATTEMPTS } = {},
+    {
+        timeoutMs = DEFAULT_TIMEOUT_MS,
+        attempts = DEFAULT_ATTEMPTS,
+        signal,
+        skipCache = false,
+        getDocFn = getDoc,
+    }: GetDocWithRetryOptions = {},
 ): Promise<DocumentSnapshot<DocumentData>> {
+    if (skipCache) {
+        invalidateCachedDoc(ref);
+        // Never spawn a duplicate getDoc — drain any in-flight fetch first.
+        await waitForInflightDoc(ref);
+    }
+
     let lastError: unknown;
 
     for (let attempt = 0; attempt < attempts; attempt++) {
+        if (signal?.aborted) throw createAbortError();
+
         try {
-            return await withTimeout(getDoc(ref), timeoutMs);
+            // Timeout only abandons this caller's wait — the shared inflight getDoc keeps running.
+            // Retry attempts await the same inflight promise, never a second getDoc.
+            return await withTimeout(getOrStartInflightDoc(ref, getDocFn), timeoutMs, signal);
         } catch (err) {
+            if (isAbortError(err)) throw err;
             lastError = err;
             const code = (err as { code?: string }).code;
             if (code && NON_RETRYABLE_CODES.has(code)) break;
             if (attempt < attempts - 1) {
-                await sleep(Math.min(1000 * 2 ** attempt, 30_000));
+                await abortableSleep(Math.min(1000 * 2 ** attempt, 30_000), signal);
             }
         }
     }
