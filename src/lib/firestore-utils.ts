@@ -2,11 +2,12 @@ import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapsho
 import {
     getOrStartInflightDoc,
     invalidateCachedDoc,
+    isFreshCachedDoc,
     peekCachedDoc,
-    waitForInflightDoc,
-} from "@/lib/firestore-cache";
+    rememberCachedDoc,
+} from "./firestore-cache";
 
-export { invalidateCachedDoc, peekCachedDoc };
+export { invalidateCachedDoc, isFreshCachedDoc, peekCachedDoc, rememberCachedDoc };
 
 const DEFAULT_TIMEOUT_MS = 8_000;
 // Two, not three: the timed-out getDoc keeps running in the background and
@@ -34,7 +35,9 @@ function createAbortError(): DOMException {
 }
 
 export function isAbortError(err: unknown): boolean {
-    if (err instanceof DOMException && err.name === "AbortError") return true;
+    if (typeof DOMException !== "undefined" && err instanceof DOMException && err.name === "AbortError") {
+        return true;
+    }
     return err instanceof Error && err.name === "AbortError";
 }
 
@@ -80,16 +83,16 @@ function abortableSleep(ms: number, signal?: AbortSignal): Promise<void> {
             return;
         }
 
-        const timer = setTimeout(() => {
-            signal?.removeEventListener("abort", onAbort);
-            resolve();
-        }, ms);
-
         const onAbort = () => {
             clearTimeout(timer);
             signal?.removeEventListener("abort", onAbort);
             reject(createAbortError());
         };
+
+        const timer = setTimeout(() => {
+            signal?.removeEventListener("abort", onAbort);
+            resolve();
+        }, ms);
 
         signal?.addEventListener("abort", onAbort, { once: true });
     });
@@ -115,8 +118,6 @@ export async function getDocWithRetry(
 ): Promise<DocumentSnapshot<DocumentData>> {
     if (skipCache) {
         invalidateCachedDoc(ref);
-        // Never spawn a duplicate getDoc — drain any in-flight fetch first.
-        await waitForInflightDoc(ref);
     }
 
     let lastError: unknown;
@@ -124,10 +125,19 @@ export async function getDocWithRetry(
     for (let attempt = 0; attempt < attempts; attempt++) {
         if (signal?.aborted) throw createAbortError();
 
+        // A timed-out getDoc may still complete during backoff. Use that
+        // snapshot instead of opening a second request on the same path.
+        if (attempt > 0) {
+            const cached = peekCachedDoc(ref);
+            if (cached) return cached;
+        }
+
         try {
-            // Timeout only abandons this caller's wait — the shared inflight getDoc keeps running.
-            // Retry attempts await the same inflight promise, never a second getDoc.
-            return await withTimeout(getOrStartInflightDoc(ref, getDocFn), timeoutMs, signal);
+            // Timeout only abandons this caller's wait — the shared inflight
+            // getDoc keeps running. Attempt 2 awaits that same promise.
+            const snapshot = await withTimeout(getOrStartInflightDoc(ref, getDocFn), timeoutMs, signal);
+            rememberCachedDoc(ref, snapshot);
+            return snapshot;
         } catch (err) {
             if (isAbortError(err)) throw err;
             lastError = err;

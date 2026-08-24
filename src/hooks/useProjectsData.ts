@@ -1,13 +1,8 @@
-import { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import { useMemo } from "react";
 import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import {
-    getDocWithRetry,
-    invalidateCachedDoc,
-    isAbortError,
-    peekCachedDoc,
-} from "@/lib/firestore-utils";
-import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
+import { invalidateCachedDoc } from "@/lib/firestore-utils";
+import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
 
 export type ProjectStatus = "Production" | "Staging" | "In Development" | "Concept" | "Retired";
 
@@ -71,75 +66,10 @@ function snapshotToProjects(snapshot: DocumentSnapshot | undefined): Project[] {
 }
 
 export function useProjectsData(type: CollectionType) {
-    const docRef = doc(db, "siteConfig", type);
-    const cached = peekCachedDoc(docRef);
-
-    const [projects, setProjects] = useState<Project[]>(() => snapshotToProjects(cached));
-    const [loading, setLoading] = useState(() => !cached);
-    const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(() => cached !== undefined && !cached.exists());
-    const [reloadKey, setReloadKey] = useState(0);
-
-    useLayoutEffect(() => {
-        const snapshot = peekCachedDoc(docRef);
-        if (snapshot?.exists()) {
-            setProjects(snapshotToProjects(snapshot));
-            setMissing(false);
-            setLoading(false);
-        } else if (snapshot) {
-            setProjects([]);
-            setMissing(true);
-            setLoading(false);
-        } else {
-            setProjects([]);
-            setMissing(false);
-            setLoading(true);
-        }
-        setError(null);
-    }, [docRef.path]);
-
-    const retry = useCallback(() => {
-        invalidateCachedDoc(doc(db, "siteConfig", type));
-        setLoading(true);
-        setError(null);
-        setMissing(false);
-        setReloadKey((key) => key + 1);
-    }, [type]);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        let cancelled = false;
-
-        getDocWithRetry(docRef, {
-            signal: controller.signal,
-            skipCache: reloadKey > 0,
-        })
-            .then((snapshot) => {
-                if (cancelled) return;
-                if (!snapshot.exists()) {
-                    setMissing(true);
-                    setProjects([]);
-                    return;
-                }
-                setMissing(false);
-                setProjects(snapshotToProjects(snapshot));
-            })
-            .catch((err) => {
-                if (cancelled || isAbortError(err)) return;
-                console.error(`Failed to fetch ${type}:`, err);
-                setError(err instanceof Error ? err.message : String(err));
-            })
-            .finally(() => {
-                if (!cancelled && !controller.signal.aborted) setLoading(false);
-            });
-
-        return () => {
-            cancelled = true;
-            controller.abort();
-        };
-    }, [docRef, type, reloadKey]);
-
-    useRetryOnVisible(error !== null, retry);
+    const docRef = useMemo(() => doc(db, "siteConfig", type), [type]);
+    const { snapshot, loading, error, retry } = useFirestoreSnapshot(docRef);
+    const missing = snapshot !== undefined && !snapshot.exists();
+    const projects = snapshotToProjects(snapshot);
 
     return { projects, loading, error, missing, retry };
 }

@@ -1,13 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
 import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import {
-    getDocWithRetry,
-    invalidateCachedDoc,
-    isAbortError,
-    peekCachedDoc,
-} from "@/lib/firestore-utils";
-import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
+import { invalidateCachedDoc } from "@/lib/firestore-utils";
+import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
 
 export interface ExploreItem {
     title: string;
@@ -103,54 +97,9 @@ function snapshotToExploreData(snapshot: DocumentSnapshot | undefined): ExploreD
 }
 
 export function useExploreData() {
-    const cached = peekCachedDoc(DOCUMENT_REF);
-    const [data, setData] = useState<ExploreData>(() => snapshotToExploreData(cached));
-    const [loading, setLoading] = useState(() => !cached);
-    const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(() => cached !== undefined && !cached.exists());
-    const [reloadKey, setReloadKey] = useState(0);
-
-    const retry = useCallback(() => {
-        invalidateCachedDoc(DOCUMENT_REF);
-        setLoading(true);
-        setError(null);
-        setMissing(false);
-        setReloadKey((key) => key + 1);
-    }, []);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        let cancelled = false;
-
-        getDocWithRetry(DOCUMENT_REF, {
-            signal: controller.signal,
-            skipCache: reloadKey > 0,
-        })
-            .then((snapshot) => {
-                if (cancelled) return;
-                if (!snapshot.exists()) {
-                    setMissing(true);
-                    return;
-                }
-                setMissing(false);
-                setData(snapshotToExploreData(snapshot));
-            })
-            .catch((err) => {
-                if (cancelled || isAbortError(err)) return;
-                console.error("Failed to fetch explore data:", err);
-                setError(err instanceof Error ? err.message : String(err));
-            })
-            .finally(() => {
-                if (!cancelled && !controller.signal.aborted) setLoading(false);
-            });
-
-        return () => {
-            cancelled = true;
-            controller.abort();
-        };
-    }, [reloadKey]);
-
-    useRetryOnVisible(error !== null, retry);
+    const { snapshot, loading, error, retry } = useFirestoreSnapshot(DOCUMENT_REF);
+    const missing = snapshot !== undefined && !snapshot.exists();
+    const data = snapshotToExploreData(snapshot);
 
     return { data, loading, error, missing, retry };
 }
