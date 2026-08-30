@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getDocWithRetry } from "@/lib/firestore-utils";
-import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
+import { invalidateCachedDoc } from "@/lib/firestore-utils";
+import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
 
 export interface ExploreItem {
     title: string;
@@ -92,47 +91,15 @@ export const defaultExploreData: ExploreData = {
 
 const DOCUMENT_REF = doc(db, "siteConfig", "explore");
 
+function snapshotToExploreData(snapshot: DocumentSnapshot | undefined): ExploreData {
+    if (!snapshot?.exists()) return defaultExploreData;
+    return { ...defaultExploreData, ...snapshot.data() } as ExploreData;
+}
+
 export function useExploreData() {
-    const [data, setData] = useState<ExploreData>(defaultExploreData);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(false);
-    const [reloadKey, setReloadKey] = useState(0);
-
-    const retry = useCallback(() => {
-        setLoading(true);
-        setError(null);
-        setMissing(false);
-        setReloadKey((key) => key + 1);
-    }, []);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        getDocWithRetry(DOCUMENT_REF)
-            .then((snapshot) => {
-                if (cancelled) return;
-                if (!snapshot.exists()) {
-                    setMissing(true);
-                    return;
-                }
-                setData({ ...defaultExploreData, ...snapshot.data() } as ExploreData);
-            })
-            .catch((err) => {
-                if (cancelled) return;
-                console.error("Failed to fetch explore data:", err);
-                setError(err instanceof Error ? err.message : String(err));
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [reloadKey]);
-
-    useRetryOnVisible(error !== null, retry);
+    const { snapshot, loading, error, retry } = useFirestoreSnapshot(DOCUMENT_REF);
+    const missing = snapshot !== undefined && !snapshot.exists();
+    const data = snapshotToExploreData(snapshot);
 
     return { data, loading, error, missing, retry };
 }
@@ -140,4 +107,5 @@ export function useExploreData() {
 export async function saveExploreData(data: ExploreData) {
     const cleaned = JSON.parse(JSON.stringify(data));
     await setDoc(DOCUMENT_REF, cleaned);
+    invalidateCachedDoc(DOCUMENT_REF);
 }

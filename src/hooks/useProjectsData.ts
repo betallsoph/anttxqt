@@ -1,8 +1,8 @@
-import { useState, useEffect, useCallback } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { useMemo } from "react";
+import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getDocWithRetry } from "@/lib/firestore-utils";
-import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
+import { invalidateCachedDoc } from "@/lib/firestore-utils";
+import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
 
 export type ProjectStatus = "Production" | "Staging" | "In Development" | "Concept" | "Retired";
 
@@ -59,55 +59,24 @@ export const defaultProducts: Project[] = [];
 
 export const defaultProjectsList: Project[] = [];
 
+function snapshotToProjects(snapshot: DocumentSnapshot | undefined): Project[] {
+    if (!snapshot?.exists()) return [];
+    const items = snapshot.data().items;
+    return Array.isArray(items) ? (items as Project[]) : [];
+}
+
 export function useProjectsData(type: CollectionType) {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(false);
-    const [reloadKey, setReloadKey] = useState(0);
-
-    const retry = useCallback(() => {
-        setLoading(true);
-        setError(null);
-        setMissing(false);
-        setReloadKey((key) => key + 1);
-    }, []);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        getDocWithRetry(doc(db, "siteConfig", type))
-            .then((snapshot) => {
-                if (cancelled) return;
-                if (!snapshot.exists()) {
-                    setMissing(true);
-                    return;
-                }
-                const items = snapshot.data().items;
-                setProjects(Array.isArray(items) ? (items as Project[]) : []);
-            })
-            .catch((err) => {
-                if (cancelled) return;
-                console.error(`Failed to fetch ${type}:`, err);
-                setError(err instanceof Error ? err.message : String(err));
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [type, reloadKey]);
-
-    useRetryOnVisible(error !== null, retry);
+    const docRef = useMemo(() => doc(db, "siteConfig", type), [type]);
+    const { snapshot, loading, error, retry } = useFirestoreSnapshot(docRef);
+    const missing = snapshot !== undefined && !snapshot.exists();
+    const projects = snapshotToProjects(snapshot);
 
     return { projects, loading, error, missing, retry };
 }
 
 export async function saveProjectsData(type: CollectionType, projects: Project[]) {
     const cleaned = JSON.parse(JSON.stringify(projects));
-    
+
     const processed = cleaned.map((project: any) => {
         // Filter out empty lines in all keyFeatures array fields dynamically
         Object.keys(project).forEach((key) => {
@@ -117,6 +86,8 @@ export async function saveProjectsData(type: CollectionType, projects: Project[]
         });
         return project;
     });
-    
-    await setDoc(doc(db, "siteConfig", type), { items: processed });
+
+    const docRef = doc(db, "siteConfig", type);
+    await setDoc(docRef, { items: processed });
+    invalidateCachedDoc(docRef);
 }

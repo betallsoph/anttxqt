@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getDocWithRetry } from "@/lib/firestore-utils";
-import { useRetryOnVisible } from "@/hooks/useRetryOnVisible";
+import { invalidateCachedDoc } from "@/lib/firestore-utils";
+import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
 
 export interface Experience {
     role: string;
@@ -50,54 +49,22 @@ export const defaultHomepageData: HomepageData = {
 
 const DOCUMENT_REF = doc(db, "siteConfig", "homepage");
 
+function snapshotToHomepageData(snapshot: DocumentSnapshot | undefined): HomepageData {
+    if (!snapshot?.exists()) return defaultHomepageData;
+    return { ...defaultHomepageData, ...snapshot.data() } as HomepageData;
+}
+
 export function useHomepageData() {
-    const [data, setData] = useState<HomepageData>(defaultHomepageData);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [missing, setMissing] = useState(false);
-    const [reloadKey, setReloadKey] = useState(0);
-
-    const retry = useCallback(() => {
-        setLoading(true);
-        setError(null);
-        setMissing(false);
-        setReloadKey((key) => key + 1);
-    }, []);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        getDocWithRetry(DOCUMENT_REF)
-            .then((snapshot) => {
-                if (cancelled) return;
-                if (!snapshot.exists()) {
-                    setMissing(true);
-                    return;
-                }
-                setData({ ...defaultHomepageData, ...snapshot.data() } as HomepageData);
-            })
-            .catch((err) => {
-                if (cancelled) return;
-                console.error("Failed to fetch homepage data:", err);
-                setError(err instanceof Error ? err.message : String(err));
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
-
-        return () => {
-            cancelled = true;
-        };
-    }, [reloadKey]);
-
-    useRetryOnVisible(error !== null, retry);
+    const { snapshot, loading, error, retry } = useFirestoreSnapshot(DOCUMENT_REF);
+    const missing = snapshot !== undefined && !snapshot.exists();
+    const data = snapshotToHomepageData(snapshot);
 
     return { data, loading, error, missing, retry };
 }
 
 export async function saveHomepageData(data: HomepageData) {
     const cleaned = JSON.parse(JSON.stringify(data));
-    
+
     // Clean up empty lines from experience descriptions
     if (cleaned.experiences) {
         cleaned.experiences = cleaned.experiences.map((exp: any) => {
@@ -107,6 +74,7 @@ export async function saveHomepageData(data: HomepageData) {
             return exp;
         });
     }
-    
+
     await setDoc(DOCUMENT_REF, cleaned);
+    invalidateCachedDoc(DOCUMENT_REF);
 }
