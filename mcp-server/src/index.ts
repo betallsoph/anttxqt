@@ -8,16 +8,16 @@ import { SECTIONS, COLLECTIONS, findCollection, getArray } from "./registry.js";
 
 const server = new McpServer({ name: "portfolio-mcp", version: "1.0.0" });
 
-const sectionEnum = z.enum(["explore", "homepage", "projects", "products"]);
+const sectionEnum = z.enum(["explore", "homepage", "projects", "playground"]);
 
-// Write array back into doc (cleanProjectItem for projects/products)
+// Write array back into doc (cleanProjectItem for projects/playground)
 async function commitArray(
   def: ReturnType<typeof findCollection>,
   doc: Record<string, any>,
   arr: any[]
 ) {
   const finalArr =
-    def.docId === "projects" || def.docId === "products" ? arr.map(cleanProjectItem) : arr;
+    def.docId === "projects" || def.docId === "playground" ? arr.map(cleanProjectItem) : arr;
   const next = { ...doc, [def.arrayPath]: finalArr };
   await writeDoc(def.docId, next);
   return next;
@@ -76,7 +76,7 @@ server.registerTool(
     inputSchema: {
       collection: z
         .string()
-        .describe("e.g. projects, products, explore.stories"),
+        .describe("e.g. projects, playground, explore.stories"),
     },
   },
   async ({ collection }) => {
@@ -149,7 +149,7 @@ server.registerTool(
       id: z
         .string()
         .optional()
-        .describe("for collections keyed by id (projects/products)"),
+        .describe("for collections keyed by id (projects/playground)"),
       index: z
         .number()
         .int()
@@ -175,7 +175,7 @@ server.registerTool(
         mode = "update";
       } else {
         if (!item.id) {
-          throw new Error("Creating projects/products items requires a unique item.id.");
+          throw new Error("Creating projects/playground items requires a unique item.id.");
         }
         arr.push(item);
         pos = arr.length - 1;

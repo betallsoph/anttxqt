@@ -6,7 +6,7 @@ import {
     type Project,
     type ProjectStatus,
     type CollectionType,
-    defaultProducts,
+    defaultPlayground,
     defaultProjectsList,
     saveProjectsData,
 } from "@/hooks/useProjectsData";
@@ -76,7 +76,7 @@ function generateId(title: string): string {
 }
 
 export function AdminProjectsPage({ type }: { type: CollectionType }) {
-    const defaultData = type === "products" ? defaultProducts : defaultProjectsList;
+    const defaultData = type === "playground" ? defaultPlayground : defaultProjectsList;
     const [projects, setProjects] = useState<Project[]>(defaultData);
     const [loading, setLoading] = useState(true);
     const [savingIndex, setSavingIndex] = useState<number | null>(null);
@@ -90,8 +90,44 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
     
-    const title = type === "products" ? "Products" : "Projects";
-    const itemLabel = type === "products" ? "product" : "project";
+    const title = type === "playground" ? "Playground" : "Projects";
+    const itemLabel = type === "playground" ? "experiment" : "project";
+    const otherType: CollectionType = type === "playground" ? "projects" : "playground";
+    const otherLabel = otherType === "playground" ? "Playground" : "Projects";
+
+    async function moveToOther(index: number) {
+        const item = projects[index];
+        if (!item?.id?.trim()) {
+            setMessages((m) => ({ ...m, [index]: "Item phải có ID trước khi chuyển." }));
+            return;
+        }
+        if (!confirm(`Chuyển "${item.title || item.id}" sang ${otherLabel}?`)) return;
+
+        setSavingIndex(index);
+        try {
+            const snap = await getDoc(doc(db, "siteConfig", otherType));
+            const targetItems: Project[] =
+                snap.exists() && Array.isArray(snap.data().items) ? (snap.data().items as Project[]) : [];
+
+            if (targetItems.some((p) => p.id === item.id)) {
+                setMessages((m) => ({ ...m, [index]: `Bên ${otherLabel} đã có ID "${item.id}".` }));
+                return;
+            }
+
+            await saveProjectsData(otherType, [...targetItems, item]);
+
+            const remaining = projects.filter((_, i) => i !== index);
+            await saveProjectsData(type, remaining);
+
+            setProjects(remaining);
+            setSelectedIndex(remaining.length > 0 ? 0 : null);
+        } catch (err) {
+            console.error("Move failed:", err);
+            setMessages((m) => ({ ...m, [index]: "Chuyển thất bại. Kiểm tra lại trước khi thử lần nữa." }));
+        } finally {
+            setSavingIndex(null);
+        }
+    }
 
     useEffect(() => {
         setLoading(true);
@@ -396,7 +432,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                             <div className="w-2.5 h-2.5 rounded-full bg-green-400 border border-green-500/10"></div>
                                         </div>
                                         <span className="text-xs font-mono font-medium text-zinc-400">
-                                            EDITING: {project.title || `Unnamed Product (${index + 1})`}
+                                            EDITING: {project.title || `Unnamed ${itemLabel} (${index + 1})`}
                                         </span>
                                     </div>
 
@@ -426,19 +462,31 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 )}
                                             </Button>
 
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    const updated = projects.filter((_, i) => i !== index);
-                                                    setProjects(updated);
-                                                    setSelectedIndex(updated.length > 0 ? 0 : null);
-                                                }}
-                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 gap-1.5 text-xs font-semibold"
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                                DELETE {itemLabel.toUpperCase()}
-                                            </Button>
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => moveToOther(index)}
+                                                    disabled={savingIndex === index}
+                                                    title={`Chuyển item này sang ${otherLabel}`}
+                                                    className="text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50 gap-1.5 text-xs font-semibold"
+                                                >
+                                                    MOVE TO {otherLabel.toUpperCase()}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    onClick={() => {
+                                                        const updated = projects.filter((_, i) => i !== index);
+                                                        setProjects(updated);
+                                                        setSelectedIndex(updated.length > 0 ? 0 : null);
+                                                    }}
+                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 gap-1.5 text-xs font-semibold"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                    DELETE {itemLabel.toUpperCase()}
+                                                </Button>
+                                            </div>
                                         </div>
 
                                         {/* SECTION A: Images & Media Uploads */}
