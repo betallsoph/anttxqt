@@ -5,7 +5,7 @@ import {
     signOut as firebaseSignOut,
     type User,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth } from "@/lib/firebase-auth";
 
 export function useAuth() {
     const [user, setUser] = useState<User | null>(null);

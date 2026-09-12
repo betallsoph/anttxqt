@@ -1,4 +1,4 @@
-import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapshot } from "firebase/firestore";
+import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapshot } from "firebase/firestore/lite";
 import {
     getOrStartInflightDoc,
     invalidateCachedDoc,
@@ -6,14 +6,18 @@ import {
     peekCachedDoc,
     rememberCachedDoc,
     type GetDocFn,
-} from "./firestore-cache";
+} from "./firestore-cache.ts";
 
 export { invalidateCachedDoc, isFreshCachedDoc, peekCachedDoc, rememberCachedDoc };
 
-const DEFAULT_TIMEOUT_MS = 8_000;
-// Two, not three: the timed-out getDoc keeps running in the background and
-// usually warms the SDK cache, so attempt two resolves instantly. A third
-// attempt rarely wins anything and costs the user another 8s of staring.
+// 4s, not 8s. With Firestore Lite a read is a single REST round trip, so a
+// healthy request lands in well under a second — anything still pending at 4s
+// is a dead connection, not a slow one. Worst case the user now waits
+// 4s + 1s backoff + 4s instead of 17s.
+const DEFAULT_TIMEOUT_MS = 4_000;
+// Two, not three: the timed-out request keeps running in the background and
+// fills the module cache, so attempt two usually resolves instantly. A third
+// attempt rarely wins anything and costs the user another 4s of staring.
 const DEFAULT_ATTEMPTS = 2;
 
 // Deterministic failures — a retry would fail the exact same way.
@@ -42,10 +46,10 @@ export function isAbortError(err: unknown): boolean {
     return err instanceof Error && err.name === "AbortError";
 }
 
-// getDoc can stay pending forever without ever resolving or rejecting
-// (firebase-js-sdk#5402), typically after the tab is suspended and its
-// connection dies. The SDK has no timeout of its own, so it has to come
-// from here — otherwise a caller's .finally() never runs.
+// A read can stay pending without ever resolving or rejecting when the tab
+// has been suspended and its network connection died under it. Neither the
+// SDK nor fetch imposes a deadline, so it has to come from here — otherwise a
+// caller's .finally() never runs and the spinner turns forever.
 function withTimeout<T>(promise: Promise<T>, ms: number, signal?: AbortSignal): Promise<T> {
     return new Promise<T>((resolve, reject) => {
         if (signal?.aborted) {
