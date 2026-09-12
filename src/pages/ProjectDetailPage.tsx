@@ -47,9 +47,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const { id } = useParams<{ id: string }>();
     const { projects, loading } = useProjectsData(type);
     const project = projects.find((p) => p.id === id);
-    const title = type === "products" ? "Product" : "Project";
-    const backLink = type === "products" ? "/products" : "/projects";
-    const backLabel = type === "products" ? "products" : "projects";
+    const isPlayground = type === "playground";
+    const title = isPlayground ? "Playground item" : "Project";
+    const backLink = isPlayground ? "/playground" : "/projects";
+    const backLabel = isPlayground ? "playground" : "projects";
     const navigate = useNavigate();
     const [lang, setLang] = useState<string>("en");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -110,8 +111,8 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         const labels: Record<string, Record<string, string>> = {
             back: {
                 en: `Back to ${backLabel}`,
-                vi: `Quay lại trang ${type === "products" ? "sản phẩm" : "dự án"}`,
-                ar: `العودة إلى ${type === "products" ? "المنتجات" : "المشاريع"}`,
+                vi: `Quay lại trang ${isPlayground ? "Playground" : "dự án"}`,
+                ar: `العودة إلى ${isPlayground ? "Playground" : "المشاريع"}`,
             },
             story: {
                 en: "The Story Behind",
@@ -270,11 +271,13 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                     {/* Status & Quick Links */}
                     <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap mb-4 sm:mb-6">
-                        <span
-                            className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded ${statusStyles[project.status]}`}
-                        >
-                            {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
-                        </span>
+                        {isPlayground && (
+                            <span
+                                className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold border rounded ${statusStyles[project.status]}`}
+                            >
+                                {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
+                            </span>
+                        )}
 
                         {project.githubUrl && (
                             <a

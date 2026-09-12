@@ -3,8 +3,8 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
     { label: "Home", path: "/" },
-    { label: "Products", path: "/products" },
     { label: "Projects", path: "/projects" },
+    { label: "Playground", path: "/playground" },
     { label: "Explore", path: "/explore" },
 ];
 

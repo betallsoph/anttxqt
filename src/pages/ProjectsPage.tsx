@@ -13,16 +13,18 @@ const statusStyles: Record<ProjectStatus, string> = {
     Retired: "bg-zinc-50 text-pink-400 border-zinc-200",
 };
 
-
+const PROJECTS_SUBTITLE =
+    "Software I designed, built, and put in front of real users — the work I want to be judged on.";
+const PLAYGROUND_SUBTITLE =
+    "Experiments, prototypes, and ideas I started for the fun of it. Some shipped, some stopped at the concept stage — every one of them taught me something.";
 
 export function ProjectsPage({ type }: { type: CollectionType }) {
     const { projects, loading, error, missing, retry } = useProjectsData(type);
     const visibleProjects = projects.filter((p) => !p.hidden);
-    const title = type === "products" ? "Products" : "Projects";
-    const itemLabel = type === "products" ? "products" : "projects";
-    const subtitle = type === "products"
-        ? "Personal software products designed, engineered, and shipped from scratch by myself."
-        : "Collaborative projects, team efforts, and organizational works where I contributed my engineering expertise alongside others.";
+    const isPlayground = type === "playground";
+    const title = isPlayground ? "Playground" : "Projects";
+    const itemLabel = isPlayground ? "experiments" : "projects";
+    const subtitle = isPlayground ? PLAYGROUND_SUBTITLE : PROJECTS_SUBTITLE;
 
     if (loading) {
         return (
@@ -108,11 +110,13 @@ export function ProjectsPage({ type }: { type: CollectionType }) {
                             <div className="mt-auto pt-4 sm:pt-6 border-t border-black/10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                                 {/* Left Column: Status Badge & Direct Links */}
                                 <div className="flex-shrink-0 flex items-center justify-start gap-2.5 sm:gap-3 flex-wrap">
-                                    <span
-                                        className={`inline-flex items-center px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
-                                    >
-                                        {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
-                                    </span>
+                                    {isPlayground && (
+                                        <span
+                                            className={`inline-flex items-center px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-bold border rounded ${statusStyles[project.status]}`}
+                                        >
+                                            {project.status === "Retired" ? "Sunsetting - Retired" : project.status}
+                                        </span>
+                                    )}
 
                                     {project.githubUrl && (
                                         <a

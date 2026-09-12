@@ -182,10 +182,11 @@ Sub-components:
 - **CardContent:** unstyled wrapper
 - **CardFooter:** `flex items-center pt-4`
 
-**Quy tắc hiển thị Chip/Tag trên List Card (Trang Projects/Products):**
+**Quy tắc hiển thị Chip/Tag trên List Card (Trang Projects/Playground):**
 - KHÔNG hiển thị các thẻ Tech Stack (React, Tailwind, v.v.) ở ngoài trang danh sách để tránh rối mắt.
-- CHỈ hiển thị thẻ **Status** (Shipped, Concept...) và thẻ **Topic / Thể loại** (Web, Mobile...).
-- Hai loại thẻ này phải được gom lại ngang hàng với nhau ở vị trí dưới cùng của card (`mt-auto`).
+- Thẻ **Status** (Production, Concept...) CHỈ hiển thị ở Playground. Trang Projects không hiển thị status ở cả list lẫn detail.
+- Thẻ **Topic / Thể loại** (Web, Mobile...) hiển thị ở cả hai trang.
+- Các thẻ này phải được gom lại ngang hàng với nhau ở vị trí dưới cùng của card (`mt-auto`).
 
 ### Product Link Item
 

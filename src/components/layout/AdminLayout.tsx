@@ -10,8 +10,8 @@ import { LogOut, Loader2, ShieldX, Home, FolderOpen, Compass, StickyNote, Calend
 
 const navItems = [
     { to: "/admin/home", label: "Home", icon: Home },
-    { to: "/admin/products", label: "Products", icon: FolderOpen },
     { to: "/admin/projects", label: "Projects", icon: FolderOpen },
+    { to: "/admin/playground", label: "Playground", icon: FolderOpen },
     { to: "/admin/explore", label: "Explore", icon: Compass },
     { to: "/admin/notes", label: "Notes", icon: StickyNote },
     { to: "/admin/planner", label: "Planner", icon: CalendarDays },

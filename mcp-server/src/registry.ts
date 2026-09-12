@@ -1,4 +1,4 @@
-export type SectionId = "explore" | "homepage" | "projects" | "products";
+export type SectionId = "explore" | "homepage" | "projects" | "playground";
 
 export interface CollectionDef {
   name: string; // tool collection name, e.g. "explore.stories"
@@ -14,7 +14,7 @@ export const SECTIONS: Record<SectionId, string> = {
     "Explore page: intro, achievements, currently, favourites, beyondCode, stories, whatsNext, impactPeople, lessonsFailed, offTheRecord, moreAndMore, hiddenSections.",
   homepage: "Homepage: hero, skillCategories, links, experiences.",
   projects: "Projects list: { items: Project[] }.",
-  products: "Products list: { items: Project[] } (same Project shape).",
+  playground: "Playground list: { items: Project[] } (same Project shape).",
 };
 
 export const COLLECTIONS: CollectionDef[] = [
@@ -28,11 +28,11 @@ export const COLLECTIONS: CollectionDef[] = [
       "Project: id, title, description, status(Production|Staging|In Development|Concept|Retired), tags[], topics?[], roles?[], keyFeatures?[], fullDescription?, storyBehind?, githubUrl?, liveUrl?, iconUrl?, imageUrl?, images?[], hidden?, + multilingual *Vi/*Ar fields.",
   },
   {
-    name: "products",
-    docId: "products",
+    name: "playground",
+    docId: "playground",
     arrayPath: "items",
     key: "id",
-    description: "Products. Same Project shape, keyed by `id`.",
+    description: "Playground. Same Project shape, keyed by `id`.",
     itemShape: "Same as Project.",
   },
   {

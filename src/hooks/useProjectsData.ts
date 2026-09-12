@@ -45,7 +45,7 @@ export interface Project {
 }
 
 
-export type CollectionType = "products" | "projects";
+export type CollectionType = "playground" | "projects";
 
 // Intentionally empty. The admin form loads these when a doc is missing, so
 // anything left here can be saved into Firestore as if it were real. Keep empty.
@@ -55,7 +55,7 @@ export const formatExternalUrl = (url: string | undefined): string | undefined =
     return `https://${url}`;
 };
 
-export const defaultProducts: Project[] = [];
+export const defaultPlayground: Project[] = [];
 
 export const defaultProjectsList: Project[] = [];
 
