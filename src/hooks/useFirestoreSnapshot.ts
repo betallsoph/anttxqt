@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DocumentData, DocumentReference } from "firebase/firestore";
+import type { DocumentData, DocumentReference } from "firebase/firestore/lite";
 import {
     getDocWithRetry,
     invalidateCachedDoc,

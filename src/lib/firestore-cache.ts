@@ -1,4 +1,4 @@
-import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapshot } from "firebase/firestore";
+import { getDoc, type DocumentData, type DocumentReference, type DocumentSnapshot } from "firebase/firestore/lite";
 
 export type GetDocFn = (
     ref: DocumentReference<DocumentData>,

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "node:test";
-import type { DocumentReference, DocumentSnapshot } from "firebase/firestore";
+import type { DocumentReference, DocumentSnapshot } from "firebase/firestore/lite";
 import {
     getOrStartInflightDoc,
     peekCachedDoc,

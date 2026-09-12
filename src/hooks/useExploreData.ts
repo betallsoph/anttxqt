@@ -1,4 +1,4 @@
-import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore";
+import { doc, setDoc, type DocumentSnapshot } from "firebase/firestore/lite";
 import { db } from "@/lib/firebase";
 import { invalidateCachedDoc } from "@/lib/firestore-utils";
 import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
