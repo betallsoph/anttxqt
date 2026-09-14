@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#BFDBFE" stroke-width="1" opacity="0.55"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="#FFFFFF"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <!-- card shadow -->
+  <rect x="85" y="66" width="1030" height="500" rx="18" fill="#000000"/>
+  <!-- card -->
+  <rect x="80" y="60" width="1030" height="500" rx="18" fill="#FFFFFF" stroke="#000000" stroke-width="3"/>
+
+  <!-- window chrome -->
+  <path d="M80 78 a18 18 0 0 1 18 -18 h994 a18 18 0 0 1 18 18 v46 h-1030 z" fill="#F4F4F5"/>
+  <line x1="80" y1="124" x2="1110" y2="124" stroke="#000000" stroke-width="3"/>
+  <circle cx="118" cy="92" r="8" fill="#EF4444" stroke="#000000" stroke-width="2"/>
+  <circle cx="148" cy="92" r="8" fill="#EAB308" stroke="#000000" stroke-width="2"/>
+  <circle cx="178" cy="92" r="8" fill="#22C55E" stroke="#000000" stroke-width="2"/>
+  <text x="1078" y="99" text-anchor="end" font-family="Avenir Next, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#A1A1AA">anttxqt.dev</text>
+
+  <!-- avatar -->
+  <circle cx="190" cy="268" r="62" fill="#BFDBFE" stroke="#000000" stroke-width="4"/>
+  <text x="190" y="296" text-anchor="middle" font-family="Apple Color Emoji, Segoe UI Emoji, sans-serif" font-size="62">🍐</text>
+
+  <!-- name + role -->
+  <text x="292" y="258" font-family="Avenir Next, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="86" font-weight="800" fill="#000000">An T. Tran</text>
+  <text x="296" y="308" font-family="Avenir Next, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="31" font-weight="500" fill="#52525B">Software developer — I build end-to-end products.</text>
+
+  <!-- nav chips -->
+  <g font-family="Avenir Next, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="25" font-weight="700" fill="#000000">
+    <rect x="130" y="400" width="175" height="62" rx="12" fill="#93C5FD" stroke="#000000" stroke-width="3"/>
+    <text x="217" y="440" text-anchor="middle">Projects</text>
+
+    <rect x="325" y="400" width="215" height="62" rx="12" fill="#FFFFFF" stroke="#000000" stroke-width="3"/>
+    <text x="432" y="440" text-anchor="middle">Playground</text>
+
+    <rect x="560" y="400" width="165" height="62" rx="12" fill="#FFFFFF" stroke="#000000" stroke-width="3"/>
+    <text x="642" y="440" text-anchor="middle">Explore</text>
+  </g>
+
+  <text x="1062" y="446" text-anchor="end" font-family="Avenir Next, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" font-weight="600" fill="#71717A">Sài Gòn, Việt Nam</text>
+</svg>
