@@ -706,7 +706,48 @@ export function ExplorePage() {
                 </p>
             </motion.section>
 
-            {/* Beyond Code (Skills Beyond Code) */}
+            {/* Stories */}
+            {!isSectionHidden("stories") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.08 }}
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Stories
+                    </h2>
+                    {data.stories && data.stories.length > 0 ? (
+                        <div className="border-t-2 border-black/10">
+                            {data.stories.map((story, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => setSelectedStory(story)}
+                                    className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
+                                >
+                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
+                                            {(index + 1).toString().padStart(2, "0")}
+                                        </span>
+                                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
+                                            {story.title}
+                                        </h3>
+                                    </div>
+                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
+                                        <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
+                                        <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
+                                            read the story
+                                        </span>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
+
+            {/* Stories Beyond Code */}
             {!isSectionHidden("beyondCode") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
@@ -714,7 +755,7 @@ export function ExplorePage() {
                     transition={{ duration: 0.35, delay: 0.1 }}
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Skills Beyond Code
+                        Stories Beyond Code
                     </h2>
                     {data.beyondCode && data.beyondCode.length > 0 ? (
                         <div className="border-t-2 border-black/10">
@@ -778,47 +819,6 @@ export function ExplorePage() {
                             </button>
                         ))}
                     </div>
-                </motion.section>
-            )}
-
-            {/* Stories */}
-            {!isSectionHidden("stories") && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: 0.08 }}
-                >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Stories
-                    </h2>
-                    {data.stories && data.stories.length > 0 ? (
-                        <div className="border-t-2 border-black/10">
-                            {data.stories.map((story, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedStory(story)}
-                                    className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
-                                >
-                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
-                                            {(index + 1).toString().padStart(2, "0")}
-                                        </span>
-                                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
-                                            {story.title}
-                                        </h3>
-                                    </div>
-                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
-                                        <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
-                                        <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
-                                            read the story
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <ComingSoon />
-                    )}
                 </motion.section>
             )}
 

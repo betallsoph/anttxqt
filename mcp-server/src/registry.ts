@@ -48,7 +48,7 @@ export const COLLECTIONS: CollectionDef[] = [
     docId: "explore",
     arrayPath: "beyondCode",
     key: "index",
-    description: "Skills Beyond Code. Keyed by index.",
+    description: "Stories Beyond Code. Keyed by index.",
     itemShape: "ExploreItem: { title, summary, story, since?, imageUrl?, tags?[] }",
   },
   {

@@ -271,7 +271,7 @@ export function AdminExplorePage() {
     return (
         <div className="space-y-6 sm:space-y-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                {/* Column 1: Intro, Favourites, Achievements, Beyond Code */}
+                {/* Column 1: Intro, Favourites, Stories, Stories Beyond Code, Achievements */}
                 <div className="space-y-6 sm:space-y-8">
                     {/* Intro Section */}
                     <motion.section
@@ -431,6 +431,202 @@ export function AdminExplorePage() {
                     </div>
                     </motion.section>
 
+                    {/* Stories Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("stories") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("stories") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("stories")}
+                                        title={isSectionHidden("stories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("stories") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <div className="space-y-3 sm:space-y-4">
+                                {(data.stories || []).map((item, index) => (
+                                    <div key={index} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
+                                        <div className="flex justify-between items-center gap-2">
+                                            <MoveButtons
+                                                index={index}
+                                                total={(data.stories || []).length}
+                                                onMove={(from, to) => setData({ ...data, stories: swap(data.stories || [], from, to) })}
+                                            />
+                                            <span className="font-bold text-sm">Story {index + 1}</span>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => setData({ ...data, stories: (data.stories || []).filter((_, i) => i !== index) })}
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Title</label>
+                                            <input
+                                                type="text"
+                                                value={item.title}
+                                                onChange={(e) => {
+                                                    const s = [...(data.stories || [])];
+                                                    s[index] = { ...item, title: e.target.value };
+                                                    setData({ ...data, stories: s });
+                                                }}
+                                                className={inputClass}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Content</label>
+                                            <textarea
+                                                value={item.content}
+                                                onChange={(e) => {
+                                                    const s = [...(data.stories || [])];
+                                                    s[index] = { ...item, content: e.target.value };
+                                                    setData({ ...data, stories: s });
+                                                }}
+                                                className={`${inputClass} min-h-[100px]`}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-bold mb-1">Topics / Hashtags (optional)</label>
+                                            <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                                                {(item.topics || []).map((topic, topicIndex) => (
+                                                    <span
+                                                        key={topicIndex}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
+                                                    >
+                                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const s = [...(data.stories || [])];
+                                                                s[index] = { ...item, topics: (item.topics || []).filter((_, i) => i !== topicIndex) };
+                                                                setData({ ...data, stories: s });
+                                                            }}
+                                                            className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
+                                                className={inputClass}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault();
+                                                        const val = e.currentTarget.value.trim();
+                                                        if (val) {
+                                                            const cur = item.topics || [];
+                                                            if (!cur.includes(val)) {
+                                                                const s = [...(data.stories || [])];
+                                                                s[index] = { ...item, topics: [...cur, val] };
+                                                                setData({ ...data, stories: s });
+                                                            }
+                                                            e.currentTarget.value = "";
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <Button
+                                variant="action"
+                                size="sm"
+                                className="mt-3"
+                                onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", topics: [] }] })}
+                            >
+                                <Plus className="w-4 h-4" />
+                                Thêm story
+                            </Button>
+                            <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
+                        </div>
+                    </div>
+                    </motion.section>
+
+                    {/* Stories Beyond Code Section */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.15 }}
+                    >
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                            Stories Beyond Code
+                        </h2>
+                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
+                            {/* macOS Window Header */}
+                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    {isSectionHidden("beyondCode") && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
+                                            <EyeOff className="w-3 h-3" />
+                                            Đang ẩn phân mục
+                                        </span>
+                                    )}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
+                                        onClick={() => toggleSectionHidden("beyondCode")}
+                                        title={isSectionHidden("beyondCode") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
+                                    >
+                                        {isSectionHidden("beyondCode") ? (
+                                            <EyeOff className="w-4 h-4 text-zinc-400" />
+                                        ) : (
+                                            <Eye className="w-4 h-4 text-zinc-700" />
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="p-4 sm:p-6 space-y-4">
+                            <ExploreItemListEditor
+                                items={data.beyondCode || []}
+                                onChange={(items) => setData({ ...data, beyondCode: items })}
+                                folder="beyond-code"
+                                itemLabel="Item"
+                            />
+                            <SaveButton
+                                saving={saving === "beyondCode"}
+                                message={message.beyondCode || ""}
+                                onSave={() => handleSave("beyondCode")}
+                            />
+                        </div>
+                    </div>
+                    </motion.section>
                     {/* Achievements Section */}
                     <motion.section
                         initial={{ opacity: 0, y: 20 }}
@@ -668,63 +864,9 @@ export function AdminExplorePage() {
                     </div>
                     </motion.section>
 
-                    {/* Beyond Code Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.15 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                            Skills Beyond Code
-                        </h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("beyondCode") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("beyondCode")}
-                                        title={isSectionHidden("beyondCode") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("beyondCode") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <ExploreItemListEditor
-                                items={data.beyondCode || []}
-                                onChange={(items) => setData({ ...data, beyondCode: items })}
-                                folder="beyond-code"
-                                itemLabel="Item"
-                            />
-                            <SaveButton
-                                saving={saving === "beyondCode"}
-                                message={message.beyondCode || ""}
-                                onSave={() => handleSave("beyondCode")}
-                            />
-                        </div>
-                    </div>
-                    </motion.section>
                 </div>
 
-                {/* Column 2: Currently, More & More, Stories, What's Next */}
+                {/* Column 2: Currently, More & More, What's Next */}
                 <div className="space-y-6 sm:space-y-8">
                     {/* Currently Section */}
                     <motion.section
@@ -1042,148 +1184,6 @@ export function AdminExplorePage() {
                                 Thêm nhóm CV
                             </Button>
                             <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
-                        </div>
-                    </div>
-                    </motion.section>
-
-                    {/* Stories Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Stories</h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("stories") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("stories") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("stories")}
-                                        title={isSectionHidden("stories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("stories") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div className="space-y-3 sm:space-y-4">
-                                {(data.stories || []).map((item, index) => (
-                                    <div key={index} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
-                                        <div className="flex justify-between items-center gap-2">
-                                            <MoveButtons
-                                                index={index}
-                                                total={(data.stories || []).length}
-                                                onMove={(from, to) => setData({ ...data, stories: swap(data.stories || [], from, to) })}
-                                            />
-                                            <span className="font-bold text-sm">Story {index + 1}</span>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => setData({ ...data, stories: (data.stories || []).filter((_, i) => i !== index) })}
-                                            >
-                                                <Trash2 className="w-4 h-4 text-red-500" />
-                                            </Button>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">Title</label>
-                                            <input
-                                                type="text"
-                                                value={item.title}
-                                                onChange={(e) => {
-                                                    const s = [...(data.stories || [])];
-                                                    s[index] = { ...item, title: e.target.value };
-                                                    setData({ ...data, stories: s });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">Content</label>
-                                            <textarea
-                                                value={item.content}
-                                                onChange={(e) => {
-                                                    const s = [...(data.stories || [])];
-                                                    s[index] = { ...item, content: e.target.value };
-                                                    setData({ ...data, stories: s });
-                                                }}
-                                                className={`${inputClass} min-h-[100px]`}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">Topics / Hashtags (optional)</label>
-                                            <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                                                {(item.topics || []).map((topic, topicIndex) => (
-                                                    <span
-                                                        key={topicIndex}
-                                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
-                                                    >
-                                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => {
-                                                                const s = [...(data.stories || [])];
-                                                                s[index] = { ...item, topics: (item.topics || []).filter((_, i) => i !== topicIndex) };
-                                                                setData({ ...data, stories: s });
-                                                            }}
-                                                            className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </span>
-                                                ))}
-                                            </div>
-                                            <input
-                                                type="text"
-                                                placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
-                                                className={inputClass}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") {
-                                                        e.preventDefault();
-                                                        const val = e.currentTarget.value.trim();
-                                                        if (val) {
-                                                            const cur = item.topics || [];
-                                                            if (!cur.includes(val)) {
-                                                                const s = [...(data.stories || [])];
-                                                                s[index] = { ...item, topics: [...cur, val] };
-                                                                setData({ ...data, stories: s });
-                                                            }
-                                                            e.currentTarget.value = "";
-                                                        }
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                variant="action"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() => setData({ ...data, stories: [...(data.stories || []), { title: "", content: "", topics: [] }] })}
-                            >
-                                <Plus className="w-4 h-4" />
-                                Thêm story
-                            </Button>
-                            <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
                         </div>
                     </div>
                     </motion.section>
