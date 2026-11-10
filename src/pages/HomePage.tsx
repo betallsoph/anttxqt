@@ -68,7 +68,7 @@ export function HomePage() {
                 </p>
             </motion.section>
 
-            {/* Skills Section */}
+            {/* Tech Stack Section */}
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -76,7 +76,7 @@ export function HomePage() {
                 className="border-t-2 border-black/20 pt-6 sm:pt-8"
             >
                 <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    Skills
+                    Tech Stack
                 </h2>
                 <div className="space-y-3 sm:space-y-4">
                     {data.skillCategories.map((category, index) => (

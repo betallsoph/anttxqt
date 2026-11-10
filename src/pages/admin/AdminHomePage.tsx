@@ -364,7 +364,7 @@ export function AdminHomePage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
                     >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Skills</h2>
+                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Tech Stack</h2>
                         <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
                             {/* macOS Window Header */}
                             <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
