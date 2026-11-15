@@ -1,6 +1,7 @@
 {
     "rewrites": [
         { "source": "/api/(.*)", "destination": "/api/$1" },
+        { "source": "/pdf-proxy/:path*", "destination": "https://pub-ea92ee69d9024277a4762fb42134595b.r2.dev/:path*" },
         { "source": "/(.*)", "destination": "/" }
     ]
 }

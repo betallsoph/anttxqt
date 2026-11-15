@@ -18,6 +18,22 @@ function ComingSoon() {
     );
 }
 
+const previewButtonClass =
+    "group inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 font-bold text-black border-2 border-black rounded-lg shadow-secondary active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all duration-200 cursor-pointer";
+
+function resumePreviewSrc(href: string): string | null {
+    const bucket = import.meta.env.VITE_R2_PUBLIC_URL;
+    if (!bucket) return null;
+    try {
+        const file = new URL(href);
+        const origin = new URL(bucket);
+        if (file.origin !== origin.origin) return null;
+        return `/pdf-proxy${file.pathname}${file.search}`;
+    } catch {
+        return null;
+    }
+}
+
 function ResumePreviewModal({
     title,
     url,
@@ -28,6 +44,11 @@ function ResumePreviewModal({
     onClose: () => void;
 }) {
     const href = formatExternalUrl(url);
+    const stageRef = useRef<HTMLDivElement>(null);
+    const pagesRef = useRef<HTMLDivElement>(null);
+    const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+    const [pageCount, setPageCount] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
         const onKey = (event: KeyboardEvent) => {
@@ -36,6 +57,89 @@ function ResumePreviewModal({
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [onClose]);
+
+    useEffect(() => {
+        const pages = pagesRef.current;
+        const stage = stageRef.current;
+        if (!href || !pages || !stage) return;
+
+        const src = resumePreviewSrc(href);
+        if (!src) {
+            setStatus("error");
+            return;
+        }
+
+        let cancelled = false;
+        const renders: { cancel: () => void }[] = [];
+        let destroyTask: (() => Promise<void>) | null = null;
+        setStatus("loading");
+        setPageCount(0);
+        setCurrentPage(1);
+        pages.replaceChildren();
+
+        (async () => {
+            const pdfjs = await import("pdfjs-dist");
+            const worker = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
+            pdfjs.GlobalWorkerOptions.workerSrc = worker.default;
+
+            const task = pdfjs.getDocument({ url: src });
+            destroyTask = () => task.destroy();
+            const pdf = await task.promise;
+            if (cancelled) return;
+
+            const pageWidth = Math.max(280, stage.clientWidth - 16);
+            for (let index = 1; index <= pdf.numPages; index += 1) {
+                if (cancelled) return;
+                const page = await pdf.getPage(index);
+                const base = page.getViewport({ scale: 1 });
+                const viewport = page.getViewport({ scale: pageWidth / base.width });
+                const canvas = document.createElement("canvas");
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                canvas.width = Math.floor(viewport.width * dpr);
+                canvas.height = Math.floor(viewport.height * dpr);
+                canvas.style.width = `${viewport.width}px`;
+                canvas.style.height = `${viewport.height}px`;
+                canvas.className = "block max-w-full h-auto bg-white";
+
+                const sheet = document.createElement("div");
+                sheet.dataset.page = String(index);
+                sheet.hidden = index !== 1;
+                sheet.className = "border-2 border-black bg-white";
+                sheet.appendChild(canvas);
+                pages.appendChild(sheet);
+
+                const render = page.render({
+                    canvas,
+                    viewport,
+                    transform: dpr === 1 ? undefined : [dpr, 0, 0, dpr, 0, 0],
+                });
+                renders.push(render);
+                await render.promise;
+            }
+            if (!cancelled) {
+                setPageCount(pdf.numPages);
+                setStatus("ready");
+            }
+        })().catch((error: unknown) => {
+            if (cancelled) return;
+            console.error(error);
+            setStatus("error");
+        });
+
+        return () => {
+            cancelled = true;
+            renders.forEach((render) => render.cancel());
+            void destroyTask?.();
+        };
+    }, [href]);
+
+    useEffect(() => {
+        const pages = pagesRef.current;
+        if (!pages) return;
+        pages.querySelectorAll<HTMLElement>("[data-page]").forEach((sheet) => {
+            sheet.hidden = sheet.dataset.page !== String(currentPage);
+        });
+    }, [currentPage, status]);
 
     return createPortal(
         <AnimatePresence>
@@ -56,41 +160,66 @@ function ResumePreviewModal({
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
                     transition={{ duration: 0.2 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="relative flex h-[min(92vh,900px)] w-full max-w-4xl flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                    className="relative flex h-[min(94vh,980px)] w-full max-w-5xl flex-col bg-white border-2 border-black rounded-lg overflow-hidden"
                 >
-                    <div className="shrink-0 border-b-2 border-black px-3 py-2.5 sm:px-4">
-                        <h3 className="font-bold text-sm sm:text-base truncate">{title}</h3>
+                    <div className="shrink-0 border-b-2 border-black px-4 py-3">
+                        <h3 className="font-bold text-base sm:text-lg truncate">{title}</h3>
                     </div>
-                    {href ? (
-                        <iframe
-                            src={href}
-                            title={title}
-                            className="min-h-0 w-full flex-1 bg-zinc-100"
-                        />
-                    ) : (
-                        <div className="flex flex-1 items-center justify-center p-6">
-                            <p className="text-sm text-zinc-500">Chưa có file để xem.</p>
+                    <div ref={stageRef} className="min-h-0 flex-1 overflow-auto bg-zinc-100">
+                        <div className="flex min-h-full flex-col items-center px-2 py-3 sm:px-3 sm:py-4">
+                            <div ref={pagesRef} className="flex w-full flex-col items-center" />
+                            {status === "loading" && (
+                                <p className="my-auto text-sm font-medium text-zinc-500">Đang mở…</p>
+                            )}
+                            {status === "error" && (
+                                <p className="my-auto text-sm font-medium text-zinc-500">Không mở được bản xem trước.</p>
+                            )}
                         </div>
-                    )}
-                    <div className="shrink-0 flex items-center justify-end gap-2 border-t-2 border-black px-3 py-2.5 sm:px-4">
-                        {href && (
-                            <a
-                                href={href}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-blue-200 hover:bg-blue-300 border-2 border-black rounded text-zinc-900 cursor-pointer"
+                    </div>
+                    <div className="shrink-0 flex items-center justify-between gap-3 border-t-2 border-black px-3 py-3 sm:px-4">
+                        <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-xs sm:text-sm font-bold text-zinc-700 shrink-0">trang:</span>
+                            <div className="flex items-center gap-1.5">
+                                {Array.from({ length: pageCount }, (_, index) => {
+                                    const page = index + 1;
+                                    const selected = page === currentPage;
+                                    return (
+                                        <button
+                                            key={page}
+                                            type="button"
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`w-8 h-8 rounded-full border-2 border-black text-xs font-bold cursor-pointer ${
+                                                selected
+                                                    ? "bg-blue-300 text-black"
+                                                    : "bg-zinc-200 text-zinc-500"
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+                            {href && (
+                                <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`${previewButtonClass} bg-blue-300`}
+                                >
+                                    Xem ở trang riêng
+                                    <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:translate-x-1" />
+                                </a>
+                            )}
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className={`${previewButtonClass} bg-white`}
                             >
-                                Mở trang riêng
-                                <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
-                        )}
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="inline-flex items-center px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border-2 border-black rounded text-zinc-900 cursor-pointer"
-                        >
-                            Đóng
-                        </button>
+                                Đóng
+                            </button>
+                        </div>
                     </div>
                 </motion.div>
             </motion.div>
