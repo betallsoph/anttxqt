@@ -1,0 +1,13 @@
+---
+description: Keep the admin editor in sync with public site changes
+alwaysApply: true
+---
+
+# Admin stays with the public page
+
+Before adding or changing public content, open the matching admin editor and use its real fields. Do not invent a label, slug, or grouping from the public card alone.
+
+- A public change that adds, renames, hides, or reshapes content also updates the admin form in the same change.
+- Resume group name is the group. The PDF filename is the file. Share links and file identity use the uploaded file, not the group name.
+- New public sections get an admin block with the same fields, save, and hide toggle as the existing editors.
+---

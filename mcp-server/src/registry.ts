@@ -11,7 +11,7 @@ export interface CollectionDef {
 
 export const SECTIONS: Record<SectionId, string> = {
   explore:
-    "Explore page: intro, achievements, currently, favourites, beyondCode, stories, whatsNext, impactPeople, lessonsFailed, offTheRecord, moreAndMore, hiddenSections.",
+    "Explore page: intro, achievements, currently, favourites, beyondCode, stories, personalStories, whatsNext, impactPeople, lessonsFailed, offTheRecord, moreAndMore, hiddenSections.",
   homepage: "Homepage: hero, skillCategories, links, experiences.",
   projects: "Projects list: { items: Project[] }.",
   playground: "Playground list: { items: Project[] } (same Project shape).",
@@ -40,7 +40,15 @@ export const COLLECTIONS: CollectionDef[] = [
     docId: "explore",
     arrayPath: "stories",
     key: "index",
-    description: "Stories on Explore. Keyed by 0-based index.",
+    description: "Coding Stories on Explore. Keyed by 0-based index.",
+    itemShape: "{ title, content, topics?[] }",
+  },
+  {
+    name: "explore.personalStories",
+    docId: "explore",
+    arrayPath: "personalStories",
+    key: "index",
+    description: "Personal Stories on Explore. Keyed by index.",
     itemShape: "{ title, content, topics?[] }",
   },
   {
@@ -48,7 +56,7 @@ export const COLLECTIONS: CollectionDef[] = [
     docId: "explore",
     arrayPath: "beyondCode",
     key: "index",
-    description: "Stories Beyond Code. Keyed by index.",
+    description: "Beyond Code Stories. Keyed by index.",
     itemShape: "ExploreItem: { title, summary, story, since?, imageUrl?, tags?[] }",
   },
   {

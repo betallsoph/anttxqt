@@ -12,6 +12,12 @@ export interface ExploreItem {
     tags?: string[];
 }
 
+export interface ExploreStory {
+    title: string;
+    content: string;
+    topics?: string[];
+}
+
 export interface ResumeVersion {
     versionName: string;
     url: string;
@@ -46,11 +52,8 @@ export interface ExploreData {
         description?: string;
     }[];
     beyondCode: ExploreItem[];
-    stories: {
-        title: string;
-        content: string;
-        topics?: string[];
-    }[];
+    stories: ExploreStory[];
+    personalStories: ExploreStory[];
     whatsNext: {
         title: string;
         description?: string;
@@ -81,6 +84,7 @@ export const defaultExploreData: ExploreData = {
     favourites: [],
     beyondCode: [],
     stories: [],
+    personalStories: [],
     whatsNext: [],
     impactPeople: [],
     lessonsFailed: [],

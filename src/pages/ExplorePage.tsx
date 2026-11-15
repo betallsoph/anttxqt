@@ -19,6 +19,45 @@ function ComingSoon() {
     );
 }
 
+function StoryList({
+    items,
+    action,
+    onOpen,
+}: {
+    items: { title: string }[];
+    action: string;
+    onOpen: (index: number) => void;
+}) {
+    if (items.length === 0) return <ComingSoon />;
+
+    return (
+        <div className="border-t-2 border-black/10">
+            {items.map((item, index) => (
+                <button
+                    key={index}
+                    onClick={() => onOpen(index)}
+                    className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
+                >
+                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
+                            {(index + 1).toString().padStart(2, "0")}
+                        </span>
+                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
+                            {item.title}
+                        </h3>
+                    </div>
+                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
+                        <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
+                        <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
+                            {action}
+                        </span>
+                    </div>
+                </button>
+            ))}
+        </div>
+    );
+}
+
 function resumeSlug(name: string) {
     const slug = name
         .normalize("NFD")
@@ -27,6 +66,12 @@ function resumeSlug(name: string) {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-+|-+$/g, "");
     return slug || "resume";
+}
+
+function resumeFileSlug(url: string) {
+    const last = decodeURIComponent(url.split("?")[0].split("/").pop() || "");
+    const bare = last.replace(/^\d+-/, "").replace(/\.pdf$/i, "");
+    return bare ? resumeSlug(bare) : "";
 }
 
 const previewButtonClass =
@@ -876,33 +921,44 @@ export function ExplorePage() {
         return (data.hiddenSections || []).includes(sectionName);
     };
 
-    const resumeGroup = slug
-        ? (data.resumes || []).find((group) => resumeSlug(group.name) === slug)
-        : undefined;
     const requestedVersion = searchParams.get("version");
-    const matchedVersion = requestedVersion
-        ? resumeGroup?.versions?.find((version) => version.versionName === requestedVersion)
-        : undefined;
-    const resumeVersion = matchedVersion?.url
-        ? matchedVersion
-        : resumeGroup?.versions?.[0];
+    let resumeGroup: ResumeGroup | undefined;
+    let resumeVersion: ResumeVersion | undefined;
+    if (slug) {
+        for (const group of data.resumes || []) {
+            const file = group.versions?.find(
+                (version) => version.url && resumeFileSlug(version.url) === slug,
+            );
+            if (file) {
+                resumeGroup = group;
+                resumeVersion = file;
+                break;
+            }
+        }
+        if (!resumeVersion) {
+            resumeGroup = (data.resumes || []).find((group) => resumeSlug(group.name) === slug);
+            resumeVersion = requestedVersion
+                ? resumeGroup?.versions?.find((version) => version.versionName === requestedVersion)
+                : resumeGroup?.versions?.[0];
+            if (!resumeVersion?.url) resumeVersion = resumeGroup?.versions?.[0];
+        }
+    }
+    const isNewest = Boolean(
+        resumeGroup && resumeVersion?.url && resumeGroup.versions?.[0]?.url === resumeVersion.url,
+    );
     const resumePreview = resumeGroup && resumeVersion?.url
         ? {
-            title: matchedVersion?.url && matchedVersion.versionName
-                ? `${resumeGroup.name} — ver ${matchedVersion.versionName}`
+            title: !isNewest && resumeVersion.versionName
+                ? `${resumeGroup.name} — ver ${resumeVersion.versionName}`
                 : resumeGroup.name,
             url: resumeVersion.url,
         }
         : null;
 
-    const openResume = (group: ResumeGroup, version: ResumeVersion) => {
-        const path = `/explore/resume/${resumeSlug(group.name)}`;
-        const newest = group.versions[0];
-        if (version.versionName && newest && version.url !== newest.url) {
-            navigate(`${path}?version=${encodeURIComponent(version.versionName)}`);
-            return;
-        }
-        navigate(path);
+    const openResume = (_group: ResumeGroup, version: ResumeVersion) => {
+        const fileSlug = version.url ? resumeFileSlug(version.url) : "";
+        if (!fileSlug) return;
+        navigate(`/explore/resume/${fileSlug}`);
     };
 
     const closeResume = () => {
@@ -911,8 +967,15 @@ export function ExplorePage() {
 
     useEffect(() => {
         if (loading || error || missing || !slug) return;
-        if (!resumePreview) navigate("/explore", { replace: true });
-    }, [loading, error, missing, slug, resumePreview, navigate]);
+        if (!resumeVersion?.url) {
+            navigate("/explore", { replace: true });
+            return;
+        }
+        const fileSlug = resumeFileSlug(resumeVersion.url);
+        if (fileSlug && fileSlug !== slug) {
+            navigate(`/explore/resume/${fileSlug}`, { replace: true });
+        }
+    }, [loading, error, missing, slug, resumeVersion?.url, navigate]);
 
     if (loading) {
         return (
@@ -949,7 +1012,7 @@ export function ExplorePage() {
                 </p>
             </motion.section>
 
-            {/* Stories */}
+            {/* Coding Stories */}
             {!isSectionHidden("stories") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
@@ -957,40 +1020,17 @@ export function ExplorePage() {
                     transition={{ duration: 0.35, delay: 0.08 }}
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Stories
+                        Coding Stories
                     </h2>
-                    {data.stories && data.stories.length > 0 ? (
-                        <div className="border-t-2 border-black/10">
-                            {data.stories.map((story, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedStory(story)}
-                                    className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
-                                >
-                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
-                                            {(index + 1).toString().padStart(2, "0")}
-                                        </span>
-                                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
-                                            {story.title}
-                                        </h3>
-                                    </div>
-                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
-                                        <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
-                                        <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
-                                            read the story
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <ComingSoon />
-                    )}
+                    <StoryList
+                        items={data.stories || []}
+                        action="read the story"
+                        onOpen={(index) => setSelectedStory(data.stories[index])}
+                    />
                 </motion.section>
             )}
 
-            {/* Stories Beyond Code */}
+            {/* Beyond Code Stories */}
             {!isSectionHidden("beyondCode") && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
@@ -998,36 +1038,31 @@ export function ExplorePage() {
                     transition={{ duration: 0.35, delay: 0.1 }}
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                        Stories Beyond Code
+                        Beyond Code Stories
                     </h2>
-                    {data.beyondCode && data.beyondCode.length > 0 ? (
-                        <div className="border-t-2 border-black/10">
-                            {data.beyondCode.map((item, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => setSelectedExploreItem(item)}
-                                    className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
-                                >
-                                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
-                                            {(index + 1).toString().padStart(2, "0")}
-                                        </span>
-                                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
-                                            {item.title}
-                                        </h3>
-                                    </div>
-                                    <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
-                                        <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
-                                        <span className="transition-all duration-300 ease-out group-hover:opacity-0 group-hover:translate-x-8 text-right">
-                                            dive into my story
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    ) : (
-                        <ComingSoon />
-                    )}
+                    <StoryList
+                        items={data.beyondCode || []}
+                        action="dive into my story"
+                        onOpen={(index) => setSelectedExploreItem(data.beyondCode[index])}
+                    />
+                </motion.section>
+            )}
+
+            {/* Personal Stories */}
+            {!isSectionHidden("personalStories") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        Personal Stories
+                    </h2>
+                    <StoryList
+                        items={data.personalStories || []}
+                        action="read the story"
+                        onOpen={(index) => setSelectedStory(data.personalStories[index])}
+                    />
                 </motion.section>
             )}
 
