@@ -1,9 +1,10 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, useInView } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { ErrorScreen } from "@/components/ui/ErrorScreen";
-import { useExploreData, type ExploreData, type ExploreItem } from "@/hooks/useExploreData";
+import { useExploreData, type ExploreData, type ExploreItem, type ResumeGroup, type ResumeVersion } from "@/hooks/useExploreData";
 import { formatExternalUrl } from "@/hooks/useProjectsData";
 
 type Achievement = ExploreData["achievements"][number];
@@ -17,27 +18,110 @@ function ComingSoon() {
     );
 }
 
-function ResumeGroupRow({ group }: { group: any }) {
+function ResumePreviewModal({
+    title,
+    url,
+    onClose,
+}: {
+    title: string;
+    url: string;
+    onClose: () => void;
+}) {
+    const href = formatExternalUrl(url);
+
+    useEffect(() => {
+        const onKey = (event: KeyboardEvent) => {
+            if (event.key === "Escape") onClose();
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [onClose]);
+
+    return createPortal(
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
+                onClick={(event) => {
+                    event.stopPropagation();
+                    onClose();
+                }}
+            >
+                <div className="absolute inset-0 bg-black/40" />
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative flex h-[min(92vh,900px)] w-full max-w-4xl flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                >
+                    <div className="shrink-0 border-b-2 border-black px-3 py-2.5 sm:px-4">
+                        <h3 className="font-bold text-sm sm:text-base truncate">{title}</h3>
+                    </div>
+                    {href ? (
+                        <iframe
+                            src={href}
+                            title={title}
+                            className="min-h-0 w-full flex-1 bg-zinc-100"
+                        />
+                    ) : (
+                        <div className="flex flex-1 items-center justify-center p-6">
+                            <p className="text-sm text-zinc-500">Chưa có file để xem.</p>
+                        </div>
+                    )}
+                    <div className="shrink-0 flex items-center justify-end gap-2 border-t-2 border-black px-3 py-2.5 sm:px-4">
+                        {href && (
+                            <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold bg-blue-200 hover:bg-blue-300 border-2 border-black rounded text-zinc-900 cursor-pointer"
+                            >
+                                Mở trang riêng
+                                <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                        )}
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="inline-flex items-center px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border-2 border-black rounded text-zinc-900 cursor-pointer"
+                        >
+                            Đóng
+                        </button>
+                    </div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>,
+        document.body,
+    );
+}
+
+function ResumeGroupRow({ group }: { group: ResumeGroup }) {
     const [expanded, setExpanded] = useState(false);
+    const [preview, setPreview] = useState<{ title: string; url: string } | null>(null);
     const newest = group.versions?.[0];
     const older = group.versions?.slice(1) || [];
 
-    const openNewest = () => {
-        if (!newest?.url) return;
-        window.open(formatExternalUrl(newest.url), "_blank", "noopener,noreferrer");
+    const openPreview = (version: ResumeVersion, title: string) => {
+        if (!version?.url) return;
+        setPreview({ title, url: version.url });
     };
 
     return (
+        <>
         <div
             role={newest ? "button" : undefined}
             tabIndex={newest ? 0 : undefined}
-            onClick={newest ? openNewest : undefined}
+            onClick={newest ? () => openPreview(newest, group.name) : undefined}
             onKeyDown={
                 newest
                     ? (e) => {
                           if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              openNewest();
+                              openPreview(newest, group.name);
                           }
                       }
                     : undefined
@@ -93,22 +177,29 @@ function ResumeGroupRow({ group }: { group: any }) {
                 >
                     <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Older Versions</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {older.map((ver: any, idx: number) => (
-                            <a
+                        {older.map((ver, idx) => (
+                            <button
                                 key={idx}
-                                href={formatExternalUrl(ver.url)}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                                type="button"
+                                onClick={() => openPreview(ver, `${group.name} — ver ${ver.versionName}`)}
                                 className="flex items-center justify-between p-2 text-xs border-2 border-black rounded bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-900 transition-all cursor-pointer"
                             >
                                 <span className="font-semibold">ver {ver.versionName}</span>
                                 <ExternalLink className="w-3.5 h-3.5 text-zinc-400" />
-                            </a>
+                            </button>
                         ))}
                     </div>
                 </div>
             )}
         </div>
+        {preview && (
+            <ResumePreviewModal
+                title={preview.title}
+                url={preview.url}
+                onClose={() => setPreview(null)}
+            />
+        )}
+        </>
     );
 }
 
@@ -493,7 +584,7 @@ function CollapsibleMoreSection({
                 className="overflow-hidden"
             >
                 <div className="space-y-6 divide-y divide-black/10">
-                    {/* Currently */}
+                    {/* Currently — tạm ẩn, mở lại khi có nội dung
                     {!isSectionHidden("currently") && (
                         <div className="space-y-3 pt-6 first:pt-0">
                             <h3 className="text-base sm:text-lg font-bold text-zinc-900">Currently</h3>
@@ -518,22 +609,7 @@ function CollapsibleMoreSection({
                             )}
                         </div>
                     )}
-
-                    {/* My Resumé */}
-                    {!isSectionHidden("moreAndMore") && (
-                        <div className="space-y-3 pt-6 first:pt-0">
-                            <h3 className="text-base sm:text-lg font-bold text-zinc-900">My Resumé</h3>
-                            {data.resumes && data.resumes.length > 0 ? (
-                                <div className="space-y-3 sm:space-y-4">
-                                    {data.resumes.map((group, index) => (
-                                        <ResumeGroupRow key={index} group={group} />
-                                    ))}
-                                </div>
-                            ) : (
-                                <ComingSoon />
-                            )}
-                        </div>
-                    )}
+                    */}
 
                     {/* Favourites */}
                     {!isSectionHidden("favourites") && (
@@ -566,7 +642,7 @@ function CollapsibleMoreSection({
                         </div>
                     )}
 
-                    {/* What's Next */}
+                    {/* What's Next — tạm ẩn, mở lại khi có nội dung
                     {!isSectionHidden("whatsNext") && (
                         <div className="space-y-3 pt-6 first:pt-0">
                             <h3 className="text-base sm:text-lg font-bold text-zinc-900">What's Next</h3>
@@ -593,6 +669,7 @@ function CollapsibleMoreSection({
                             )}
                         </div>
                     )}
+                    */}
 
                     {/* If You're Reading Closely */}
                     {!isSectionHidden("readingClosely") && (
@@ -788,6 +865,28 @@ export function ExplorePage() {
                 </motion.section>
             )}
 
+            {/* My Resumé */}
+            {!isSectionHidden("moreAndMore") && (
+                <motion.section
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: 0.1 }}
+                >
+                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                        My Resumé
+                    </h2>
+                    {data.resumes && data.resumes.length > 0 ? (
+                        <div className="space-y-3 sm:space-y-4">
+                            {data.resumes.map((group, index) => (
+                                <ResumeGroupRow key={index} group={group} />
+                            ))}
+                        </div>
+                    ) : (
+                        <ComingSoon />
+                    )}
+                </motion.section>
+            )}
+
             {/* Achievements */}
             {data.achievements.length > 0 && !isSectionHidden("achievements") && (
                 <motion.section
@@ -823,7 +922,7 @@ export function ExplorePage() {
             )}
 
             {/* More & More Grouped Section */}
-            {(!isSectionHidden("currently") || !isSectionHidden("moreAndMore") || !isSectionHidden("favourites") || !isSectionHidden("whatsNext") || !isSectionHidden("readingClosely")) && (
+            {(!isSectionHidden("favourites") || !isSectionHidden("readingClosely")) && (
                 <CollapsibleMoreSection
                     data={data}
                     isSectionHidden={isSectionHidden}
