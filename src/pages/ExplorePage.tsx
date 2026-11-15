@@ -19,7 +19,7 @@ function ComingSoon() {
 }
 
 const previewButtonClass =
-    "group inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 font-bold text-black border-2 border-black rounded-lg shadow-secondary active:translate-y-[3px] active:translate-x-[3px] active:shadow-none transition-all duration-200 cursor-pointer";
+    "group inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-black border-2 border-black rounded-lg shadow-secondary active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all duration-200 cursor-pointer";
 
 function resumePreviewSrc(href: string): string | null {
     const bucket = import.meta.env.VITE_R2_PUBLIC_URL;
@@ -162,11 +162,11 @@ function ResumePreviewModal({
                     onClick={(e) => e.stopPropagation()}
                     className="relative flex h-[min(94vh,980px)] w-full max-w-5xl flex-col bg-white border-2 border-black rounded-lg overflow-hidden"
                 >
-                    <div className="shrink-0 border-b-2 border-black px-4 py-3">
-                        <h3 className="font-bold text-base sm:text-lg truncate">{title}</h3>
+                    <div className="shrink-0 border-b-2 border-black px-3 py-1.5">
+                        <h3 className="font-bold text-sm truncate">{title}</h3>
                     </div>
                     <div ref={stageRef} className="min-h-0 flex-1 overflow-auto bg-zinc-100">
-                        <div className="flex min-h-full flex-col items-center px-2 py-3 sm:px-3 sm:py-4">
+                        <div className="flex min-h-full flex-col items-center px-2 py-2">
                             <div ref={pagesRef} className="flex w-full flex-col items-center" />
                             {status === "loading" && (
                                 <p className="my-auto text-sm font-medium text-zinc-500">Đang mở…</p>
@@ -176,9 +176,9 @@ function ResumePreviewModal({
                             )}
                         </div>
                     </div>
-                    <div className="shrink-0 flex items-center justify-between gap-3 border-t-2 border-black px-3 py-3 sm:px-4">
+                    <div className="shrink-0 flex items-center justify-between gap-3 border-t-2 border-black px-3 py-1.5">
                         <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-xs sm:text-sm font-bold text-zinc-700 shrink-0">trang:</span>
+                            <span className="text-xs font-bold text-zinc-700 shrink-0">trang:</span>
                             <div className="flex items-center gap-1.5">
                                 {Array.from({ length: pageCount }, (_, index) => {
                                     const page = index + 1;
@@ -188,7 +188,7 @@ function ResumePreviewModal({
                                             key={page}
                                             type="button"
                                             onClick={() => setCurrentPage(page)}
-                                            className={`w-8 h-8 rounded-full border-2 border-black text-xs font-bold cursor-pointer ${
+                                            className={`w-6 h-6 rounded-full border-2 border-black text-[11px] font-bold cursor-pointer ${
                                                 selected
                                                     ? "bg-blue-300 text-black"
                                                     : "bg-zinc-200 text-zinc-500"
@@ -209,7 +209,7 @@ function ResumePreviewModal({
                                     className={`${previewButtonClass} bg-blue-300`}
                                 >
                                     Xem ở trang riêng
-                                    <ExternalLink className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:translate-x-1" />
+                                    <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:translate-x-1" />
                                 </a>
                             )}
                             <button
@@ -272,21 +272,8 @@ function ResumeGroupRow({ group }: { group: ResumeGroup }) {
                     )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    {newest && (
-                        <a
-                            href={formatExternalUrl(newest.url)}
-                            download
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center px-2.5 py-1.5 text-xs font-bold bg-white hover:bg-zinc-100 border-2 border-black rounded text-zinc-900 cursor-pointer"
-                            title="Tải CV"
-                        >
-                            Tải về
-                        </a>
-                    )}
-
-                    {older.length > 0 && (
+                {older.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2" onClick={(e) => e.stopPropagation()}>
                         <button
                             type="button"
                             onClick={() => setExpanded(!expanded)}
@@ -295,8 +282,8 @@ function ResumeGroupRow({ group }: { group: ResumeGroup }) {
                             {expanded ? "Hide history" : `History (${older.length})`}
                             <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
                         </button>
-                    )}
-                </div>
+                    </div>
+                )}
             </div>
 
             {expanded && older.length > 0 && (

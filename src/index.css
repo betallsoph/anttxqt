@@ -112,21 +112,26 @@
   animation: marquee2 15s linear infinite;
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
+/* Custom Scrollbar — page and marked panes only, so the resume
+   preview can keep the browser's own scrollbar. */
+html::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
+html::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1;
 }
 
-::-webkit-scrollbar-thumb {
+html::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb {
   background: #93C5FD;
   border: 2px solid black;
 }
 
-::-webkit-scrollbar-thumb:hover {
+html::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #60A5FA;
 }
 
