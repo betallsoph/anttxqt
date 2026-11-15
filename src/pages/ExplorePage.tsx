@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useInView } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
@@ -16,6 +17,16 @@ function ComingSoon() {
             <p className="text-sm sm:text-base text-zinc-400 font-medium">Coming soon</p>
         </div>
     );
+}
+
+function resumeSlug(name: string) {
+    const slug = name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    return slug || "resume";
 }
 
 const previewButtonClass =
@@ -178,7 +189,7 @@ function ResumePreviewModal({
                     </div>
                     <div className="shrink-0 flex items-center justify-between gap-3 border-t-2 border-black px-3 py-1.5">
                         <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-xs font-bold text-zinc-700 shrink-0">trang:</span>
+                            <span className="text-xs font-bold text-zinc-700 shrink-0">page:</span>
                             <div className="flex items-center gap-1.5">
                                 {Array.from({ length: pageCount }, (_, index) => {
                                     const page = index + 1;
@@ -208,7 +219,7 @@ function ResumePreviewModal({
                                     rel="noopener noreferrer"
                                     className={`${previewButtonClass} bg-blue-300`}
                                 >
-                                    Xem ở trang riêng
+                                    Open in a new tab
                                     <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:translate-x-1" />
                                 </a>
                             )}
@@ -217,7 +228,7 @@ function ResumePreviewModal({
                                 onClick={onClose}
                                 className={`${previewButtonClass} bg-white`}
                             >
-                                Đóng
+                                Close
                             </button>
                         </div>
                     </div>
@@ -228,15 +239,20 @@ function ResumePreviewModal({
     );
 }
 
-function ResumeGroupRow({ group }: { group: ResumeGroup }) {
+function ResumeGroupRow({
+    group,
+    onOpen,
+}: {
+    group: ResumeGroup;
+    onOpen: (version: ResumeVersion) => void;
+}) {
     const [expanded, setExpanded] = useState(false);
-    const [preview, setPreview] = useState<{ title: string; url: string } | null>(null);
     const newest = group.versions?.[0];
     const older = group.versions?.slice(1) || [];
 
-    const openPreview = (version: ResumeVersion, title: string) => {
+    const openPreview = (version: ResumeVersion) => {
         if (!version?.url) return;
-        setPreview({ title, url: version.url });
+        onOpen(version);
     };
 
     return (
@@ -244,13 +260,13 @@ function ResumeGroupRow({ group }: { group: ResumeGroup }) {
         <div
             role={newest ? "button" : undefined}
             tabIndex={newest ? 0 : undefined}
-            onClick={newest ? () => openPreview(newest, group.name) : undefined}
+            onClick={newest ? () => openPreview(newest) : undefined}
             onKeyDown={
                 newest
                     ? (e) => {
                           if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              openPreview(newest, group.name);
+                              openPreview(newest);
                           }
                       }
                     : undefined
@@ -297,7 +313,7 @@ function ResumeGroupRow({ group }: { group: ResumeGroup }) {
                             <button
                                 key={idx}
                                 type="button"
-                                onClick={() => openPreview(ver, `${group.name} — ver ${ver.versionName}`)}
+                                onClick={() => openPreview(ver)}
                                 className="flex items-center justify-between p-2 text-xs border-2 border-black rounded bg-white hover:bg-zinc-50 text-zinc-600 hover:text-zinc-900 transition-all cursor-pointer"
                             >
                                 <span className="font-semibold">ver {ver.versionName}</span>
@@ -308,13 +324,6 @@ function ResumeGroupRow({ group }: { group: ResumeGroup }) {
                 </div>
             )}
         </div>
-        {preview && (
-            <ResumePreviewModal
-                title={preview.title}
-                url={preview.url}
-                onClose={() => setPreview(null)}
-            />
-        )}
         </>
     );
 }
@@ -852,6 +861,9 @@ function CollapsibleMoreSection({
 
 export function ExplorePage() {
     const { data, loading, error, missing, retry } = useExploreData();
+    const { slug } = useParams<{ slug: string }>();
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
     const [selectedAchievement, setSelectedAchievement] =
         useState<Achievement | null>(null);
     const [selectedExploreItem, setSelectedExploreItem] =
@@ -863,6 +875,44 @@ export function ExplorePage() {
     const isSectionHidden = (sectionName: string) => {
         return (data.hiddenSections || []).includes(sectionName);
     };
+
+    const resumeGroup = slug
+        ? (data.resumes || []).find((group) => resumeSlug(group.name) === slug)
+        : undefined;
+    const requestedVersion = searchParams.get("version");
+    const matchedVersion = requestedVersion
+        ? resumeGroup?.versions?.find((version) => version.versionName === requestedVersion)
+        : undefined;
+    const resumeVersion = matchedVersion?.url
+        ? matchedVersion
+        : resumeGroup?.versions?.[0];
+    const resumePreview = resumeGroup && resumeVersion?.url
+        ? {
+            title: matchedVersion?.url && matchedVersion.versionName
+                ? `${resumeGroup.name} — ver ${matchedVersion.versionName}`
+                : resumeGroup.name,
+            url: resumeVersion.url,
+        }
+        : null;
+
+    const openResume = (group: ResumeGroup, version: ResumeVersion) => {
+        const path = `/explore/resume/${resumeSlug(group.name)}`;
+        const newest = group.versions[0];
+        if (version.versionName && newest && version.url !== newest.url) {
+            navigate(`${path}?version=${encodeURIComponent(version.versionName)}`);
+            return;
+        }
+        navigate(path);
+    };
+
+    const closeResume = () => {
+        navigate("/explore", { replace: true });
+    };
+
+    useEffect(() => {
+        if (loading || error || missing || !slug) return;
+        if (!resumePreview) navigate("/explore", { replace: true });
+    }, [loading, error, missing, slug, resumePreview, navigate]);
 
     if (loading) {
         return (
@@ -994,7 +1044,11 @@ export function ExplorePage() {
                     {data.resumes && data.resumes.length > 0 ? (
                         <div className="space-y-3 sm:space-y-4">
                             {data.resumes.map((group, index) => (
-                                <ResumeGroupRow key={index} group={group} />
+                                <ResumeGroupRow
+                                    key={index}
+                                    group={group}
+                                    onOpen={(version) => openResume(group, version)}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -1043,6 +1097,15 @@ export function ExplorePage() {
                     data={data}
                     isSectionHidden={isSectionHidden}
                     setSelectedExploreItem={setSelectedExploreItem}
+                />
+            )}
+
+            {resumePreview && (
+                <ResumePreviewModal
+                    key={resumePreview.url}
+                    title={resumePreview.title}
+                    url={resumePreview.url}
+                    onClose={closeResume}
                 />
             )}
 
