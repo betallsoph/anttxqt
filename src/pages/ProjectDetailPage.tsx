@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, ExternalLink, Github, Globe, ChevronDown } from "lucide-react";
@@ -35,6 +35,62 @@ const langList: readonly LangItem[] = [
 
 
 
+function FadeReadMore({
+    id,
+    open,
+    onToggle,
+    children,
+    readMore,
+    showLess,
+}: {
+    id: string;
+    open: boolean;
+    onToggle: (id: string) => void;
+    children: React.ReactNode;
+    readMore: string;
+    showLess: string;
+}) {
+    const bodyRef = useRef<HTMLDivElement>(null);
+    const [overflows, setOverflows] = useState(false);
+
+    useEffect(() => {
+        const el = bodyRef.current;
+        if (!el || open) return;
+        const measure = () => {
+            setOverflows(el.scrollHeight > el.clientHeight + 8);
+        };
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [open, children]);
+
+    return (
+        <div>
+            <div className="relative">
+                <div
+                    ref={bodyRef}
+                    className={open ? undefined : "max-h-36 overflow-hidden"}
+                >
+                    {children}
+                </div>
+                {!open && overflows && (
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
+                )}
+            </div>
+            {overflows && (
+                <button
+                    type="button"
+                    onClick={() => onToggle(id)}
+                    className="mt-1 block mx-auto text-sm font-bold text-zinc-500 hover:text-black cursor-pointer"
+                >
+                    {open ? showLess : `... ${readMore}`}
+                </button>
+            )}
+        </div>
+    );
+}
+
 const statusStyles: Record<string, string> = {
     Production: "bg-zinc-50 text-green-500 border-zinc-200",
     Staging: "bg-zinc-50 text-blue-500 border-zinc-200",
@@ -54,6 +110,30 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const navigate = useNavigate();
     const [lang, setLang] = useState<string>("en");
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [openSection, setOpenSection] = useState<string | null>(null);
+    const sectionAnchor = useRef<{ id: string; top: number } | null>(null);
+
+    useEffect(() => {
+        setOpenSection(null);
+    }, [lang, id]);
+
+    const toggleSection = (sectionId: string) => {
+        const section = document.getElementById(`detail-section-${sectionId}`);
+        if (section) {
+            sectionAnchor.current = { id: sectionId, top: section.getBoundingClientRect().top };
+        }
+        setOpenSection((current) => (current === sectionId ? null : sectionId));
+    };
+
+    useLayoutEffect(() => {
+        const anchor = sectionAnchor.current;
+        if (!anchor) return;
+        sectionAnchor.current = null;
+        const section = document.getElementById(`detail-section-${anchor.id}`);
+        if (!section) return;
+        const shift = section.getBoundingClientRect().top - anchor.top;
+        if (Math.abs(shift) > 1) window.scrollBy(0, shift);
+    }, [openSection]);
 
     const handleBack = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -158,7 +238,17 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 en: "Visit Website",
                 vi: "Ghé thăm trang web",
                 ar: "زيارة الموقع",
-            }
+            },
+            readMore: {
+                en: "read more",
+                vi: "xem thêm",
+                ar: "اقرأ المزيد",
+            },
+            showLess: {
+                en: "show less",
+                vi: "ẩn bớt",
+                ar: "عرض أقل",
+            },
         };
         return labels[key]?.[lang] || labels[key]?.en || "";
     };
@@ -310,66 +400,98 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                     {/* The Story Behind */}
                     {storyBehindText && (
-                        <div className="mb-6 sm:mb-8">
+                        <div id="detail-section-story" className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("story")}
                             </h3>
-                            <div className="space-y-3 sm:space-y-4">
-                                {storyBehindText.split(/\n\s*\n/).map((para: string, i: number) => (
-                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                        {parseBoldText(para.trim())}
-                                    </p>
-                                ))}
-                            </div>
+                            <FadeReadMore
+                                id="story"
+                                open={openSection === "story"}
+                                onToggle={toggleSection}
+                                readMore={getLabel("readMore")}
+                                showLess={getLabel("showLess")}
+                            >
+                                <div className="space-y-3 sm:space-y-4">
+                                    {storyBehindText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                        <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                            {parseBoldText(para.trim())}
+                                        </p>
+                                    ))}
+                                </div>
+                            </FadeReadMore>
                         </div>
                     )}
 
                     {/* How I Built It */}
                     {howIBuiltText?.trim() && (
-                        <div className="mb-6 sm:mb-8">
+                        <div id="detail-section-built" className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("howIBuilt")}
                             </h3>
-                            <div className="space-y-3 sm:space-y-4">
-                                {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
-                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                        {parseBoldText(para.trim())}
-                                    </p>
-                                ))}
-                            </div>
+                            <FadeReadMore
+                                id="built"
+                                open={openSection === "built"}
+                                onToggle={toggleSection}
+                                readMore={getLabel("readMore")}
+                                showLess={getLabel("showLess")}
+                            >
+                                <div className="space-y-3 sm:space-y-4">
+                                    {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                        <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                            {parseBoldText(para.trim())}
+                                        </p>
+                                    ))}
+                                </div>
+                            </FadeReadMore>
                         </div>
                     )}
 
                     {/* Key Features */}
                     {keyFeaturesList && keyFeaturesList.length > 0 && (
-                        <div className="mb-6 sm:mb-8">
+                        <div id="detail-section-features" className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("features")}
                             </h3>
-                            <div className="space-y-2 sm:space-y-3">
-                                {keyFeaturesList.map((feature: string, index: number) => (
-                                    <div key={index} className={`flex items-start gap-3 ${isRtl ? "flex-row-reverse" : ""}`}>
-                                        <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
-                                        <p className={`text-base sm:text-lg text-zinc-700 leading-relaxed ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>{parseBoldText(feature)}</p>
-                                    </div>
-                                ))}
-                            </div>
+                            <FadeReadMore
+                                id="features"
+                                open={openSection === "features"}
+                                onToggle={toggleSection}
+                                readMore={getLabel("readMore")}
+                                showLess={getLabel("showLess")}
+                            >
+                                <div className="space-y-2 sm:space-y-3">
+                                    {keyFeaturesList.map((feature: string, index: number) => (
+                                        <div key={index} className={`flex items-start gap-3 ${isRtl ? "flex-row-reverse" : ""}`}>
+                                            <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
+                                            <p className={`text-base sm:text-lg text-zinc-700 leading-relaxed ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>{parseBoldText(feature)}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </FadeReadMore>
                         </div>
                     )}
 
                     {/* Full Description */}
                     {fullDescriptionText && (
-                        <div className="mb-6 sm:mb-8">
+                        <div id="detail-section-description" className="mb-6 sm:mb-8">
                             <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
                                 {getLabel("description")}
                             </h3>
-                            <div className="space-y-3 sm:space-y-4">
-                                {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
-                                    <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                        {parseBoldText(para.trim())}
-                                    </p>
-                                ))}
-                            </div>
+                            <FadeReadMore
+                                id="description"
+                                open={openSection === "description"}
+                                onToggle={toggleSection}
+                                readMore={getLabel("readMore")}
+                                showLess={getLabel("showLess")}
+                            >
+                                <div className="space-y-3 sm:space-y-4">
+                                    {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
+                                        <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                            {parseBoldText(para.trim())}
+                                        </p>
+                                    ))}
+                                </div>
+                            </FadeReadMore>
                         </div>
                     )}
 
