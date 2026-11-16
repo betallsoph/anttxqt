@@ -84,7 +84,7 @@ function FadeReadMore({
                     onClick={() => onToggle(id)}
                     className="mt-1 block mx-auto text-sm font-bold text-zinc-500 hover:text-black cursor-pointer"
                 >
-                    {open ? showLess : `... ${readMore}`}
+                    {open ? showLess : `${readMore}...`}
                 </button>
             )}
         </div>
