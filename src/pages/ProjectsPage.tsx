@@ -14,9 +14,9 @@ const statusStyles: Record<ProjectStatus, string> = {
 };
 
 const PROJECTS_SUBTITLE =
-    "Software I designed, built, and put in front of real users — the work I want to be judged on.";
+    "Products I’ve built, alone or with others, for problems I’ve lived or seen up close. They are the ones I care about most, and I’m still making them better.";
 const PLAYGROUND_SUBTITLE =
-    "Experiments, prototypes, and ideas I started for the fun of it. Some shipped, some stopped at the concept stage — every one of them taught me something.";
+    "Small ideas I started because something around me caught my heart or my curiosity. A few grew into prototypes. Others stayed as plans on paper. Every one of them taught me something.";
 
 export function ProjectsPage({ type }: { type: CollectionType }) {
     const { projects, loading, error, missing, retry } = useProjectsData(type);
