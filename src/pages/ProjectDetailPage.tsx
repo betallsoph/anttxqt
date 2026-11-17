@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github, Globe, ChevronDown } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Globe, ChevronDown, Images } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { useProjectsData, type CollectionType, formatExternalUrl } from "@/hooks/useProjectsData";
 import { parseBoldText } from "@/lib/utils";
@@ -243,6 +243,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 vi: "Ghé thăm trang web",
                 ar: "زيارة الموقع",
             },
+            photos: {
+                en: "Real photos",
+                vi: "Hình ảnh thực tế",
+            },
             readMore: {
                 en: "read more",
                 vi: "xem thêm",
@@ -266,6 +270,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const keyFeaturesList = (suffix && (project[`keyFeatures${suffix}`] as string[])) || project.keyFeatures;
     const fullDescriptionText = (suffix && (project[`fullDescription${suffix}`] as string)) || project.fullDescription;
     const howIBuiltText = (suffix && (project[`howIBuilt${suffix}`] as string)) || project.howIBuilt;
+    const galleryImages = (project.images ?? []).filter((img) => img.trim());
 
     return (
         <div className={`space-y-8 ${lang === "vi" ? "font-vietnamese" : ""}`}>
@@ -396,6 +401,20 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                             >
                                 <ExternalLink className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                                 Live
+                            </a>
+                        )}
+
+                        {galleryImages.length > 0 && (
+                            <a
+                                href="#detail-gallery"
+                                onClick={(event) => {
+                                    event.preventDefault();
+                                    document.getElementById("detail-gallery")?.scrollIntoView({ behavior: "auto", block: "start" });
+                                }}
+                                className="inline-flex items-center gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-bold bg-zinc-50 border border-zinc-200 text-blue-600 rounded hover:bg-zinc-100 transition-colors"
+                            >
+                                <Images className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                                {getLabel("photos")}
                             </a>
                         )}
                     </div>
@@ -578,16 +597,17 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
             </motion.article>
 
             {/* Gallery */}
-            {project.images && project.images.length > 0 && (
+            {galleryImages.length > 0 && (
                 <motion.section
+                    id="detail-gallery"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.1 }}
-                    className="border-t-2 border-black/20 pt-6 sm:pt-8"
+                    className="scroll-mt-6 border-t-2 border-black/20 pt-6 sm:pt-8"
                 >
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">More & More</h2>
                     <div className="space-y-3 sm:space-y-4">
-                        {project.images.map((img, index) => (
+                        {galleryImages.map((img, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, y: 20 }}
