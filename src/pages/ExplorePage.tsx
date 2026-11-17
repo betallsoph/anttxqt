@@ -68,6 +68,11 @@ function resumeSlug(name: string) {
     return slug || "resume";
 }
 
+function resumeFileName(url: string) {
+    const last = decodeURIComponent(url.split("?")[0].split("/").pop() || "");
+    return last.replace(/^\d+-/, "") || "resume.pdf";
+}
+
 function resumeFileSlug(url: string) {
     const last = decodeURIComponent(url.split("?")[0].split("/").pop() || "");
     const bare = last.replace(/^\d+-/, "").replace(/\.pdf$/i, "");
@@ -75,7 +80,7 @@ function resumeFileSlug(url: string) {
 }
 
 const previewButtonClass =
-    "group inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-black border-2 border-black rounded-lg shadow-secondary active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all duration-200 cursor-pointer";
+    "group inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold text-black border-2 border-black rounded-lg shadow-[1px_1px_0_#000] active:translate-y-px active:translate-x-px active:shadow-none transition-all duration-200 cursor-pointer";
 
 function resumePreviewSrc(href: string): string | null {
     const bucket = import.meta.env.VITE_R2_PUBLIC_URL;
@@ -100,6 +105,7 @@ function ResumePreviewModal({
     onClose: () => void;
 }) {
     const href = formatExternalUrl(url);
+    const downloadHref = href ? resumePreviewSrc(href) ?? href : undefined;
     const stageRef = useRef<HTMLDivElement>(null);
     const pagesRef = useRef<HTMLDivElement>(null);
     const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
@@ -218,8 +224,28 @@ function ResumePreviewModal({
                     onClick={(e) => e.stopPropagation()}
                     className="relative flex h-[min(94vh,980px)] w-full max-w-5xl flex-col bg-white border-2 border-black rounded-lg overflow-hidden"
                 >
-                    <div className="shrink-0 border-b-2 border-black px-3 py-1.5">
-                        <h3 className="font-bold text-sm truncate">{title}</h3>
+                    <div className="shrink-0 flex items-center justify-between gap-3 border-b-2 border-black px-3 py-1.5">
+                        <h3 className="font-bold text-sm truncate min-w-0">{title}</h3>
+                        <div className="flex items-center gap-2 shrink-0">
+                            {href && (
+                                <a
+                                    href={href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`${previewButtonClass} bg-blue-100`}
+                                >
+                                    Open in a new tab
+                                    <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:translate-x-1" />
+                                </a>
+                            )}
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className={`${previewButtonClass} bg-white`}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                     <div ref={stageRef} className="min-h-0 flex-1 overflow-auto bg-zinc-100">
                         <div className="flex min-h-full flex-col items-center px-2 py-2">
@@ -233,7 +259,7 @@ function ResumePreviewModal({
                         </div>
                     </div>
                     <div className="shrink-0 flex items-center justify-between gap-3 border-t-2 border-black px-3 py-1.5">
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex items-center gap-2 shrink-0">
                             <span className="text-xs font-bold text-zinc-700 shrink-0">page:</span>
                             <div className="flex items-center gap-1.5">
                                 {Array.from({ length: pageCount }, (_, index) => {
@@ -256,25 +282,19 @@ function ResumePreviewModal({
                                 })}
                             </div>
                         </div>
-                        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                            {href && (
+                        <div className="flex items-center justify-end gap-3 min-w-0">
+                            <p className="font-vietnamese text-[11px] sm:text-xs font-medium text-blue-500 leading-snug text-right">
+                                *Để xem các liên kết trong CV, bạn chọn xem bằng trang mới ở trên hoặc tải về nha.
+                            </p>
+                            {downloadHref && (
                                 <a
-                                    href={href}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`${previewButtonClass} bg-blue-300`}
+                                    href={downloadHref}
+                                    download={resumeFileName(href || downloadHref)}
+                                    className={`${previewButtonClass} bg-white shrink-0`}
                                 >
-                                    Open in a new tab
-                                    <ExternalLink className="w-3.5 h-3.5 transition-transform duration-200 group-hover:scale-110 group-hover:-rotate-12 group-hover:translate-x-1" />
+                                    Download
                                 </a>
                             )}
-                            <button
-                                type="button"
-                                onClick={onClose}
-                                className={`${previewButtonClass} bg-white`}
-                            >
-                                Close
-                            </button>
                         </div>
                     </div>
                 </motion.div>
