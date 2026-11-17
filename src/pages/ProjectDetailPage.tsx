@@ -200,7 +200,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
             },
             story: {
                 en: "The Story Behind",
-                vi: "Câu chuyện phía sau",
+                vi: "Câu chuyện sản phẩm",
                 ar: "القصة وراء المشروع",
             },
             features: {
@@ -210,12 +210,12 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
             },
             description: {
                 en: "Full Description",
-                vi: "Mô tả chi tiết",
+                vi: "Mô tả chi tiết hơn",
                 ar: "الوصف الكامل",
             },
             howIBuilt: {
                 en: "How I Built It",
-                vi: "Cách tôi xây dựng",
+                vi: "Cách mình làm",
                 ar: "كيف بنيته",
             },
             role: {
