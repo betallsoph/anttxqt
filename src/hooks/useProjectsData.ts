@@ -4,7 +4,7 @@ import { db } from "@/lib/firebase";
 import { invalidateCachedDoc } from "@/lib/firestore-utils";
 import { useFirestoreSnapshot } from "@/hooks/useFirestoreSnapshot";
 
-export type ProjectStatus = "Production" | "Staging" | "In Development" | "Concept" | "Retired";
+export type ProjectStatus = "Production" | "Staging" | "In Development" | "Prototype" | "Planned - Draft" | "Concept" | "Retired";
 
 export interface Project {
     id: string;

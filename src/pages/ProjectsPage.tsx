@@ -9,6 +9,8 @@ const statusStyles: Record<ProjectStatus, string> = {
     Production: "bg-zinc-50 text-green-500 border-zinc-200",
     Staging: "bg-zinc-50 text-blue-500 border-zinc-200",
     "In Development": "bg-zinc-50 text-red-500 border-zinc-200",
+    Prototype: "bg-zinc-50 text-purple-500 border-zinc-200",
+    "Planned - Draft": "bg-zinc-50 text-amber-600 border-zinc-200",
     Concept: "bg-zinc-50 text-purple-500 border-zinc-200",
     Retired: "bg-zinc-50 text-pink-400 border-zinc-200",
 };

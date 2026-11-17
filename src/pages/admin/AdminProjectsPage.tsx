@@ -29,12 +29,14 @@ import { MoveButtons, swap } from "@/components/ui/move-buttons";
 const inputClass =
     "w-full border border-zinc-300 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all";
 
-const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Concept", "Retired"];
+const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Prototype", "Planned - Draft", "Retired"];
 
 const statusStyles: Record<ProjectStatus, string> = {
     Production: "bg-zinc-50 text-green-500 border-zinc-200",
     Staging: "bg-zinc-50 text-blue-500 border-zinc-200",
     "In Development": "bg-zinc-50 text-red-500 border-zinc-200",
+    Prototype: "bg-zinc-50 text-purple-500 border-zinc-200",
+    "Planned - Draft": "bg-zinc-50 text-amber-600 border-zinc-200",
     Concept: "bg-zinc-50 text-purple-500 border-zinc-200",
     Retired: "bg-zinc-50 text-pink-400 border-zinc-200",
 };
@@ -273,7 +275,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                             id: "",
                             title: "",
                             description: "",
-                            status: "Concept",
+                            status: "Planned - Draft",
                             tags: [],
                             keyFeatures: [],
                         };
@@ -316,7 +318,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 <option value="all">All Statuses</option>
                                 <option value="visible">Visible</option>
                                 <option value="hidden">Hidden</option>
-                                {statusOptions.map(opt => (
+                                {[...statusOptions, "Concept" as const].map(opt => (
                                     <option key={opt} value={opt}>{opt}</option>
                                 ))}
                             </select>
@@ -533,7 +535,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                         onChange={(e) => updateProject(index, { status: e.target.value as ProjectStatus })}
                                                         className={inputClass}
                                                     >
-                                                        {statusOptions.map((s) => (
+                                                        { (project.status === "Concept" ? ["Concept" as ProjectStatus, ...statusOptions] : statusOptions).map((s) => (
                                                             <option key={s} value={s}>{s}</option>
                                                         ))}
                                                     </select>

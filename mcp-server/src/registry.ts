@@ -25,7 +25,7 @@ export const COLLECTIONS: CollectionDef[] = [
     key: "id",
     description: "Projects. Items keyed by unique `id`.",
     itemShape:
-      "Project: id, title, description, status(Production|Staging|In Development|Concept|Retired), tags[], topics?[], roles?[], keyFeatures?[], fullDescription?, storyBehind?, githubUrl?, liveUrl?, iconUrl?, imageUrl?, images?[], hidden?, + multilingual *Vi/*Ar fields.",
+      "Project: id, title, description, status(Production|Staging|In Development|Prototype|Planned - Draft|Retired), tags[], topics?[], roles?[], keyFeatures?[], fullDescription?, storyBehind?, githubUrl?, liveUrl?, iconUrl?, imageUrl?, images?[], hidden?, + multilingual *Vi/*Ar fields.",
   },
   {
     name: "playground",
