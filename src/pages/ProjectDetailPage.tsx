@@ -42,6 +42,7 @@ function FadeReadMore({
     children,
     readMore,
     showLess,
+    collapsedClass = "max-h-36",
 }: {
     id: string;
     open: boolean;
@@ -49,6 +50,7 @@ function FadeReadMore({
     children: React.ReactNode;
     readMore: string;
     showLess: string;
+    collapsedClass?: string;
 }) {
     const bodyRef = useRef<HTMLDivElement>(null);
     const [overflows, setOverflows] = useState(false);
@@ -70,7 +72,7 @@ function FadeReadMore({
             <div className="relative">
                 <div
                     ref={bodyRef}
-                    className={open ? undefined : "max-h-36 overflow-hidden"}
+                    className={open ? undefined : `${collapsedClass} overflow-hidden`}
                 >
                     {children}
                 </div>
@@ -82,7 +84,7 @@ function FadeReadMore({
                 <button
                     type="button"
                     onClick={() => onToggle(id)}
-                    className="mt-1 block mx-auto text-sm font-bold text-zinc-500 hover:text-black cursor-pointer"
+                    className="mt-1 block w-full py-2 text-center text-sm font-bold text-zinc-500 hover:text-black cursor-pointer"
                 >
                     {open ? showLess : `${readMore}...`}
                 </button>
@@ -412,6 +414,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore")}
                                 showLess={getLabel("showLess")}
+                                collapsedClass="max-h-72"
                             >
                                 <div className="space-y-3 sm:space-y-4">
                                     {storyBehindText.split(/\n\s*\n/).map((para: string, i: number) => (
