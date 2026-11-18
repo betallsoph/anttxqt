@@ -416,21 +416,21 @@ function ExploreItemModal({
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
                     transition={{ duration: 0.2 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="relative w-auto max-w-3xl min-w-[300px] sm:min-w-[500px] max-h-[90vh] flex flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                    className="relative z-10 flex w-full max-w-4xl flex-col items-center"
                 >
-                    {item.imageUrl && (
-                        <div className="flex-1 shrink min-h-0 w-full border-b-2 border-black bg-white flex items-center justify-center">
-                            <ImageWithLoader
-                                src={item.imageUrl}
-                                alt={item.title}
-                                className="w-full h-full max-h-[70vh]"
-                                imgClassName="object-contain"
-                            />
-                        </div>
-                    )}
+                    <div className="custom-scrollbar w-full max-h-[calc(90vh-4.5rem)] overflow-y-auto rounded-lg border-2 border-black bg-white">
+                        {item.imageUrl && (
+                            <div className="flex w-full items-center justify-center border-b-2 border-black bg-white">
+                                <ImageWithLoader
+                                    src={item.imageUrl}
+                                    alt={item.title}
+                                    className="h-full max-h-[70vh] w-full"
+                                    imgClassName="object-contain"
+                                />
+                            </div>
+                        )}
 
-                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[70vh]">
-                        <div className="flex items-start justify-between gap-3">
+                        <div className="w-full space-y-3 p-4 sm:p-6">
                             <div className="min-w-0">
                                 <h3 className="font-bold text-lg sm:text-2xl">
                                     {item.title}
@@ -448,47 +448,49 @@ function ExploreItemModal({
                                     </p>
                                 )}
                             </div>
-                            <button
-                                onClick={onClose}
-                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-black bg-white hover:bg-zinc-100 transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
 
-                        {item.story && (
-                            <div className="space-y-2 pt-1">
-                                <h4 className="text-xs sm:text-sm font-bold text-blue-600">
-                                    The Backstory
-                                </h4>
-                                <div className="space-y-3">
-                                    {item.story.split("\n").map((paragraph, idx) => {
-                                        if (!paragraph.trim()) {
-                                            return <div key={idx} className="h-2" />;
-                                        }
-                                        return (
-                                            <p key={idx} className="text-sm sm:text-base text-zinc-700 leading-relaxed">
-                                                {paragraph}
-                                            </p>
-                                        );
-                                    })}
+                            {item.story && (
+                                <div className="space-y-2 pt-1">
+                                    <h4 className="text-xs sm:text-sm font-bold text-blue-600">
+                                        The Backstory
+                                    </h4>
+                                    <div className="space-y-3">
+                                        {item.story.split("\n").map((paragraph, idx) => {
+                                            if (!paragraph.trim()) {
+                                                return <div key={idx} className="h-2" />;
+                                            }
+                                            return (
+                                                <p key={idx} className="text-sm sm:text-base text-zinc-700 leading-relaxed">
+                                                    {paragraph}
+                                                </p>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {item.tags && item.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                                {item.tags.map((tag, i) => (
-                                    <span
-                                        key={i}
-                                        className="px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        )}
+                            {item.tags && item.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                    {item.tags.map((tag, i) => (
+                                        <span
+                                            key={i}
+                                            className="px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Close"
+                        className="mt-4 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-black bg-white transition-colors hover:bg-zinc-100"
+                    >
+                        <X className="h-4 w-4 text-red-500" />
+                    </button>
                 </motion.div>
             </motion.div>
         </AnimatePresence>
@@ -518,20 +520,12 @@ function StoryModal({
                     exit={{ opacity: 0, scale: 0.95, y: 10 }}
                     transition={{ duration: 0.2 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="relative w-auto max-w-3xl min-w-[300px] sm:min-w-[500px] max-h-[90vh] flex flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                    className="relative z-10 flex w-full max-w-4xl flex-col items-center"
                 >
-                    <div className="shrink-0 w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3 max-h-[80vh]">
-                        <div className="flex items-start justify-between gap-3">
-                            <h3 className="font-bold text-lg sm:text-2xl min-w-0">
-                                {story.title}
-                            </h3>
-                            <button
-                                onClick={onClose}
-                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-black bg-white hover:bg-zinc-100 transition-colors"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        </div>
+                    <div className="custom-scrollbar w-full max-h-[calc(90vh-4.5rem)] space-y-3 overflow-y-auto rounded-lg border-2 border-black bg-white p-4 sm:p-6">
+                        <h3 className="font-bold text-lg sm:text-2xl">
+                            {story.title}
+                        </h3>
 
                         {story.content && (
                             <div className="space-y-3 pt-1">
@@ -561,6 +555,14 @@ function StoryModal({
                             </div>
                         )}
                     </div>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        aria-label="Close"
+                        className="mt-4 flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border-2 border-black bg-white transition-colors hover:bg-zinc-100"
+                    >
+                        <X className="h-4 w-4 text-red-500" />
+                    </button>
                 </motion.div>
             </motion.div>
         </AnimatePresence>
@@ -1059,7 +1061,7 @@ export function ExplorePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.1 }}
                 >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                    <h2 className={`text-lg sm:text-xl font-bold ${data.beyondCodeIntro?.trim() ? "mb-1.5" : "mb-3 sm:mb-4"}`}>
                         Beyond Code Stories
                     </h2>
                     {data.beyondCodeIntro?.trim() && (
@@ -1082,7 +1084,7 @@ export function ExplorePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.35, delay: 0.1 }}
                 >
-                    <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
+                    <h2 className={`text-lg sm:text-xl font-bold ${data.personalStoriesIntro?.trim() ? "mb-1.5" : "mb-3 sm:mb-4"}`}>
                         Personal Stories
                     </h2>
                     {data.personalStoriesIntro?.trim() && (

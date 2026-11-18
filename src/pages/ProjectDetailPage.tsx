@@ -114,14 +114,15 @@ function SectionLangChips({
         if (only === "en") {
             return (
                 <p className="font-vietnamese min-w-0 text-right text-[11px] sm:text-xs font-medium leading-snug text-zinc-400">
-                    *hiện chỉ có bản Tiếng Anh
+                    *hiện chỉ có bản tiếng Anh
                 </p>
             );
         }
         return null;
     }
+    const label = (key: string) => (key === "en" ? "tiếng Anh" : key === "vi" ? "tiếng Việt" : key);
     return (
-        <div className="flex items-center shrink-0 text-[11px] sm:text-xs font-bold leading-none">
+        <div className="font-vietnamese flex items-center shrink-0 text-[11px] sm:text-xs font-bold leading-none">
             {languages.map((item, index) => {
                 const selected = item.key === value;
                 return (
@@ -133,7 +134,7 @@ function SectionLangChips({
                             aria-pressed={selected}
                             className={`cursor-pointer px-3 py-2 ${selected ? "text-blue-600" : "text-zinc-400 hover:text-zinc-600"}`}
                         >
-                            {item.key}
+                            {label(item.key)}
                         </button>
                     </span>
                 );
