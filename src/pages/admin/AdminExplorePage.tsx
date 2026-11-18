@@ -623,6 +623,17 @@ export function AdminExplorePage() {
                                 </div>
                             </div>
                             <div className="p-4 sm:p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-bold mb-1">
+                                    Description
+                                </label>
+                                <textarea
+                                    value={data.beyondCodeIntro || ""}
+                                    onChange={(e) => setData({ ...data, beyondCodeIntro: e.target.value })}
+                                    className={`${inputClass} min-h-[60px]`}
+                                    rows={2}
+                                />
+                            </div>
                             <ExploreItemListEditor
                                 items={data.beyondCode || []}
                                 onChange={(items) => setData({ ...data, beyondCode: items })}
@@ -677,6 +688,17 @@ export function AdminExplorePage() {
                                 </div>
                             </div>
                             <div className="p-4 sm:p-6 space-y-4">
+                                <div>
+                                    <label className="block text-sm font-bold mb-1">
+                                        Description
+                                    </label>
+                                    <textarea
+                                        value={data.personalStoriesIntro || ""}
+                                        onChange={(e) => setData({ ...data, personalStoriesIntro: e.target.value })}
+                                        className={`${inputClass} min-h-[60px]`}
+                                        rows={2}
+                                    />
+                                </div>
                                 <StoryListEditor
                                     items={data.personalStories || []}
                                     onChange={(items) => setData({ ...data, personalStories: items })}

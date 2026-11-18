@@ -1027,9 +1027,11 @@ export function ExplorePage() {
                 <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">
                     {data.intro.title}
                 </h2>
-                <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap">
-                    {data.intro.description}
-                </p>
+                {data.intro.description.trim() && (
+                    <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap">
+                        {data.intro.description}
+                    </p>
+                )}
             </motion.section>
 
             {/* Coding Stories */}
@@ -1060,6 +1062,11 @@ export function ExplorePage() {
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         Beyond Code Stories
                     </h2>
+                    {data.beyondCodeIntro?.trim() && (
+                        <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap mb-3 sm:mb-4">
+                            {data.beyondCodeIntro}
+                        </p>
+                    )}
                     <StoryList
                         items={data.beyondCode || []}
                         action="dive into my story"
@@ -1078,6 +1085,11 @@ export function ExplorePage() {
                     <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
                         Personal Stories
                     </h2>
+                    {data.personalStoriesIntro?.trim() && (
+                        <p className="text-sm sm:text-base text-zinc-600 whitespace-pre-wrap mb-3 sm:mb-4">
+                            {data.personalStoriesIntro}
+                        </p>
+                    )}
                     <StoryList
                         items={data.personalStories || []}
                         action="read the story"

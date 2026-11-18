@@ -52,8 +52,10 @@ export interface ExploreData {
         description?: string;
     }[];
     beyondCode: ExploreItem[];
+    beyondCodeIntro?: string;
     stories: ExploreStory[];
     personalStories: ExploreStory[];
+    personalStoriesIntro?: string;
     whatsNext: {
         title: string;
         description?: string;
