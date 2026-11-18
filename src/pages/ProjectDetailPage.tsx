@@ -230,7 +230,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
     const languagesFor = (field: string) =>
         langList.filter((item) => {
-            if (item.key !== "en" && !sectionLanguageOn(project, field, item.suffix)) return false;
+            if (!sectionLanguageOn(project, field, item.suffix)) return false;
             return fieldHasContent(field, item.suffix);
         });
 

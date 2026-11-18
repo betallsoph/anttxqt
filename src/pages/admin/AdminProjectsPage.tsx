@@ -12,6 +12,7 @@ import {
     sectionLanguageOn,
     sectionShowKey,
     languageOffered,
+    englishHideableFields,
 } from "@/hooks/useProjectsData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -634,7 +635,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                     <label className={`block text-xs font-semibold uppercase text-zinc-600 ${align}`}>
                                                                         {label} ({lang.key.toUpperCase()})
                                                                     </label>
-                                                                    {suffix && (
+                                                                    {(suffix || englishHideableFields.has(field)) && (
                                                                         <SectionSwitch
                                                                             on={on}
                                                                             onClick={() => updateProject(index, { [sectionShowKey(field, suffix)]: !on })}

@@ -14,11 +14,13 @@ export interface Project {
     fullDescription?: string;
     storyBehind?: string;
     howIBuilt?: string;
+    showHowIBuilt?: boolean;
     status: ProjectStatus;
     tags: string[];
     topics?: string[];
     roles?: string[];
     keyFeatures?: string[];
+    showKeyFeatures?: boolean;
     githubUrl?: string;
     liveUrl?: string;
     iconUrl?: string; // Small app icon or logo
@@ -47,13 +49,21 @@ export interface Project {
 
 export const detailLanguageFields = ["storyBehind", "howIBuilt", "keyFeatures", "fullDescription"] as const;
 
+// English sections stay visible unless listed here. A missing flag still means on.
+export const englishHideableFields = new Set<string>(["howIBuilt", "keyFeatures"]);
+
 export function sectionShowKey(field: string, suffix: string) {
     return `show${field.charAt(0).toUpperCase()}${field.slice(1)}${suffix}`;
 }
 
 // A missing per-section flag still follows the old language-wide switch.
+// English stays on, except the sections that have their own hide switch.
 export function sectionLanguageOn(project: { [key: string]: any }, field: string, suffix: string) {
-    if (!suffix) return true;
+    if (!suffix) {
+        if (!englishHideableFields.has(field)) return true;
+        const specific = project[sectionShowKey(field, "")];
+        return typeof specific === "boolean" ? specific : true;
+    }
     const specific = project[sectionShowKey(field, suffix)];
     if (typeof specific === "boolean") return specific;
     return !!project[`show${suffix}`];
