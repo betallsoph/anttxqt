@@ -180,7 +180,7 @@ function SectionLangChips({
                     <button
                         type="button"
                         onClick={() => onChange(action.key)}
-                        className={`cursor-pointer border-0 bg-transparent px-3 py-2 text-blue-600 hover:text-blue-700 ${action.vietnamese ? "font-vietnamese" : ""}`}
+                        className={`cursor-pointer px-3 py-2 text-zinc-400 hover:text-zinc-600 ${action.vietnamese ? "font-vietnamese" : ""}`}
                         style={action.vietnamese ? undefined : { fontFamily: '"Outfit", sans-serif' }}
                     >
                         {action.label}
