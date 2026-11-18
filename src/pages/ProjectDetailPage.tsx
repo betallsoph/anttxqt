@@ -41,7 +41,6 @@ function FadeReadMore({
     onToggle,
     children,
     readMore,
-    showLess,
     collapsedClass = "max-h-36",
 }: {
     id: string;
@@ -49,7 +48,6 @@ function FadeReadMore({
     onToggle: (id: string) => void;
     children: React.ReactNode;
     readMore: string;
-    showLess: string;
     collapsedClass?: string;
 }) {
     const bodyRef = useRef<HTMLDivElement>(null);
@@ -80,13 +78,13 @@ function FadeReadMore({
                     <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white to-transparent" />
                 )}
             </div>
-            {overflows && (
+            {!open && overflows && (
                 <button
                     type="button"
                     onClick={() => onToggle(id)}
                     className="mt-1 block w-full py-2 text-center text-sm font-bold text-zinc-500 hover:text-black cursor-pointer"
                 >
-                    {open ? showLess : `${readMore}...`}
+                    {`${readMore}...`}
                 </button>
             )}
         </div>
@@ -457,7 +455,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 open={openSection === "story"}
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", storyLang)}
-                                showLess={getLabel("showLess", storyLang)}
                                 collapsedClass="max-h-72"
                             >
                                 <div className="space-y-3 sm:space-y-4 font-normal">
@@ -487,7 +484,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 open={openSection === "built"}
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", builtLang)}
-                                showLess={getLabel("showLess", builtLang)}
                             >
                                 <div className="space-y-3 sm:space-y-4 font-normal">
                                     {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
@@ -516,7 +512,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 open={openSection === "features"}
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", featureLang)}
-                                showLess={getLabel("showLess", featureLang)}
                             >
                                 <div className="space-y-2 sm:space-y-3 font-normal">
                                     {keyFeaturesList.map((feature: string, index: number) => (
@@ -546,7 +541,6 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 open={openSection === "description"}
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", descriptionLang)}
-                                showLess={getLabel("showLess", descriptionLang)}
                             >
                                 <div className="space-y-3 sm:space-y-4 font-normal">
                                     {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
