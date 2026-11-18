@@ -91,6 +91,30 @@ function FadeReadMore({
     );
 }
 
+const viLangName: Record<string, string> = {
+    ar: "Ả Rập",
+    de: "Đức",
+    nl: "Hà Lan",
+    sv: "Thụy Điển",
+    cs: "Séc",
+    da: "Đan Mạch",
+    es: "Tây Ban Nha",
+    fr: "Pháp",
+    no: "Na Uy",
+    fi: "Phần Lan",
+    it: "Ý",
+    pt: "Bồ Đào Nha",
+    hu: "Hungary",
+    el: "Hy Lạp",
+};
+
+function extraLangLabel(item: LangItem) {
+    const short = viLangName[item.key];
+    if (short) return `tiếng ${short}`;
+    const stripped = item.name.split(item.flag).join("").replace(/\s+/g, " ").trim();
+    return stripped || item.name.trim();
+}
+
 function SectionLangChips({
     languages,
     value,
@@ -118,25 +142,51 @@ function SectionLangChips({
         }
         return null;
     }
-    const label = (key: string) => (key === "en" ? "tiếng Anh" : key === "vi" ? "tiếng Việt" : key);
+
+    const available = new Set(languages.map((item) => item.key));
+    const actions: { key: string; label: string; vietnamese: boolean }[] = [];
+    const addEnglish = () => {
+        if (value !== "en" && available.has("en")) {
+            actions.push({ key: "en", label: "switch to English", vietnamese: false });
+        }
+    };
+    const addVietnamese = () => {
+        if (value !== "vi" && available.has("vi")) {
+            actions.push({ key: "vi", label: "chuyển sang tiếng Việt", vietnamese: true });
+        }
+    };
+
+    if (value === "en") addVietnamese();
+    else if (value === "vi") addEnglish();
+    else {
+        addEnglish();
+        addVietnamese();
+    }
+
+    for (const item of languages) {
+        if (item.key === "en" || item.key === "vi" || item.key === value) continue;
+        actions.push({ key: item.key, label: extraLangLabel(item), vietnamese: item.key in viLangName });
+    }
+
+    if (actions.length === 0) return null;
+
     return (
-        <div className="font-vietnamese flex items-center shrink-0 text-[11px] sm:text-xs font-bold leading-none">
-            {languages.map((item, index) => {
-                const selected = item.key === value;
-                return (
-                    <span key={item.key} className="flex items-center">
-                        {index > 0 && <span className="text-zinc-300 select-none">|</span>}
-                        <button
-                            type="button"
-                            onClick={() => onChange(item.key)}
-                            aria-pressed={selected}
-                            className={`cursor-pointer px-3 py-2 ${selected ? "text-blue-600" : "text-zinc-400 hover:text-zinc-600"}`}
-                        >
-                            {label(item.key)}
-                        </button>
-                    </span>
-                );
-            })}
+        <div dir="ltr" className="flex items-center shrink-0 text-[11px] sm:text-xs font-bold leading-none">
+            {actions.map((action, index) => (
+                <span key={action.key} className="flex items-center">
+                    {index > 0 && (
+                        <span className="select-none text-zinc-300 pointer-events-none" aria-hidden="true"> | </span>
+                    )}
+                    <button
+                        type="button"
+                        onClick={() => onChange(action.key)}
+                        className={`cursor-pointer border-0 bg-transparent px-3 py-2 text-blue-600 hover:text-blue-700 ${action.vietnamese ? "font-vietnamese" : ""}`}
+                        style={action.vietnamese ? undefined : { fontFamily: '"Outfit", sans-serif' }}
+                    >
+                        {action.label}
+                    </button>
+                </span>
+            ))}
         </div>
     );
 }
