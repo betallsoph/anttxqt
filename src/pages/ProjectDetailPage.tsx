@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Github, Globe, ChevronDown, Images } from "lucide-react";
+import { ArrowLeft, ExternalLink, Github, Images } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
-import { useProjectsData, type CollectionType, formatExternalUrl } from "@/hooks/useProjectsData";
+import { useProjectsData, type CollectionType, formatExternalUrl, sectionLanguageOn } from "@/hooks/useProjectsData";
 import { parseBoldText } from "@/lib/utils";
 
 interface LangItem {
@@ -93,6 +93,55 @@ function FadeReadMore({
     );
 }
 
+function SectionLangChips({
+    languages,
+    value,
+    onChange,
+}: {
+    languages: readonly LangItem[];
+    value: string;
+    onChange: (key: string) => void;
+}) {
+    if (languages.length < 2) {
+        const only = languages[0]?.key;
+        if (only === "vi") {
+            return (
+                <p className="min-w-0 text-right text-[11px] sm:text-xs font-medium leading-snug text-zinc-400">
+                    *only available in Vietnamese
+                </p>
+            );
+        }
+        if (only === "en") {
+            return (
+                <p className="font-vietnamese min-w-0 text-right text-[11px] sm:text-xs font-medium leading-snug text-zinc-400">
+                    *hiện chỉ có bản Tiếng Anh
+                </p>
+            );
+        }
+        return null;
+    }
+    return (
+        <div className="flex items-center shrink-0 text-[11px] sm:text-xs font-bold leading-none">
+            {languages.map((item, index) => {
+                const selected = item.key === value;
+                return (
+                    <span key={item.key} className="flex items-center">
+                        {index > 0 && <span className="px-1.5 text-zinc-300 select-none">|</span>}
+                        <button
+                            type="button"
+                            onClick={() => onChange(item.key)}
+                            aria-pressed={selected}
+                            className={`cursor-pointer ${selected ? "text-blue-600" : "text-zinc-400 hover:text-zinc-600"}`}
+                        >
+                            {item.key}
+                        </button>
+                    </span>
+                );
+            })}
+        </div>
+    );
+}
+
 const statusStyles: Record<string, string> = {
     Production: "bg-zinc-50 text-green-500 border-zinc-200",
     Staging: "bg-zinc-50 text-blue-500 border-zinc-200",
@@ -112,14 +161,22 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
     const backLink = isPlayground ? "/playground" : "/projects";
     const backLabel = isPlayground ? "playground" : "projects";
     const navigate = useNavigate();
-    const [lang, setLang] = useState<string>("en");
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [sectionLangs, setSectionLangs] = useState<Record<string, string>>({});
     const [openSection, setOpenSection] = useState<string | null>(null);
     const sectionAnchor = useRef<{ id: string; top: number } | null>(null);
 
     useEffect(() => {
         setOpenSection(null);
-    }, [lang, id]);
+        setSectionLangs({});
+    }, [id]);
+
+    const chooseSectionLang = (sectionId: string, next: string) => {
+        const section = document.getElementById(`detail-section-${sectionId}`);
+        if (section) {
+            sectionAnchor.current = { id: sectionId, top: section.getBoundingClientRect().top };
+        }
+        setSectionLangs((current) => ({ ...current, [sectionId]: next }));
+    };
 
     const toggleSection = (sectionId: string) => {
         const section = document.getElementById(`detail-section-${sectionId}`);
@@ -137,7 +194,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         if (!section) return;
         const shift = section.getBoundingClientRect().top - anchor.top;
         if (Math.abs(shift) > 1) window.scrollBy(0, shift);
-    }, [openSection]);
+    }, [openSection, sectionLangs]);
 
     const handleBack = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -165,33 +222,36 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
         );
     }
 
-    const hasTranslationData = (suffix: string) => {
-        if (!suffix) return true;
-        const titleKey = `title${suffix}`;
-        const descKey = `description${suffix}`;
-        const storyKey = `storyBehind${suffix}`;
-        const fullDescKey = `fullDescription${suffix}`;
-        const featuresKey = `keyFeatures${suffix}`;
-        const howIBuiltKey = `howIBuilt${suffix}`;
-
-        return !!(
-            project[titleKey]?.trim() ||
-            project[descKey]?.trim() ||
-            project[storyKey]?.trim() ||
-            project[fullDescKey]?.trim() ||
-            (project[featuresKey] && project[featuresKey].length > 0) ||
-            project[howIBuiltKey]?.trim()
-        );
+    const fieldHasContent = (field: string, suffix: string) => {
+        const value = project[suffix ? `${field}${suffix}` : field];
+        if (Array.isArray(value)) return value.some((item) => typeof item === "string" && item.trim());
+        return typeof value === "string" && !!value.trim();
     };
 
-    const availableLanguages = langList.filter((langItem) => {
-        if (langItem.key === "en") return true;
-        const showFieldKey = `show${langItem.suffix}`;
-        if (!project[showFieldKey]) return false;
-        return hasTranslationData(langItem.suffix);
-    });
+    const languagesFor = (field: string) =>
+        langList.filter((item) => {
+            if (item.key !== "en" && !sectionLanguageOn(project, field, item.suffix)) return false;
+            return fieldHasContent(field, item.suffix);
+        });
 
-    const getLabel = (key: string) => {
+    const selectedLang = (sectionId: string, languages: readonly LangItem[]) => {
+        const chosen = sectionLangs[sectionId];
+        if (chosen && languages.some((item) => item.key === chosen)) return chosen;
+        return languages[0]?.key ?? "en";
+    };
+
+    const stringField = (field: string, suffix: string) => {
+        const value = project[suffix ? `${field}${suffix}` : field];
+        return typeof value === "string" ? value : "";
+    };
+
+    const listField = (field: string, suffix: string) => {
+        const value = project[suffix ? `${field}${suffix}` : field];
+        if (!Array.isArray(value)) return [];
+        return value.filter((item): item is string => typeof item === "string" && !!item.trim());
+    };
+
+    const getLabel = (key: string, labelLang = "en") => {
         const labels: Record<string, Record<string, string>> = {
             back: {
                 en: `Back to ${backLabel}`,
@@ -258,22 +318,31 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 ar: "عرض أقل",
             },
         };
-        return labels[key]?.[lang] || labels[key]?.en || "";
+        return labels[key]?.[labelLang] || labels[key]?.en || "";
     };
 
-    const activeLangItem = langList.find((l) => l.key === lang) || langList[0];
-    const suffix = activeLangItem.suffix;
-    const isRtl = activeLangItem.dir === "rtl";
+    const storyLangs = languagesFor("storyBehind");
+    const builtLangs = languagesFor("howIBuilt");
+    const featureLangs = languagesFor("keyFeatures");
+    const descriptionLangs = languagesFor("fullDescription");
+    const storyLang = selectedLang("story", storyLangs);
+    const builtLang = selectedLang("built", builtLangs);
+    const featureLang = selectedLang("features", featureLangs);
+    const descriptionLang = selectedLang("description", descriptionLangs);
+    const langItem = (key: string) => langList.find((item) => item.key === key) ?? langList[0];
+    const storyItem = langItem(storyLang);
+    const builtItem = langItem(builtLang);
+    const featureItem = langItem(featureLang);
+    const descriptionItem = langItem(descriptionLang);
 
-    const titleText = (suffix && (project[`title${suffix}`] as string)) || project.title;
-    const storyBehindText = (suffix && (project[`storyBehind${suffix}`] as string)) || project.storyBehind;
-    const keyFeaturesList = (suffix && (project[`keyFeatures${suffix}`] as string[])) || project.keyFeatures;
-    const fullDescriptionText = (suffix && (project[`fullDescription${suffix}`] as string)) || project.fullDescription;
-    const howIBuiltText = (suffix && (project[`howIBuilt${suffix}`] as string)) || project.howIBuilt;
+    const storyBehindText = stringField("storyBehind", storyItem.suffix);
+    const keyFeaturesList = listField("keyFeatures", featureItem.suffix);
+    const fullDescriptionText = stringField("fullDescription", descriptionItem.suffix);
+    const howIBuiltText = stringField("howIBuilt", builtItem.suffix);
     const galleryImages = (project.images ?? []).filter((img) => img.trim());
 
     return (
-        <div className={`space-y-8 ${lang === "vi" ? "font-vietnamese" : ""}`}>
+        <div className="space-y-8">
             {/* Back Button */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -297,60 +366,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary"
             >
                 {/* macOS Window Header */}
-                <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                    <div className="flex items-center gap-1.5 sm:gap-2">
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                        <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                    </div>
-                    {/* Language Switcher Dropdown */}
-                    {availableLanguages.length > 1 && (
-                        <div className="relative">
-                            {/* Backdrop overlay for closing dropdown */}
-                            {isDropdownOpen && (
-                                <div
-                                    className="fixed inset-0 z-35 cursor-default"
-                                    onClick={() => setIsDropdownOpen(false)}
-                                />
-                            )}
-                            
-                            {/* Trigger Text Button */}
-                            <button
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="relative z-40 flex items-center gap-1.5 text-xs sm:text-sm font-bold text-zinc-400 hover:text-black transition-colors cursor-pointer select-none"
-                            >
-                                <Globe className="w-3.5 h-3.5" />
-                                <span>{activeLangItem.name}</span>
-                                <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`} />
-                            </button>
-
-                            {/* Dropdown Options List */}
-                            {isDropdownOpen && (
-                                <div className="absolute right-0 mt-2 w-48 bg-white border-2 border-black rounded-lg shadow-secondary py-1.5 z-40 overflow-hidden min-w-[170px]">
-                                    {availableLanguages.map((langItem) => {
-                                        const isActive = langItem.key === lang;
-                                        return (
-                                            <button
-                                                key={langItem.key}
-                                                onClick={() => {
-                                                    setLang(langItem.key);
-                                                    setIsDropdownOpen(false);
-                                                }}
-                                                className={`w-full text-left px-3 py-2 text-xs sm:text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer select-none ${
-                                                    isActive 
-                                                        ? "bg-blue-300 text-black" 
-                                                        : "text-zinc-700 hover:bg-zinc-50 hover:text-black"
-                                                }`}
-                                            >
-                                                <span className="text-sm select-none">{langItem.flag}</span>
-                                                <span className="flex-1">{langItem.name}</span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
+                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
                 </div>
 
                 {/* Project Image */}
@@ -366,7 +385,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                 )}
 
                 <div className="p-4 sm:p-6">
-                    <h1 className={`text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>{titleText}</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">{project.title}</h1>
 
                     {/* Status & Quick Links */}
                     <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap mb-4 sm:mb-6">
@@ -422,22 +441,27 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
 
                     {/* The Story Behind */}
-                    {storyBehindText && (
-                        <div id="detail-section-story" className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("story")}
-                            </h3>
+                    {storyLangs.length > 0 && (
+                        <div id="detail-section-story" className={`mb-6 sm:mb-8 ${storyLang === "vi" ? "font-vietnamese" : ""}`} dir={storyItem.dir || "ltr"}>
+                            <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
+                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("story", storyLang)}</h3>
+                                <SectionLangChips
+                                    languages={storyLangs}
+                                    value={storyLang}
+                                    onChange={(key) => chooseSectionLang("story", key)}
+                                />
+                            </div>
                             <FadeReadMore
                                 id="story"
                                 open={openSection === "story"}
                                 onToggle={toggleSection}
-                                readMore={getLabel("readMore")}
-                                showLess={getLabel("showLess")}
+                                readMore={getLabel("readMore", storyLang)}
+                                showLess={getLabel("showLess", storyLang)}
                                 collapsedClass="max-h-72"
                             >
-                                <div className="space-y-3 sm:space-y-4">
+                                <div className="space-y-3 sm:space-y-4 font-normal">
                                     {storyBehindText.split(/\n\s*\n/).map((para: string, i: number) => (
-                                        <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                        <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                             {parseBoldText(para.trim())}
                                         </p>
                                     ))}
@@ -447,21 +471,26 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     )}
 
                     {/* How I Built It */}
-                    {howIBuiltText?.trim() && (
-                        <div id="detail-section-built" className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("howIBuilt")}
-                            </h3>
+                    {builtLangs.length > 0 && (
+                        <div id="detail-section-built" className={`mb-6 sm:mb-8 ${builtLang === "vi" ? "font-vietnamese" : ""}`} dir={builtItem.dir || "ltr"}>
+                            <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
+                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("howIBuilt", builtLang)}</h3>
+                                <SectionLangChips
+                                    languages={builtLangs}
+                                    value={builtLang}
+                                    onChange={(key) => chooseSectionLang("built", key)}
+                                />
+                            </div>
                             <FadeReadMore
                                 id="built"
                                 open={openSection === "built"}
                                 onToggle={toggleSection}
-                                readMore={getLabel("readMore")}
-                                showLess={getLabel("showLess")}
+                                readMore={getLabel("readMore", builtLang)}
+                                showLess={getLabel("showLess", builtLang)}
                             >
-                                <div className="space-y-3 sm:space-y-4">
+                                <div className="space-y-3 sm:space-y-4 font-normal">
                                     {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
-                                        <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                        <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                             {parseBoldText(para.trim())}
                                         </p>
                                     ))}
@@ -471,23 +500,28 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     )}
 
                     {/* Key Features */}
-                    {keyFeaturesList && keyFeaturesList.length > 0 && (
-                        <div id="detail-section-features" className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("features")}
-                            </h3>
+                    {featureLangs.length > 0 && (
+                        <div id="detail-section-features" className={`mb-6 sm:mb-8 ${featureLang === "vi" ? "font-vietnamese" : ""}`} dir={featureItem.dir || "ltr"}>
+                            <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
+                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("features", featureLang)}</h3>
+                                <SectionLangChips
+                                    languages={featureLangs}
+                                    value={featureLang}
+                                    onChange={(key) => chooseSectionLang("features", key)}
+                                />
+                            </div>
                             <FadeReadMore
                                 id="features"
                                 open={openSection === "features"}
                                 onToggle={toggleSection}
-                                readMore={getLabel("readMore")}
-                                showLess={getLabel("showLess")}
+                                readMore={getLabel("readMore", featureLang)}
+                                showLess={getLabel("showLess", featureLang)}
                             >
-                                <div className="space-y-2 sm:space-y-3">
+                                <div className="space-y-2 sm:space-y-3 font-normal">
                                     {keyFeaturesList.map((feature: string, index: number) => (
-                                        <div key={index} className={`flex items-start gap-3 ${isRtl ? "flex-row-reverse" : ""}`}>
+                                        <div key={index} className="flex items-start gap-3">
                                             <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
-                                            <p className={`text-base sm:text-lg text-zinc-700 leading-relaxed ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>{parseBoldText(feature)}</p>
+                                            <p className="text-base sm:text-lg text-zinc-700 leading-relaxed">{parseBoldText(feature)}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -496,21 +530,26 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     )}
 
                     {/* Full Description */}
-                    {fullDescriptionText && (
-                        <div id="detail-section-description" className="mb-6 sm:mb-8">
-                            <h3 className={`text-lg sm:text-xl font-bold text-blue-600 mb-3 sm:mb-4 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
-                                {getLabel("description")}
-                            </h3>
+                    {descriptionLangs.length > 0 && (
+                        <div id="detail-section-description" className={`mb-6 sm:mb-8 ${descriptionLang === "vi" ? "font-vietnamese" : ""}`} dir={descriptionItem.dir || "ltr"}>
+                            <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
+                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("description", descriptionLang)}</h3>
+                                <SectionLangChips
+                                    languages={descriptionLangs}
+                                    value={descriptionLang}
+                                    onChange={(key) => chooseSectionLang("description", key)}
+                                />
+                            </div>
                             <FadeReadMore
                                 id="description"
                                 open={openSection === "description"}
                                 onToggle={toggleSection}
-                                readMore={getLabel("readMore")}
-                                showLess={getLabel("showLess")}
+                                readMore={getLabel("readMore", descriptionLang)}
+                                showLess={getLabel("showLess", descriptionLang)}
                             >
-                                <div className="space-y-3 sm:space-y-4">
+                                <div className="space-y-3 sm:space-y-4 font-normal">
                                     {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
-                                        <p key={i} className={`text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                        <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                             {parseBoldText(para.trim())}
                                         </p>
                                     ))}
@@ -524,10 +563,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                         {/* Roles */}
                         {project.roles && project.roles.length > 0 && (
                             <div>
-                                <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                                <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">
                                     {getLabel("role")}
                                 </h3>
-                                <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                                <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                     {project.roles.map((role) => (
                                         <span
                                             key={role}
@@ -542,10 +581,10 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
 
                         {/* Tech Stack */}
                         <div>
-                            <h3 className={`text-xs sm:text-sm font-bold text-blue-600 mb-2 ${isRtl ? "text-right" : ""}`} dir={isRtl ? "rtl" : "ltr"}>
+                            <h3 className="text-xs sm:text-sm font-bold text-blue-600 mb-2">
                                 {getLabel("tech")}
                             </h3>
-                            <div className={`flex flex-wrap gap-1.5 sm:gap-2 ${isRtl ? "flex-row-reverse" : ""}`}>
+                            <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                 {project.tags.map((tag) => (
                                     <span
                                         key={tag}

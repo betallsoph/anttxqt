@@ -45,6 +45,25 @@ export interface Project {
 }
 
 
+export const detailLanguageFields = ["storyBehind", "howIBuilt", "keyFeatures", "fullDescription"] as const;
+
+export function sectionShowKey(field: string, suffix: string) {
+    return `show${field.charAt(0).toUpperCase()}${field.slice(1)}${suffix}`;
+}
+
+// A missing per-section flag still follows the old language-wide switch.
+export function sectionLanguageOn(project: { [key: string]: any }, field: string, suffix: string) {
+    if (!suffix) return true;
+    const specific = project[sectionShowKey(field, suffix)];
+    if (typeof specific === "boolean") return specific;
+    return !!project[`show${suffix}`];
+}
+
+export function languageOffered(project: { [key: string]: any }, suffix: string) {
+    if (!suffix) return true;
+    return detailLanguageFields.some((field) => sectionLanguageOn(project, field, suffix));
+}
+
 export type CollectionType = "playground" | "projects";
 
 // Intentionally empty. The admin form loads these when a doc is missing, so

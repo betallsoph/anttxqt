@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { doc, getDoc } from "firebase/firestore/lite";
 import { db } from "@/lib/firebase";
@@ -9,6 +9,9 @@ import {
     defaultPlayground,
     defaultProjectsList,
     saveProjectsData,
+    sectionLanguageOn,
+    sectionShowKey,
+    languageOffered,
 } from "@/hooks/useProjectsData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -68,6 +71,25 @@ const langList: readonly LangItem[] = [
     { key: "el", label: "🇬🇷 Ελληνικά", suffix: "El", placeholder: "Ελληνικά..." }
 ];
 
+
+function SectionSwitch({ on, onClick }: { on: boolean; onClick: () => void }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            aria-pressed={on}
+            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-zinc-200 transition-colors duration-200 ease-in-out focus:outline-none ${
+                on ? "bg-green-500" : "bg-zinc-200"
+            }`}
+        >
+            <span
+                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                    on ? "translate-x-5" : "translate-x-0"
+                }`}
+            />
+        </button>
+    );
+}
 
 function generateId(title: string): string {
     return title
@@ -377,8 +399,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                     <span className="text-blue-600 font-semibold">EN</span>
                                                     {langList.map((lang) => {
                                                         if (lang.key === "en") return null;
-                                                        const showFieldKey = `show${lang.suffix}`;
-                                                        if (!(proj as any)[showFieldKey]) return null;
+                                                        if (!languageOffered(proj, lang.suffix)) return null;
                                                         return (
                                                             <span key={lang.key} className="text-green-600 font-bold uppercase text-[9px]">
                                                                 {lang.key}
@@ -572,8 +593,6 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                 {langList.map((lang) => {
                                                     const isTabActive = activeLangTab === lang.key;
                                                     const suffix = lang.suffix;
-                                                    const showFieldKey = suffix ? `show${suffix}` : "";
-                                                    
                                                     // Set up badge color for dynamic tabs
                                                     let dotColor = "bg-green-500";
                                                     if (lang.key === "ar") dotColor = "bg-purple-500";
@@ -589,7 +608,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                             }`}
                                                         >
                                                             {lang.label}
-                                                            {showFieldKey && project[showFieldKey] && (
+                                                            {suffix && languageOffered(project, suffix) && (
                                                                 <span className={`w-1.5 h-1.5 inline-block rounded-full ${dotColor}`} />
                                                             )}
                                                         </button>
@@ -603,126 +622,111 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                     if (activeLangTab !== lang.key) return null;
                                                     
                                                     const suffix = lang.suffix;
-                                                    const showFieldKey = suffix ? `show${suffix}` : "";
-                                                    const isLanguageEnabled = !showFieldKey || !!project[showFieldKey];
-
                                                     const titleKey = `title${suffix}`;
                                                     const descKey = `description${suffix}`;
-                                                    const fullDescKey = `fullDescription${suffix}`;
-                                                    const storyKey = `storyBehind${suffix}`;
-                                                    const featuresKey = `keyFeatures${suffix}`;
+                                                    const align = lang.dir === "rtl" ? "text-right" : "";
+                                                    const row = lang.dir === "rtl" ? "flex-row-reverse" : "";
+                                                    const sectionField = (field: string, label: string, editor: ReactNode) => {
+                                                        const on = sectionLanguageOn(project, field, suffix);
+                                                        return (
+                                                            <div className={align}>
+                                                                <div className={`mb-1 flex items-center justify-between gap-3 ${row}`}>
+                                                                    <label className={`block text-xs font-semibold uppercase text-zinc-600 ${align}`}>
+                                                                        {label} ({lang.key.toUpperCase()})
+                                                                    </label>
+                                                                    {suffix && (
+                                                                        <SectionSwitch
+                                                                            on={on}
+                                                                            onClick={() => updateProject(index, { [sectionShowKey(field, suffix)]: !on })}
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                                {!suffix || on ? editor : (
+                                                                    <p className={`text-[10px] text-zinc-400 ${align}`}>Off on the detail page.</p>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    };
 
                                                     return (
-                                                        <div key={lang.key} className="space-y-4">
-                                                            {/* Language Enable Toggle (only for non-English translations) */}
-                                                            {showFieldKey && (
-                                                                <div className="flex items-center justify-between pb-3 border-b border-zinc-100">
-                                                                    <div>
-                                                                        <span className="block text-xs font-bold uppercase text-zinc-700">Enable {lang.label.split(" ").slice(1).join(" ")} Translation</span>
-                                                                        <span className="block text-[10px] text-zinc-500 font-medium uppercase mt-0.5">Show language switcher on the detail page</span>
-                                                                    </div>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => updateProject(index, { [showFieldKey]: !project[showFieldKey] })}
-                                                                        className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-zinc-200 transition-colors duration-200 ease-in-out focus:outline-none ${
-                                                                            project[showFieldKey] ? "bg-green-500" : "bg-zinc-200"
-                                                                        }`}
-                                                                    >
-                                                                        <span
-                                                                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                                                                                project[showFieldKey] ? "translate-x-5" : "translate-x-0"
-                                                                            }`}
-                                                                        />
-                                                                    </button>
-                                                                </div>
-                                                            )}
+                                                        <div key={lang.key} className="space-y-4" dir={lang.dir || "ltr"}>
+                                                            <div className={align}>
+                                                                <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${align}`}>
+                                                                    Title ({lang.key.toUpperCase()})
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    value={project[titleKey] || ""}
+                                                                    onChange={(e) => {
+                                                                        const updates: any = { [titleKey]: e.target.value };
+                                                                        if (lang.key === "en" && !project.id) {
+                                                                            updates.id = generateId(e.target.value);
+                                                                        }
+                                                                        updateProject(index, updates);
+                                                                    }}
+                                                                    className={`${inputClass} ${align}`}
+                                                                    placeholder={`Title in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                                    dir={lang.dir || "ltr"}
+                                                                />
+                                                            </div>
 
-                                                            {isLanguageEnabled ? (
-                                                                <div className="space-y-4 animate-fadeIn" dir={lang.dir || "ltr"}>
-                                                                    <div className={lang.dir === "rtl" ? "text-right" : ""}>
-                                                                        <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${lang.dir === "rtl" ? "text-right" : ""}`}>
-                                                                            Title ({lang.key.toUpperCase()})
-                                                                        </label>
-                                                                        <input
-                                                                            type="text"
-                                                                            value={project[titleKey] || ""}
-                                                                            onChange={(e) => {
-                                                                                const updates: any = { [titleKey]: e.target.value };
-                                                                                if (lang.key === "en" && !project.id) {
-                                                                                    updates.id = generateId(e.target.value);
-                                                                                }
-                                                                                updateProject(index, updates);
-                                                                            }}
-                                                                            className={`${inputClass} ${lang.dir === "rtl" ? "text-right" : ""}`}
-                                                                            placeholder={`Title in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                            dir={lang.dir || "ltr"}
-                                                                        />
-                                                                    </div>
+                                                            <div className={align}>
+                                                                <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${align}`}>
+                                                                    Short Description ({lang.key.toUpperCase()})
+                                                                </label>
+                                                                <textarea
+                                                                    value={project[descKey] || ""}
+                                                                    onChange={(e) => updateProject(index, { [descKey]: e.target.value })}
+                                                                    className={`${inputClass} min-h-[60px] leading-relaxed ${align}`}
+                                                                    rows={2}
+                                                                    placeholder={`Short description in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                                    dir={lang.dir || "ltr"}
+                                                                />
+                                                            </div>
 
-                                                                    <div className={lang.dir === "rtl" ? "text-right" : ""}>
-                                                                        <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${lang.dir === "rtl" ? "text-right" : ""}`}>
-                                                                            Short Description ({lang.key.toUpperCase()})
-                                                                        </label>
-                                                                        <textarea
-                                                                            value={project[descKey] || ""}
-                                                                            onChange={(e) => updateProject(index, { [descKey]: e.target.value })}
-                                                                            className={`${inputClass} min-h-[60px] leading-relaxed ${lang.dir === "rtl" ? "text-right" : ""}`}
-                                                                            rows={2}
-                                                                            placeholder={`Short description in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                            dir={lang.dir || "ltr"}
-                                                                        />
-                                                                    </div>
+                                                            {sectionField("fullDescription", "Full Description", (
+                                                                <textarea
+                                                                    value={project[`fullDescription${suffix}`] || ""}
+                                                                    onChange={(e) => updateProject(index, { [`fullDescription${suffix}`]: e.target.value })}
+                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
+                                                                    rows={3}
+                                                                    placeholder={`Full description in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                                    dir={lang.dir || "ltr"}
+                                                                />
+                                                            ))}
 
-                                                                    <div className={lang.dir === "rtl" ? "text-right" : ""}>
-                                                                        <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${lang.dir === "rtl" ? "text-right" : ""}`}>
-                                                                            Full Description ({lang.key.toUpperCase()})
-                                                                        </label>
-                                                                        <textarea
-                                                                            value={project[fullDescKey] || ""}
-                                                                            onChange={(e) => updateProject(index, { [fullDescKey]: e.target.value })}
-                                                                            className={`${inputClass} min-h-[100px] leading-relaxed ${lang.dir === "rtl" ? "text-right" : ""}`}
-                                                                            rows={3}
-                                                                            placeholder={`Full description in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                            dir={lang.dir || "ltr"}
-                                                                        />
-                                                                    </div>
+                                                            {sectionField("storyBehind", "Story Behind", (
+                                                                <textarea
+                                                                    value={project[`storyBehind${suffix}`] || ""}
+                                                                    onChange={(e) => updateProject(index, { [`storyBehind${suffix}`]: e.target.value })}
+                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
+                                                                    rows={3}
+                                                                    placeholder={`The story behind in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                                    dir={lang.dir || "ltr"}
+                                                                />
+                                                            ))}
 
-                                                                    <div className={lang.dir === "rtl" ? "text-right" : ""}>
-                                                                        <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${lang.dir === "rtl" ? "text-right" : ""}`}>
-                                                                            Story Behind ({lang.key.toUpperCase()})
-                                                                        </label>
-                                                                        <textarea
-                                                                            value={project[storyKey] || ""}
-                                                                            onChange={(e) => updateProject(index, { [storyKey]: e.target.value })}
-                                                                            className={`${inputClass} min-h-[100px] leading-relaxed ${lang.dir === "rtl" ? "text-right" : ""}`}
-                                                                            rows={3}
-                                                                            placeholder={`The story behind in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                            dir={lang.dir || "ltr"}
-                                                                        />
-                                                                    </div>
+                                                            {sectionField("howIBuilt", "How I Built It", (
+                                                                <textarea
+                                                                    value={project[`howIBuilt${suffix}`] || ""}
+                                                                    onChange={(e) => updateProject(index, { [`howIBuilt${suffix}`]: e.target.value })}
+                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
+                                                                    rows={3}
+                                                                    placeholder={`How it was built in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                                    dir={lang.dir || "ltr"}
+                                                                />
+                                                            ))}
 
-                                                                    <div className={lang.dir === "rtl" ? "text-right" : ""}>
-                                                                        <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${lang.dir === "rtl" ? "text-right" : ""}`}>
-                                                                            Key Features ({lang.key.toUpperCase()}) (One per line)
-                                                                        </label>
-                                                                        <textarea
-                                                                            value={(project[featuresKey] || []).join("\n")}
-                                                                            onChange={(e) => {
-                                                                                const features = e.target.value.split("\n");
-                                                                                updateProject(index, { [featuresKey]: features });
-                                                                            }}
-                                                                            className={`${inputClass} min-h-[100px] leading-relaxed ${lang.dir === "rtl" ? "text-right" : ""}`}
-                                                                            rows={4}
-                                                                            placeholder={`Feature 1\nFeature 2...`}
-                                                                            dir={lang.dir || "ltr"}
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="py-8 text-center text-xs text-zinc-400 bg-zinc-50/50 rounded-lg border border-dashed border-zinc-200">
-                                                                    {lang.label.split(" ").slice(1).join(" ")} translation is OFF. Enable above to edit.
-                                                                </div>
-                                                            )}
+                                                            {sectionField("keyFeatures", "Key Features (One per line)", (
+                                                                <textarea
+                                                                    value={(project[`keyFeatures${suffix}`] || []).join("\n")}
+                                                                    onChange={(e) => updateProject(index, { [`keyFeatures${suffix}`]: e.target.value.split("\n") })}
+                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
+                                                                    rows={4}
+                                                                    placeholder={"Feature 1\nFeature 2..."}
+                                                                    dir={lang.dir || "ltr"}
+                                                                />
+                                                            ))}
                                                         </div>
                                                     );
                                                 })}
