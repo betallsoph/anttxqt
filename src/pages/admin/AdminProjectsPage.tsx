@@ -641,9 +641,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                                                         />
                                                                     )}
                                                                 </div>
-                                                                {!suffix || on ? editor : (
-                                                                    <p className={`text-[10px] text-zinc-400 ${align}`}>Off on the detail page.</p>
-                                                                )}
+                                                                {editor}
                                                             </div>
                                                         );
                                                     };
