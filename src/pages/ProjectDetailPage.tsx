@@ -126,12 +126,12 @@ function SectionLangChips({
                 const selected = item.key === value;
                 return (
                     <span key={item.key} className="flex items-center">
-                        {index > 0 && <span className="px-1.5 text-zinc-300 select-none">|</span>}
+                        {index > 0 && <span className="text-zinc-300 select-none">|</span>}
                         <button
                             type="button"
                             onClick={() => onChange(item.key)}
                             aria-pressed={selected}
-                            className={`cursor-pointer ${selected ? "text-blue-600" : "text-zinc-400 hover:text-zinc-600"}`}
+                            className={`cursor-pointer px-3 py-2 ${selected ? "text-blue-600" : "text-zinc-400 hover:text-zinc-600"}`}
                         >
                             {item.key}
                         </button>
