@@ -41,7 +41,7 @@ function FadeReadMore({
     onToggle,
     children,
     readMore,
-    collapsedClass = "max-h-36",
+    collapsedClass = "max-h-48",
 }: {
     id: string;
     open: boolean;
