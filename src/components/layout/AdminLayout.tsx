@@ -1,21 +1,23 @@
 import { useState } from "react";
 import { Outlet, NavLink } from "react-router-dom";
-import { motion } from "motion/react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTapBounce } from "@/hooks/useTapBounce";
 import { ALLOWED_ADMIN_EMAILS } from "@/lib/admin-config";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { LogOut, Loader2, ShieldX, Home, FolderOpen, Compass, StickyNote, CalendarDays } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 
 const navItems = [
-    { to: "/admin/home", label: "Home", icon: Home },
-    { to: "/admin/projects", label: "Projects", icon: FolderOpen },
-    { to: "/admin/playground", label: "Playground", icon: FolderOpen },
-    { to: "/admin/explore", label: "Explore", icon: Compass },
-    { to: "/admin/notes", label: "Notes", icon: StickyNote },
-    { to: "/admin/planner", label: "Planner", icon: CalendarDays },
+    { to: "/admin/home", label: "Home" },
+    { to: "/admin/projects", label: "Projects" },
+    { to: "/admin/playground", label: "Playground" },
+    { to: "/admin/explore", label: "Explore" },
+    { to: "/admin/notes", label: "Notes" },
+    { to: "/admin/planner", label: "Planner" },
 ];
+
+const fieldClass = "w-full bg-zinc-50 px-4 py-3 text-base text-zinc-700 rounded-md focus:bg-white focus:outline-none";
+const saveButtonClass =
+    "inline-flex w-full cursor-pointer items-center justify-center rounded-lg bg-blue-100 px-4 py-3 text-base font-bold text-zinc-800 shadow-[1px_1px_0_#000] transition-all duration-200 active:translate-x-px active:translate-y-px active:shadow-none disabled:opacity-50";
 
 function LoginForm() {
     const { signIn } = useAuth();
@@ -44,46 +46,45 @@ function LoginForm() {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="max-w-sm mx-auto"
-        >
-            <Card>
-                <CardHeader>
-                    <CardTitle>Admin Login</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Email</label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Password</label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full border-2 border-black rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
-                                required
-                            />
-                        </div>
-                        {error && <p className="text-red-500 text-sm font-bold">{error}</p>}
-                        <Button type="submit" className="w-full" disabled={loading}>
-                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Đăng nhập"}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-        </motion.div>
+        <div data-tap-zone="plain" className="max-w-md text-zinc-700">
+            <h1 className="text-2xl font-semibold text-zinc-800">Admin Login</h1>
+            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+                <div>
+                    <label className="mb-2 block text-sm font-medium text-zinc-600" htmlFor="admin-email">
+                        Email
+                    </label>
+                    <input
+                        id="admin-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={fieldClass}
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="mb-2 block text-sm font-medium text-zinc-600" htmlFor="admin-password">
+                        Password
+                    </label>
+                    <input
+                        id="admin-password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className={fieldClass}
+                        required
+                    />
+                </div>
+                {error && <p className="text-sm text-red-600">{error}</p>}
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className={saveButtonClass}
+                >
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Đăng nhập"}
+                </button>
+            </form>
+        </div>
     );
 }
 
@@ -94,7 +95,7 @@ export function AdminLayout() {
     if (loading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <Loader2 className="w-6 h-6 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin" />
             </div>
         );
     }
@@ -105,78 +106,52 @@ export function AdminLayout() {
 
     if (!ALLOWED_ADMIN_EMAILS.includes(user.email || "")) {
         return (
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="max-w-sm mx-auto text-center space-y-4"
-            >
-                <div className="w-16 h-16 mx-auto bg-red-100 border-2 border-black rounded-lg flex items-center justify-center">
-                    <ShieldX className="w-8 h-8 text-red-500" />
-                </div>
-                <h2 className="text-xl font-bold">Không có quyền truy cập</h2>
-                <p className="text-sm text-zinc-600">
+            <div data-tap-zone="plain" className="max-w-md space-y-3 text-zinc-700">
+                <h1 className="text-2xl font-semibold text-zinc-800">Không có quyền truy cập</h1>
+                <p className="text-base text-zinc-600">
                     Tài khoản của bạn không được phép truy cập trang admin.
                 </p>
-                <Button variant="secondary" size="sm" onClick={signOut}>
-                    <LogOut className="w-4 h-4" />
+                <button type="button" onClick={signOut} className="text-base text-zinc-700">
                     Đăng xuất
-                </Button>
-            </motion.div>
+                </button>
+            </div>
         );
     }
 
     return (
-        <div className="space-y-6 sm:space-y-8">
-            {/* Admin Header */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-            >
-                <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Admin Panel</h2>
-                <div className="flex items-center gap-2 text-sm text-zinc-600">
-                    <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                    <span>{user.email}</span>
-                    <span className="text-zinc-300">|</span>
-                    <button
-                        onClick={signOut}
-                        className="text-blue-500 font-medium hover:underline"
-                    >
-                        Đăng xuất
-                    </button>
+        <div className="space-y-10 text-zinc-700">
+            <header data-tap-zone="plain" className="space-y-6">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                    <h1 className="text-2xl font-semibold text-zinc-800">Admin</h1>
+                    <div className="flex items-center gap-4 text-sm text-zinc-500">
+                        <span>{user.email}</span>
+                        <button type="button" onClick={signOut} className="text-zinc-700">
+                            Đăng xuất
+                        </button>
+                    </div>
                 </div>
-            </motion.section>
-
-            {/* Admin Nav — styled like skill items */}
-            <motion.nav
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                className="flex flex-wrap gap-2 sm:gap-3"
-            >
-                {navItems.map(({ to, label, icon: Icon }) => (
-                    <NavLink
-                        key={to}
-                        to={to}
-                        className={({ isActive }) =>
-                            `flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-sm font-bold border-2 border-black rounded-lg transition-all duration-150 ${
-                                isActive
-                                    ? "bg-blue-300 shadow-secondary active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
-                                    : "bg-white hover:bg-blue-100"
-                            }`
-                        }
-                    >
-                        <Icon className="w-4 h-4" />
-                        {label}
-                    </NavLink>
-                ))}
-            </motion.nav>
-
-            {/* Section Divider */}
-            <div className="border-t-2 border-black/20"></div>
-
-            {/* Page Content */}
+                <nav aria-label="Admin sections">
+                    <ul className="flex flex-wrap gap-x-6 gap-y-2">
+                        {navItems.map(({ to, label }) => (
+                            <li key={to}>
+                                <NavLink
+                                    to={to}
+                                    className={({ isActive }) =>
+                                        cn(
+                                            "text-base",
+                                            isActive
+                                                ? "font-medium text-zinc-800"
+                                                : "text-zinc-500 hover:text-zinc-800"
+                                        )
+                                    }
+                                >
+                                    {label}
+                                </NavLink>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+            </header>
             <Outlet />
         </div>
     );

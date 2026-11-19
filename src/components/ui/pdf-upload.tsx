@@ -63,28 +63,30 @@ export function PdfUpload({
     return (
         <div className={`min-w-0 max-w-full ${className}`}>
             {value ? (
-                <div className="flex w-full min-w-0 items-start gap-2 px-3 py-2 border-2 border-black rounded-lg bg-zinc-50">
-                    <FileText className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                    <span className="min-w-0 flex-1 text-sm font-medium break-words [overflow-wrap:anywhere]" title={getFileName(value)}>
+                <div className="flex w-full min-w-0 items-start gap-2 rounded-md bg-zinc-50 px-3 py-2.5">
+                    <FileText className="mt-0.5 h-5 w-5 shrink-0 text-red-500" />
+                    <span
+                        className="min-w-0 flex-1 break-words text-base font-medium text-zinc-700 [overflow-wrap:anywhere]"
+                        title={getFileName(value)}
+                    >
                         {getFileName(value)}
                     </span>
                     <button
                         type="button"
                         onClick={() => onChange("")}
-                        className="shrink-0 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-black cursor-pointer"
+                        className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-red-500 text-white"
                         aria-label="Xóa file PDF"
                     >
-                        <X className="w-3 h-3" />
+                        <X className="h-4 w-4" />
                     </button>
                 </div>
             ) : (
                 <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
-                    className="border border-zinc-300 hover:border-black"
+                    className="h-auto cursor-pointer gap-1.5 px-0 text-base font-medium text-zinc-700 hover:bg-transparent hover:underline"
                 >
                     {uploading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -101,7 +103,7 @@ export function PdfUpload({
                 onChange={handleUpload}
                 className="hidden"
             />
-            {error && <p className="text-red-500 text-xs mt-1 font-semibold">{error}</p>}
+            {error && <p className="mt-1.5 text-sm font-semibold text-red-600">{error}</p>}
         </div>
     );
 }

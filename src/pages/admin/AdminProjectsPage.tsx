@@ -16,33 +16,36 @@ import {
 } from "@/hooks/useProjectsData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { 
-    Plus, 
-    Trash2, 
-    Save, 
-    Loader2, 
-    Eye, 
-    EyeOff, 
-    FolderOpen, 
-    Search, 
-    SlidersHorizontal,
-    Globe
+import {
+    Plus,
+    Trash2,
+    Save,
+    Loader2,
+    Eye,
+    EyeOff,
+    Search,
 } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
 const inputClass =
-    "w-full border border-zinc-300 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all";
+    "w-full text-base px-3 py-2.5 bg-zinc-50 rounded-md text-zinc-700 placeholder:text-zinc-400 focus:bg-white focus:outline-none";
+
+const labelClass = "block text-sm font-medium text-zinc-600";
+const saveButtonClass =
+    "h-auto cursor-pointer gap-1.5 rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-bold text-zinc-800 shadow-[1px_1px_0_#000] transition-all duration-200 hover:bg-blue-100 active:translate-x-px active:translate-y-px active:shadow-none sm:text-sm";
+const textActionClass =
+    "h-auto cursor-pointer gap-1.5 px-0 text-base font-medium text-zinc-700 hover:bg-transparent hover:underline";
 
 const statusOptions: ProjectStatus[] = ["Production", "Staging", "In Development", "Prototype", "Planned - Draft", "Retired"];
 
-const statusStyles: Record<ProjectStatus, string> = {
-    Production: "bg-zinc-50 text-green-500 border-zinc-200",
-    Staging: "bg-zinc-50 text-blue-500 border-zinc-200",
-    "In Development": "bg-zinc-50 text-red-500 border-zinc-200",
-    Prototype: "bg-zinc-50 text-purple-500 border-zinc-200",
-    "Planned - Draft": "bg-zinc-50 text-amber-600 border-zinc-200",
-    Concept: "bg-zinc-50 text-purple-500 border-zinc-200",
-    Retired: "bg-zinc-50 text-pink-400 border-zinc-200",
+const statusTextClass: Record<ProjectStatus, string> = {
+    Production: "text-green-700",
+    Staging: "text-blue-700",
+    "In Development": "text-red-600",
+    Prototype: "text-purple-700",
+    "Planned - Draft": "text-amber-700",
+    Concept: "text-purple-700",
+    Retired: "text-pink-600",
 };
 
 interface LangItem {
@@ -72,6 +75,9 @@ const langList: readonly LangItem[] = [
     { key: "el", label: "🇬🇷 Ελληνικά", suffix: "El", placeholder: "Ελληνικά..." }
 ];
 
+function SectionHeading({ children }: { children: ReactNode }) {
+    return <h3 className="text-lg font-bold text-zinc-800">{children}</h3>;
+}
 
 function SectionSwitch({ on, onClick }: { on: boolean; onClick: () => void }) {
     return (
@@ -79,13 +85,13 @@ function SectionSwitch({ on, onClick }: { on: boolean; onClick: () => void }) {
             type="button"
             onClick={onClick}
             aria-pressed={on}
-            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border border-zinc-200 transition-colors duration-200 ease-in-out focus:outline-none ${
-                on ? "bg-green-500" : "bg-zinc-200"
+            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-zinc-300 ${
+                on ? "bg-green-500" : "bg-zinc-300"
             }`}
         >
             <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    on ? "translate-x-5" : "translate-x-0"
+                className={`pointer-events-none mt-0.5 inline-block h-6 w-6 transform rounded-full bg-white transition duration-200 ease-in-out ${
+                    on ? "translate-x-[22px]" : "translate-x-0.5"
                 }`}
             />
         </button>
@@ -100,21 +106,29 @@ function generateId(title: string): string {
         .slice(0, 50);
 }
 
+function listTitle(project: { title?: string; id?: string }): string {
+    const title = (project.title || "").trim();
+    if (title) return title;
+    const id = (project.id || "").trim();
+    if (id) return id;
+    return "Untitled";
+}
+
 export function AdminProjectsPage({ type }: { type: CollectionType }) {
     const defaultData = type === "playground" ? defaultPlayground : defaultProjectsList;
     const [projects, setProjects] = useState<Project[]>(defaultData);
     const [loading, setLoading] = useState(true);
     const [savingIndex, setSavingIndex] = useState<number | null>(null);
     const [messages, setMessages] = useState<Record<number, string>>({});
-    
+
     // Select state using index of full projects array
     const [selectedIndex, setSelectedIndex] = useState<number | null>(0);
     const [activeLangTab, setActiveLangTab] = useState<string>("en");
-    
+
     // Filter & Search states
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState<string>("all");
-    
+
     const title = type === "playground" ? "Playground" : "Projects";
     const itemLabel = type === "playground" ? "experiment" : "project";
     const otherType: CollectionType = type === "playground" ? "projects" : "playground";
@@ -249,7 +263,7 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
             <div className="flex items-center justify-center py-24">
                 <div className="text-center space-y-3">
                     <Loader2 className="w-8 h-8 animate-spin mx-auto text-zinc-500" />
-                    <p className="text-xs text-zinc-500 font-semibold uppercase tracking-wider">Loading {title} list...</p>
+                    <p className="text-base text-zinc-600">Loading {title}…</p>
                 </div>
             </div>
         );
@@ -276,23 +290,22 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
         });
 
     return (
-        <div className="space-y-6 sm:space-y-8">
-            {/* Header */}
+        <div className="space-y-8">
             <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-200 pb-4"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-4"
             >
                 <div>
-                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-900">{title} Manager</h2>
-                    <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mt-0.5">
-                        <span className="font-bold text-zinc-900">{projects.length}</span> {itemLabel}s available
+                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-800">{title}</h2>
+                    <p className="text-base text-zinc-600 mt-1">
+                        <span className="font-semibold text-zinc-700">{projects.length}</span> {itemLabel}s
                     </p>
                 </div>
                 <Button
-                    variant="toolbar"
-                    size="sm"
-                    className="cursor-pointer font-semibold"
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
                     onClick={() => {
                         const newProject: Project = {
                             id: "",
@@ -312,33 +325,32 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                 </Button>
             </motion.div>
 
-            {/* Master-Detail Layout Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                
-                {/* 1. Master List Pane (Left Column) */}
-                <div className="lg:col-span-1 space-y-4">
-                    {/* Search & Filter Controls */}
-                    <div className="border border-zinc-200 rounded-xl bg-zinc-50/50 p-4 space-y-3 shadow-sm">
-                        <div className="relative">
-                            <Search className="w-4 h-4 absolute left-3 top-3 text-zinc-400" />
-                            <input
-                                type="text"
-                                placeholder="Search by name, tags..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full bg-white border border-zinc-300 rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-                            />
-                        </div>
-                        <div className="flex gap-2">
-                            <div className="w-9 h-9 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0">
-                                <SlidersHorizontal className="w-4 h-4 text-zinc-500" />
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)] gap-10 items-start">
+                <div className="space-y-5">
+                    <div className="space-y-4">
+                        <div className="space-y-1.5">
+                            <label className={labelClass} htmlFor={`${type}-search`}>Search</label>
+                            <div className="relative">
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
+                                <input
+                                    id={`${type}-search`}
+                                    type="text"
+                                    placeholder="Title, tags, or id"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full text-base pl-10 pr-3 py-2.5 bg-zinc-50 rounded-md text-zinc-700 placeholder:text-zinc-400 focus:bg-white focus:outline-none"
+                                />
                             </div>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className={labelClass} htmlFor={`${type}-status-filter`}>Status</label>
                             <select
+                                id={`${type}-status-filter`}
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full bg-white border border-zinc-300 rounded-lg px-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
+                                className={inputClass}
                             >
-                                <option value="all">All Statuses</option>
+                                <option value="all">All statuses</option>
                                 <option value="visible">Visible</option>
                                 <option value="hidden">Hidden</option>
                                 {[...statusOptions, "Concept" as const].map(opt => (
@@ -348,72 +360,40 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                         </div>
                     </div>
 
-                    {/* Master Items Scroll Area */}
-                    <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
+                    <p className="text-sm text-zinc-600">
+                        {filteredProjects.length} shown
+                    </p>
+
+                    <div className="max-h-[70vh] overflow-y-auto">
                         {filteredProjects.map((proj) => {
                             const isSelected = proj.originalIndex === selectedIndex;
                             return (
                                 <div
                                     key={proj.originalIndex}
                                     onClick={() => setSelectedIndex(proj.originalIndex)}
-                                    className={`group flex items-center justify-between p-3 border rounded-xl cursor-pointer transition-all duration-200 ${
-                                        isSelected
-                                            ? "bg-zinc-100 border-zinc-400 shadow-sm"
-                                            : "bg-white hover:bg-zinc-50/80 border-zinc-200 shadow-sm"
-                                    } ${proj.hidden ? "opacity-75" : ""}`}
+                                    className={`flex items-start gap-3 px-2 py-3 cursor-pointer rounded-md ${
+                                        isSelected ? "bg-zinc-100" : "hover:bg-zinc-50"
+                                    } ${proj.hidden ? "opacity-70" : ""}`}
                                 >
-                                    <div className="flex items-center gap-3 overflow-hidden flex-1">
-                                        {/* Image Thumbnail Preview */}
-                                        {proj.iconUrl ? (
-                                            <img
-                                                src={proj.iconUrl}
-                                                alt=""
-                                                className="w-10 h-10 rounded-lg border border-zinc-200 bg-white object-contain flex-shrink-0"
-                                            />
-                                        ) : proj.imageUrl ? (
-                                            <img
-                                                src={proj.imageUrl}
-                                                alt=""
-                                                className="w-10 h-10 rounded-lg border border-zinc-200 bg-white object-cover flex-shrink-0"
-                                            />
-                                        ) : (
-                                            <div className="w-10 h-10 rounded-lg border border-zinc-200 bg-zinc-50 flex items-center justify-center shrink-0">
-                                                <Globe className="w-4 h-4 text-zinc-400" />
-                                            </div>
-                                        )}
-                                        
-                                        <div className="truncate flex-1">
-                                            <p className="font-semibold text-sm text-zinc-900 truncate">{proj.title || `Unnamed (${proj.originalIndex + 1})`}</p>
-                                            
-                                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                                                <span className={`text-[10px] font-medium border px-1.5 py-0.5 rounded-full ${statusStyles[proj.status]}`}>
-                                                    {proj.status}
-                                                </span>
-                                                {proj.hidden && (
-                                                    <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 border border-zinc-200 px-1.5 py-0.5 rounded-full flex items-center gap-1">
-                                                        <EyeOff className="w-3 h-3" /> Hidden
-                                                    </span>
-                                                )}
-                                                
-                                                {/* Language indicator badges */}
-                                                <div className="flex flex-wrap items-center gap-1 ml-1 text-[10px] font-medium max-w-[140px]">
-                                                    <span className="text-blue-600 font-semibold">EN</span>
-                                                    {langList.map((lang) => {
-                                                        if (lang.key === "en") return null;
-                                                        if (!languageOffered(proj, lang.suffix)) return null;
-                                                        return (
-                                                            <span key={lang.key} className="text-green-600 font-bold uppercase text-[9px]">
-                                                                {lang.key}
-                                                            </span>
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        </div>
+                                    {(proj.iconUrl || proj.imageUrl) && (
+                                        <img
+                                            src={proj.iconUrl || proj.imageUrl}
+                                            alt=""
+                                            className={`h-12 w-12 shrink-0 rounded-md bg-zinc-100 ${proj.iconUrl ? "object-contain" : "object-cover"}`}
+                                        />
+                                    )}
+
+                                    <div className="min-w-0 flex-1">
+                                        <p className="truncate text-base font-semibold text-zinc-800">
+                                            {listTitle(proj)}
+                                        </p>
+                                        <p className={`mt-0.5 text-sm font-medium ${statusTextClass[proj.status] ?? "text-zinc-700"}`}>
+                                            {proj.status || "No status"}
+                                            {proj.hidden ? <span className="font-normal text-zinc-500"> · Hidden</span> : null}
+                                        </p>
                                     </div>
 
-                                    {/* Position Re-ordering handle */}
-                                    <div className="flex items-center gap-1 ml-2 shrink-0">
+                                    <div className="shrink-0">
                                         <MoveButtons
                                             index={proj.originalIndex}
                                             total={projects.length}
@@ -431,497 +411,480 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                                 </div>
                             );
                         })}
-                        
+
                         {filteredProjects.length === 0 && (
-                            <div className="p-8 text-center border border-dashed border-zinc-200 rounded-xl text-zinc-500 text-sm bg-zinc-50/50">
-                                No {itemLabel}s found.
-                            </div>
+                            <p className="py-8 text-base text-zinc-500">No {itemLabel}s found.</p>
                         )}
                     </div>
                 </div>
 
-                {/* 2. Detail Editor Pane (Right Column) */}
-                <div className="lg:col-span-2">
+                <div>
                     {selectedIndex !== null && projects[selectedIndex] ? (
                         (() => {
                             const project = projects[selectedIndex];
                             const index = selectedIndex;
                             return (
-                                <div className="border border-zinc-200 rounded-xl bg-white shadow-sm overflow-hidden">
-                                    {/* macOS Window Header */}
-                                    <div className="flex items-center justify-between px-4 py-3 bg-zinc-50 border-b border-zinc-200">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/10"></div>
-                                            <div className="w-2.5 h-2.5 rounded-full bg-yellow-400 border border-yellow-500/10"></div>
-                                            <div className="w-2.5 h-2.5 rounded-full bg-green-400 border border-green-500/10"></div>
-                                        </div>
-                                        <span className="text-xs font-mono font-medium text-zinc-400">
-                                            EDITING: {project.title || `Unnamed ${itemLabel} (${index + 1})`}
-                                        </span>
+                                <div className="space-y-10">
+                                    <div>
+                                        <h2 className="text-xl font-bold text-zinc-800">{listTitle(project)}</h2>
+                                        <p className="mt-1 text-base text-zinc-600">
+                                            <span className={statusTextClass[project.status] ?? "text-zinc-700"}>{project.status}</span>
+                                            {project.hidden ? " · Hidden" : " · Public"}
+                                        </p>
                                     </div>
 
-                                    {/* Main Form Fields Container */}
-                                    <div className="p-4 sm:p-6 space-y-6">
-                                        
-                                        {/* Action Bar (Visibility and Delete) */}
-                                        <div className="flex items-center justify-between pb-4 border-b border-zinc-100">
+                                    <section className="space-y-5">
+                                        <SectionHeading>Status and links</SectionHeading>
+
+                                        <div className="flex flex-wrap items-center gap-2">
                                             <Button
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => updateProject(index, { hidden: !project.hidden })}
-                                                className={`gap-1.5 font-semibold text-xs transition-colors border border-zinc-200 ${
-                                                    project.hidden ? "bg-zinc-100 text-zinc-700 hover:bg-zinc-200" : "bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
-                                                }`}
                                             >
                                                 {project.hidden ? (
                                                     <>
-                                                        <EyeOff className="w-3.5 h-3.5" />
-                                                        STATUS: HIDDEN
+                                                        <EyeOff className="w-4 h-4" />
+                                                        Hidden
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Eye className="w-3.5 h-3.5" />
-                                                        STATUS: PUBLIC
+                                                        <Eye className="w-4 h-4" />
+                                                        Public
                                                     </>
                                                 )}
                                             </Button>
-
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => moveToOther(index)}
-                                                    disabled={savingIndex === index}
-                                                    title={`Chuyển item này sang ${otherLabel}`}
-                                                    className="text-zinc-500 hover:text-zinc-700 hover:bg-zinc-50 gap-1.5 text-xs font-semibold"
-                                                >
-                                                    MOVE TO {otherLabel.toUpperCase()}
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    onClick={() => {
-                                                        const updated = projects.filter((_, i) => i !== index);
-                                                        setProjects(updated);
-                                                        setSelectedIndex(updated.length > 0 ? 0 : null);
-                                                    }}
-                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 gap-1.5 text-xs font-semibold"
-                                                >
-                                                    <Trash2 className="w-3.5 h-3.5" />
-                                                    DELETE {itemLabel.toUpperCase()}
-                                                </Button>
-                                            </div>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => moveToOther(index)}
+                                                disabled={savingIndex === index}
+                                                title={`Chuyển item này sang ${otherLabel}`}
+                                            >
+                                                Move to {otherLabel}
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => {
+                                                    const updated = projects.filter((_, i) => i !== index);
+                                                    setProjects(updated);
+                                                    setSelectedIndex(updated.length > 0 ? 0 : null);
+                                                }}
+                                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                                Delete {itemLabel}
+                                            </Button>
                                         </div>
 
-                                        {/* SECTION A: Images & Media Uploads */}
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                            <div className="border border-zinc-200 rounded-xl bg-zinc-50/50 p-4">
-                                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-zinc-700">App Icon / Logo</label>
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>ID (URL slug)</label>
+                                            <input
+                                                type="text"
+                                                value={project.id}
+                                                onChange={(e) => updateProject(index, { id: e.target.value })}
+                                                className={inputClass}
+                                                placeholder="project-slug"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>Status</label>
+                                            <select
+                                                value={project.status}
+                                                onChange={(e) => updateProject(index, { status: e.target.value as ProjectStatus })}
+                                                className={inputClass}
+                                            >
+                                                { (project.status === "Concept" ? ["Concept" as ProjectStatus, ...statusOptions] : statusOptions).map((s) => (
+                                                    <option key={s} value={s}>{s}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>GitHub URL</label>
+                                            <input
+                                                type="text"
+                                                value={project.githubUrl || ""}
+                                                onChange={(e) => updateProject(index, { githubUrl: e.target.value || undefined })}
+                                                className={inputClass}
+                                                placeholder="https://github.com/..."
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>Live Demo URL</label>
+                                            <input
+                                                type="text"
+                                                value={project.liveUrl || ""}
+                                                onChange={(e) => updateProject(index, { liveUrl: e.target.value || undefined })}
+                                                className={inputClass}
+                                                placeholder="https://..."
+                                            />
+                                        </div>
+                                    </section>
+
+                                    <section className="space-y-5">
+                                        <SectionHeading>Images</SectionHeading>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                            <div className="space-y-1.5">
+                                                <label className={labelClass}>App Icon / Logo</label>
                                                 <ImageUpload
                                                     value={project.iconUrl || ""}
                                                     onChange={(url) => updateProject(index, { iconUrl: url })}
                                                     folder="projects"
                                                 />
-                                                <p className="text-[10px] text-zinc-400 mt-2 font-medium">Thumbnail shown in the main list.</p>
+                                                <p className="text-sm text-zinc-500">Thumbnail shown in the main list.</p>
                                             </div>
-                                            <div className="border border-zinc-200 rounded-xl bg-zinc-50/50 p-4">
-                                                <label className="block text-xs font-bold uppercase tracking-wider mb-2 text-zinc-700">Banner Image</label>
+                                            <div className="space-y-1.5">
+                                                <label className={labelClass}>Banner Image</label>
                                                 <ImageUpload
                                                     value={project.imageUrl || ""}
                                                     onChange={(url) => updateProject(index, { imageUrl: url })}
                                                     folder="projects"
                                                 />
-                                                <p className="text-[10px] text-zinc-400 mt-2 font-medium">16:9 banner shown at the top of detail page.</p>
+                                                <p className="text-sm text-zinc-500">16:9 banner shown at the top of the detail page.</p>
                                             </div>
                                         </div>
+                                    </section>
 
-                                        {/* SECTION B: Core Settings (Metadata & Links) */}
-                                        <div className="border border-zinc-200 p-4 rounded-xl bg-zinc-50/50 space-y-4">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Link Configuration & Metadata</h3>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                                <div>
-                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">ID (URL slug)</label>
-                                                    <input
-                                                        type="text"
-                                                        value={project.id}
-                                                        onChange={(e) => updateProject(index, { id: e.target.value })}
-                                                        className={inputClass}
-                                                        placeholder="project-slug"
-                                                    />
-                                                </div>
+                                    <section className="space-y-5">
+                                        <SectionHeading>Translations</SectionHeading>
 
-                                                <div>
-                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Status</label>
-                                                    <select
-                                                        value={project.status}
-                                                        onChange={(e) => updateProject(index, { status: e.target.value as ProjectStatus })}
-                                                        className={inputClass}
+                                        <div className="flex flex-wrap gap-2">
+                                            {langList.map((lang) => {
+                                                const isTabActive = activeLangTab === lang.key;
+                                                const suffix = lang.suffix;
+                                                let dotColor = "bg-green-500";
+                                                if (lang.key === "ar") dotColor = "bg-purple-500";
+                                                else if (lang.key !== "vi" && lang.key !== "en") dotColor = "bg-blue-500";
+
+                                                return (
+                                                    <button
+                                                        key={lang.key}
+                                                        type="button"
+                                                        onClick={() => setActiveLangTab(lang.key)}
+                                                        aria-pressed={isTabActive}
+                                                        className={`inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-semibold cursor-pointer ${
+                                                            isTabActive ? "bg-zinc-100 text-zinc-800" : "text-zinc-600 hover:bg-zinc-50"
+                                                        }`}
                                                     >
-                                                        { (project.status === "Concept" ? ["Concept" as ProjectStatus, ...statusOptions] : statusOptions).map((s) => (
-                                                            <option key={s} value={s}>{s}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-
-                                                <div>
-                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">GitHub URL</label>
-                                                    <input
-                                                        type="text"
-                                                        value={project.githubUrl || ""}
-                                                        onChange={(e) => updateProject(index, { githubUrl: e.target.value || undefined })}
-                                                        className={inputClass}
-                                                        placeholder="https://github.com/..."
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Live Demo URL</label>
-                                                    <input
-                                                        type="text"
-                                                        value={project.liveUrl || ""}
-                                                        onChange={(e) => updateProject(index, { liveUrl: e.target.value || undefined })}
-                                                        className={inputClass}
-                                                        placeholder="https://..."
-                                                    />
-                                                </div>
-                                            </div>
+                                                        {lang.label}
+                                                        {suffix && languageOffered(project, suffix) && (
+                                                            <span className={`h-1.5 w-1.5 rounded-full ${dotColor}`} />
+                                                        )}
+                                                    </button>
+                                                );
+                                            })}
                                         </div>
 
-                                        {/* SECTION C: Bilingual & Multilingual Tabbed Translations */}
-                                        <div className="border border-zinc-200 rounded-xl overflow-hidden shadow-sm">
-                                            {/* Tabs Header - Responsive grid wrapping at max 5 columns */}
-                                            <div className="grid grid-cols-2 sm:grid-cols-5 bg-zinc-50 border-b border-zinc-200">
-                                                {langList.map((lang) => {
-                                                    const isTabActive = activeLangTab === lang.key;
-                                                    const suffix = lang.suffix;
-                                                    // Set up badge color for dynamic tabs
-                                                    let dotColor = "bg-green-500";
-                                                    if (lang.key === "ar") dotColor = "bg-purple-500";
-                                                    else if (lang.key !== "vi" && lang.key !== "en") dotColor = "bg-blue-500";
+                                        {langList.map((lang) => {
+                                            if (activeLangTab !== lang.key) return null;
 
-                                                    return (
-                                                        <button
-                                                            key={lang.key}
-                                                            type="button"
-                                                            onClick={() => setActiveLangTab(lang.key)}
-                                                            className={`py-2.5 px-3 text-xs font-semibold border-r border-b border-zinc-200 last:border-r-0 transition-colors cursor-pointer inline-flex items-center justify-center gap-1.5 ${
-                                                                isTabActive ? "bg-white text-zinc-900 font-bold" : "text-zinc-500 hover:bg-zinc-100/50 hover:text-zinc-700"
-                                                            }`}
-                                                        >
-                                                            {lang.label}
-                                                            {suffix && languageOffered(project, suffix) && (
-                                                                <span className={`w-1.5 h-1.5 inline-block rounded-full ${dotColor}`} />
+                                            const suffix = lang.suffix;
+                                            const titleKey = `title${suffix}`;
+                                            const descKey = `description${suffix}`;
+                                            const align = lang.dir === "rtl" ? "text-right" : "";
+                                            const row = lang.dir === "rtl" ? "flex-row-reverse" : "";
+                                            const sectionField = (field: string, label: string, editor: ReactNode) => {
+                                                const on = sectionLanguageOn(project, field, suffix);
+                                                return (
+                                                    <div className={`space-y-1.5 ${align}`}>
+                                                        <div className={`flex items-center justify-between gap-3 ${row}`}>
+                                                            <label className={`${labelClass} ${align}`}>
+                                                                {label} ({lang.key.toUpperCase()})
+                                                            </label>
+                                                            {(suffix || englishHideableFields.has(field)) && (
+                                                                <span className={`inline-flex items-center gap-2 ${row}`}>
+                                                                    <span className="text-sm text-zinc-600">{on ? "On site" : "Off site"}</span>
+                                                                    <SectionSwitch
+                                                                        on={on}
+                                                                        onClick={() => updateProject(index, { [sectionShowKey(field, suffix)]: !on })}
+                                                                    />
+                                                                </span>
                                                             )}
-                                                        </button>
-                                                    );
-                                                })}
-                                            </div>
-
-                                            {/* Tab Panel Content */}
-                                            <div className="p-4 bg-white">
-                                                {langList.map((lang) => {
-                                                    if (activeLangTab !== lang.key) return null;
-                                                    
-                                                    const suffix = lang.suffix;
-                                                    const titleKey = `title${suffix}`;
-                                                    const descKey = `description${suffix}`;
-                                                    const align = lang.dir === "rtl" ? "text-right" : "";
-                                                    const row = lang.dir === "rtl" ? "flex-row-reverse" : "";
-                                                    const sectionField = (field: string, label: string, editor: ReactNode) => {
-                                                        const on = sectionLanguageOn(project, field, suffix);
-                                                        return (
-                                                            <div className={align}>
-                                                                <div className={`mb-1 flex items-center justify-between gap-3 ${row}`}>
-                                                                    <label className={`block text-xs font-semibold uppercase text-zinc-600 ${align}`}>
-                                                                        {label} ({lang.key.toUpperCase()})
-                                                                    </label>
-                                                                    {(suffix || englishHideableFields.has(field)) && (
-                                                                        <SectionSwitch
-                                                                            on={on}
-                                                                            onClick={() => updateProject(index, { [sectionShowKey(field, suffix)]: !on })}
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                                {editor}
-                                                            </div>
-                                                        );
-                                                    };
-
-                                                    return (
-                                                        <div key={lang.key} className="space-y-4" dir={lang.dir || "ltr"}>
-                                                            <div className={align}>
-                                                                <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${align}`}>
-                                                                    Title ({lang.key.toUpperCase()})
-                                                                </label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={project[titleKey] || ""}
-                                                                    onChange={(e) => {
-                                                                        const updates: any = { [titleKey]: e.target.value };
-                                                                        if (lang.key === "en" && !project.id) {
-                                                                            updates.id = generateId(e.target.value);
-                                                                        }
-                                                                        updateProject(index, updates);
-                                                                    }}
-                                                                    className={`${inputClass} ${align}`}
-                                                                    placeholder={`Title in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                    dir={lang.dir || "ltr"}
-                                                                />
-                                                            </div>
-
-                                                            <div className={align}>
-                                                                <label className={`block text-xs font-semibold mb-1 uppercase text-zinc-600 ${align}`}>
-                                                                    Short Description ({lang.key.toUpperCase()})
-                                                                </label>
-                                                                <textarea
-                                                                    value={project[descKey] || ""}
-                                                                    onChange={(e) => updateProject(index, { [descKey]: e.target.value })}
-                                                                    className={`${inputClass} min-h-[60px] leading-relaxed ${align}`}
-                                                                    rows={2}
-                                                                    placeholder={`Short description in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                    dir={lang.dir || "ltr"}
-                                                                />
-                                                            </div>
-
-                                                            {sectionField("fullDescription", "Full Description", (
-                                                                <textarea
-                                                                    value={project[`fullDescription${suffix}`] || ""}
-                                                                    onChange={(e) => updateProject(index, { [`fullDescription${suffix}`]: e.target.value })}
-                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
-                                                                    rows={3}
-                                                                    placeholder={`Full description in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                    dir={lang.dir || "ltr"}
-                                                                />
-                                                            ))}
-
-                                                            {sectionField("storyBehind", "Story Behind", (
-                                                                <textarea
-                                                                    value={project[`storyBehind${suffix}`] || ""}
-                                                                    onChange={(e) => updateProject(index, { [`storyBehind${suffix}`]: e.target.value })}
-                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
-                                                                    rows={3}
-                                                                    placeholder={`The story behind in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                    dir={lang.dir || "ltr"}
-                                                                />
-                                                            ))}
-
-                                                            {sectionField("howIBuilt", "How I Built It", (
-                                                                <textarea
-                                                                    value={project[`howIBuilt${suffix}`] || ""}
-                                                                    onChange={(e) => updateProject(index, { [`howIBuilt${suffix}`]: e.target.value })}
-                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
-                                                                    rows={3}
-                                                                    placeholder={`How it was built in ${lang.label.split(" ").slice(1).join(" ")}...`}
-                                                                    dir={lang.dir || "ltr"}
-                                                                />
-                                                            ))}
-
-                                                            {sectionField("keyFeatures", "Key Features (One per line)", (
-                                                                <textarea
-                                                                    value={(project[`keyFeatures${suffix}`] || []).join("\n")}
-                                                                    onChange={(e) => updateProject(index, { [`keyFeatures${suffix}`]: e.target.value.split("\n") })}
-                                                                    className={`${inputClass} min-h-[100px] leading-relaxed ${align}`}
-                                                                    rows={4}
-                                                                    placeholder={"Feature 1\nFeature 2..."}
-                                                                    dir={lang.dir || "ltr"}
-                                                                />
-                                                            ))}
                                                         </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+                                                        {editor}
+                                                    </div>
+                                                );
+                                            };
 
-                                        {/* SECTION D: Taxonomy & Classifications (Roles, Topics, Tags) */}
-                                        <div className="space-y-4 bg-zinc-50/50 p-4 border border-zinc-200 rounded-xl">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Taxonomy & Classification</h3>
-                                            
-                                            {/* Roles */}
-                                            <div>
-                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Roles / Job Types (Blue label)</label>
-                                                <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                                                    {(project.roles || []).map((role, roleIndex) => (
-                                                        <span
-                                                            key={roleIndex}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-blue-50 border border-blue-200 text-blue-700 rounded-lg"
-                                                        >
-                                                            {role}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    const newRoles = (project.roles || []).filter((_, i) => i !== roleIndex);
-                                                                    updateProject(index, { roles: newRoles });
-                                                                }}
-                                                                className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
-                                                            >
-                                                                ×
-                                                            </button>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Enter new role and press Enter (e.g. Lead Dev, Designer)..."
-                                                    className={inputClass}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Enter") {
-                                                            e.preventDefault();
-                                                            const val = e.currentTarget.value.trim();
-                                                            if (val) {
-                                                                const cur = project.roles || [];
-                                                                if (!cur.includes(val)) {
-                                                                    updateProject(index, { roles: [...cur, val] });
+                                            return (
+                                                <div key={lang.key} className="space-y-5" dir={lang.dir || "ltr"}>
+                                                    <div className={`space-y-1.5 ${align}`}>
+                                                        <label className={`${labelClass} ${align}`}>
+                                                            Title ({lang.key.toUpperCase()})
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={project[titleKey] || ""}
+                                                            onChange={(e) => {
+                                                                const updates: any = { [titleKey]: e.target.value };
+                                                                if (lang.key === "en" && !project.id) {
+                                                                    updates.id = generateId(e.target.value);
                                                                 }
-                                                                e.currentTarget.value = "";
-                                                            }
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-
-                                            {/* Topics */}
-                                            <div>
-                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Topics / Hashtags (Gray label)</label>
-                                                <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                                                    {(project.topics || []).map((topic, topicIndex) => (
-                                                        <span
-                                                            key={topicIndex}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
-                                                        >
-                                                            #{topic.toLowerCase().replace(/\s+/g, "-")}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
-                                                                    updateProject(index, { topics: newTopics });
-                                                                }}
-                                                                className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
-                                                            >
-                                                                ×
-                                                            </button>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Enter new topic and press Enter (e.g. automation, education)..."
-                                                    className={inputClass}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Enter") {
-                                                            e.preventDefault();
-                                                            const val = e.currentTarget.value.trim();
-                                                            if (val) {
-                                                                const cur = project.topics || [];
-                                                                if (!cur.includes(val)) {
-                                                                    updateProject(index, { topics: [...cur, val] });
-                                                                }
-                                                                e.currentTarget.value = "";
-                                                            }
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-
-                                            {/* Tags */}
-                                            <div>
-                                                <label className="block text-xs font-semibold mb-1 text-zinc-600 uppercase">Tech Stack / Tags (Black label)</label>
-                                                <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                                                    {(project.tags || []).map((tag, tagIndex) => (
-                                                        <span
-                                                            key={tagIndex}
-                                                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold bg-zinc-50 border border-zinc-200 text-zinc-800 rounded-lg"
-                                                        >
-                                                            {tag}
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => removeTag(index, tagIndex)}
-                                                                className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
-                                                            >
-                                                                ×
-                                                            </button>
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    placeholder="Enter tech tag and press Enter (e.g. React, Docker)..."
-                                                    className={inputClass}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Enter") {
-                                                            e.preventDefault();
-                                                            addTag(index, e.currentTarget.value);
-                                                            e.currentTarget.value = "";
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* SECTION E: Gallery Images Grid */}
-                                        <div className="border border-zinc-200 p-4 rounded-xl bg-zinc-50/50 space-y-4">
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-800 border-b border-zinc-100 pb-2">Gallery Images</h3>
-                                            
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                {(project.images || []).map((imgUrl, imgIndex) => (
-                                                    <div key={imgIndex} className="border border-zinc-200 rounded-xl bg-white p-3 flex flex-col justify-between">
-                                                        <div className="flex justify-between items-center mb-2">
-                                                            <span className="text-[10px] font-bold text-zinc-400">IMAGE {imgIndex + 1}</span>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 w-7 h-7"
-                                                                onClick={() => {
-                                                                    const newImages = (project.images || []).filter((__, i) => i !== imgIndex);
-                                                                    updateProject(index, { images: newImages });
-                                                                }}
-                                                            >
-                                                                <Trash2 className="w-3.5 h-3.5" />
-                                                            </Button>
-                                                        </div>
-                                                        <ImageUpload
-                                                            value={imgUrl || ""}
-                                                            onChange={(url) => {
-                                                                const newImages = [...(project.images || [])];
-                                                                newImages[imgIndex] = url;
-                                                                updateProject(index, { images: newImages });
+                                                                updateProject(index, updates);
                                                             }}
-                                                            folder="projects"
+                                                            className={`${inputClass} ${align}`}
+                                                            placeholder={`Title in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                            dir={lang.dir || "ltr"}
                                                         />
                                                     </div>
+
+                                                    <div className={`space-y-1.5 ${align}`}>
+                                                        <label className={`${labelClass} ${align}`}>
+                                                            Short Description ({lang.key.toUpperCase()})
+                                                        </label>
+                                                        <textarea
+                                                            value={project[descKey] || ""}
+                                                            onChange={(e) => updateProject(index, { [descKey]: e.target.value })}
+                                                            className={`${inputClass} min-h-[96px] leading-relaxed resize-y ${align}`}
+                                                            rows={3}
+                                                            placeholder={`Short description in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                            dir={lang.dir || "ltr"}
+                                                        />
+                                                    </div>
+
+                                                    {sectionField("fullDescription", "Full Description", (
+                                                        <textarea
+                                                            value={project[`fullDescription${suffix}`] || ""}
+                                                            onChange={(e) => updateProject(index, { [`fullDescription${suffix}`]: e.target.value })}
+                                                            className={`${inputClass} min-h-[140px] leading-relaxed resize-y ${align}`}
+                                                            rows={6}
+                                                            placeholder={`Full description in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                            dir={lang.dir || "ltr"}
+                                                        />
+                                                    ))}
+
+                                                    {sectionField("storyBehind", "Story Behind", (
+                                                        <textarea
+                                                            value={project[`storyBehind${suffix}`] || ""}
+                                                            onChange={(e) => updateProject(index, { [`storyBehind${suffix}`]: e.target.value })}
+                                                            className={`${inputClass} min-h-[140px] leading-relaxed resize-y ${align}`}
+                                                            rows={6}
+                                                            placeholder={`The story behind in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                            dir={lang.dir || "ltr"}
+                                                        />
+                                                    ))}
+
+                                                    {sectionField("howIBuilt", "How I Built It", (
+                                                        <textarea
+                                                            value={project[`howIBuilt${suffix}`] || ""}
+                                                            onChange={(e) => updateProject(index, { [`howIBuilt${suffix}`]: e.target.value })}
+                                                            className={`${inputClass} min-h-[140px] leading-relaxed resize-y ${align}`}
+                                                            rows={6}
+                                                            placeholder={`How it was built in ${lang.label.split(" ").slice(1).join(" ")}...`}
+                                                            dir={lang.dir || "ltr"}
+                                                        />
+                                                    ))}
+
+                                                    {sectionField("keyFeatures", "Key Features (One per line)", (
+                                                        <textarea
+                                                            value={(project[`keyFeatures${suffix}`] || []).join("\n")}
+                                                            onChange={(e) => updateProject(index, { [`keyFeatures${suffix}`]: e.target.value.split("\n") })}
+                                                            className={`${inputClass} min-h-[140px] leading-relaxed resize-y ${align}`}
+                                                            rows={6}
+                                                            placeholder={"Feature 1\nFeature 2..."}
+                                                            dir={lang.dir || "ltr"}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            );
+                                        })}
+                                    </section>
+
+                                    <section className="space-y-5">
+                                        <SectionHeading>Taxonomy</SectionHeading>
+
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>Roles / Job Types (Blue label)</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {(project.roles || []).map((role, roleIndex) => (
+                                                    <span
+                                                        key={roleIndex}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium bg-blue-50 text-blue-800 rounded-md"
+                                                    >
+                                                        {role}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newRoles = (project.roles || []).filter((_, i) => i !== roleIndex);
+                                                                updateProject(index, { roles: newRoles });
+                                                            }}
+                                                            className="text-base leading-none text-zinc-500 hover:text-red-600 cursor-pointer"
+                                                            aria-label={`Remove ${role}`}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </span>
                                                 ))}
                                             </div>
-                                            
-                                            <Button
-                                                variant="action"
-                                                size="sm"
-                                                className="mt-2 font-semibold text-xs border border-zinc-200"
-                                                onClick={() => {
-                                                    updateProject(index, { images: [...(project.images || []), ""] });
+                                            <input
+                                                type="text"
+                                                placeholder="Enter a role and press Enter"
+                                                className={inputClass}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault();
+                                                        const val = e.currentTarget.value.trim();
+                                                        if (val) {
+                                                            const cur = project.roles || [];
+                                                            if (!cur.includes(val)) {
+                                                                updateProject(index, { roles: [...cur, val] });
+                                                            }
+                                                            e.currentTarget.value = "";
+                                                        }
+                                                    }
                                                 }}
-                                            >
-                                                <Plus className="w-4 h-4 mr-1.5" />
-                                                Add new gallery image
-                                            </Button>
+                                            />
                                         </div>
-                                    </div>
 
-                                    {/* Sticky Save Footer */}
-                                    <div className="flex items-center gap-3 p-4 sm:px-6 sm:py-4 bg-zinc-50 border-t border-zinc-200">
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>Topics / Hashtags (Gray label)</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {(project.topics || []).map((topic, topicIndex) => (
+                                                    <span
+                                                        key={topicIndex}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-medium bg-zinc-100 text-zinc-700 rounded-md"
+                                                    >
+                                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newTopics = (project.topics || []).filter((_, i) => i !== topicIndex);
+                                                                updateProject(index, { topics: newTopics });
+                                                            }}
+                                                            className="text-base leading-none text-zinc-500 hover:text-red-600 cursor-pointer"
+                                                            aria-label={`Remove ${topic}`}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter a topic and press Enter"
+                                                className={inputClass}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault();
+                                                        const val = e.currentTarget.value.trim();
+                                                        if (val) {
+                                                            const cur = project.topics || [];
+                                                            if (!cur.includes(val)) {
+                                                                updateProject(index, { topics: [...cur, val] });
+                                                            }
+                                                            e.currentTarget.value = "";
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className={labelClass}>Tech Stack / Tags (Black label)</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {(project.tags || []).map((tag, tagIndex) => (
+                                                    <span
+                                                        key={tagIndex}
+                                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 text-sm font-semibold bg-zinc-200 text-zinc-800 rounded-md"
+                                                    >
+                                                        {tag}
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeTag(index, tagIndex)}
+                                                            className="text-base leading-none text-zinc-500 hover:text-red-600 cursor-pointer"
+                                                            aria-label={`Remove ${tag}`}
+                                                        >
+                                                            ×
+                                                        </button>
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter a tag and press Enter"
+                                                className={inputClass}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        e.preventDefault();
+                                                        addTag(index, e.currentTarget.value);
+                                                        e.currentTarget.value = "";
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+                                    </section>
+
+                                    <section className="space-y-5">
+                                        <SectionHeading>Gallery</SectionHeading>
+
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                                            {(project.images || []).map((imgUrl, imgIndex) => (
+                                                <div key={imgIndex} className="space-y-1.5">
+                                                    <div className="flex items-center justify-between gap-3">
+                                                        <span className={labelClass}>Image {imgIndex + 1}</span>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            onClick={() => {
+                                                                const newImages = (project.images || []).filter((__, i) => i !== imgIndex);
+                                                                updateProject(index, { images: newImages });
+                                                            }}
+                                                            aria-label={`Remove image ${imgIndex + 1}`}
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                    <ImageUpload
+                                                        value={imgUrl || ""}
+                                                        onChange={(url) => {
+                                                            const newImages = [...(project.images || [])];
+                                                            newImages[imgIndex] = url;
+                                                            updateProject(index, { images: newImages });
+                                                        }}
+                                                        folder="projects"
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {(project.images || []).length === 0 && (
+                                            <p className="text-base text-zinc-500">No gallery images yet.</p>
+                                        )}
+
                                         <Button
-                                            variant="action"
-                                            onClick={() => handleSave(index)} 
-                                            disabled={savingIndex === index} 
-                                            size="sm"
-                                            className="font-semibold cursor-pointer"
+                                            type="button"
+                                            variant="ghost"
+                                            className={textActionClass}
+                                            onClick={() => {
+                                                updateProject(index, { images: [...(project.images || []), ""] });
+                                            }}
+                                        >
+                                            <Plus className="w-4 h-4 mr-1.5" />
+                                            Add new gallery image
+                                        </Button>
+                                    </section>
+
+                                    <div className="sticky bottom-0 flex items-center gap-3 bg-white/95 py-4">
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            onClick={() => handleSave(index)}
+                                            disabled={savingIndex === index}
+                                            className={saveButtonClass}
                                         >
                                             {savingIndex === index ? <Loader2 className="w-4 h-4 animate-spin mr-1.5" /> : <Save className="w-4 h-4 mr-1.5" />}
                                             {savingIndex === index ? "Saving..." : "Save changes"}
                                         </Button>
                                         {messages[index] && (
-                                            <span className={`text-xs font-semibold px-2.5 py-1 rounded-lg border ${
-                                                messages[index].includes("successfully") 
-                                                    ? "bg-green-50 border-green-200 text-green-700" 
-                                                    : "bg-red-50 border-red-200 text-red-700"
+                                            <span className={`text-sm font-semibold ${
+                                                messages[index].includes("successfully")
+                                                    ? "text-green-700"
+                                                    : "text-red-600"
                                             }`}>
                                                 {messages[index]}
                                             </span>
@@ -931,14 +894,12 @@ export function AdminProjectsPage({ type }: { type: CollectionType }) {
                             );
                         })()
                     ) : (
-                        <div className="h-full min-h-[300px] flex flex-col items-center justify-center border border-dashed border-zinc-200 rounded-xl p-6 bg-zinc-50/50 text-zinc-400 text-center">
-                            <FolderOpen className="w-10 h-10 mb-2 text-zinc-300 animate-pulse" />
-                            <p className="font-semibold text-sm">No {itemLabel} selected</p>
-                            <p className="text-xs text-zinc-400 mt-1">Select an item from the left list or click Add new above.</p>
+                        <div className="py-16">
+                            <p className="text-lg font-bold text-zinc-800">No {itemLabel} selected</p>
+                            <p className="mt-1 text-base text-zinc-600">Choose one from the list, or add a new {itemLabel}.</p>
                         </div>
                     )}
                 </div>
-
             </div>
         </div>
     );

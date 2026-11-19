@@ -5,8 +5,14 @@ import { useAdminPlanner } from "@/hooks/useAdminPlanner";
 import type { PlannerItem } from "@/lib/takenote-api";
 import { CalendarDays, Loader2, Plus, Save, Trash2 } from "lucide-react";
 
-const inputClass =
-    "w-full border border-zinc-300 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all";
+const fieldClass =
+    "w-full text-base px-3 py-2.5 bg-zinc-50 rounded-md text-zinc-700 placeholder:text-zinc-400 focus:bg-white focus:outline-none";
+const saveButtonClass =
+    "h-auto cursor-pointer gap-1.5 rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-bold text-zinc-800 shadow-[1px_1px_0_#000] transition-all duration-200 hover:bg-blue-100 active:translate-x-px active:translate-y-px active:shadow-none sm:text-sm";
+const textActionClass =
+    "h-auto cursor-pointer gap-1.5 px-0 text-base font-medium text-zinc-700 hover:bg-transparent hover:underline";
+const deleteActionClass =
+    "h-auto cursor-pointer gap-1.5 px-0 text-base font-medium text-red-600 hover:bg-transparent hover:underline";
 
 const statusLabels: Record<PlannerItem["status"], string> = {
     todo: "To do",
@@ -15,6 +21,11 @@ const statusLabels: Record<PlannerItem["status"], string> = {
 };
 
 const columns: PlannerItem["status"][] = ["todo", "doing", "done"];
+
+function taskName(item: Pick<PlannerItem, "title">) {
+    const name = item.title.trim();
+    return name || "Untitled task";
+}
 
 export function AdminPlannerPage() {
     const { items, loading, error, reload, saveItem, removeItem, setItems } = useAdminPlanner();
@@ -92,7 +103,7 @@ export function AdminPlannerPage() {
     }
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <motion.section
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -100,119 +111,128 @@ export function AdminPlannerPage() {
                 className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
             >
                 <div>
-                    <h3 className="text-xl font-bold flex items-center gap-2">
+                    <h2 className="text-xl font-bold text-zinc-800 flex items-center gap-2">
                         <CalendarDays className="w-5 h-5" />
                         Planner
-                    </h3>
+                    </h2>
                     <p className="text-sm text-zinc-600 mt-1">
                         Personal task planner — shared TakeNote MongoDB.
                     </p>
                 </div>
-                <Button variant="toolbar" size="sm" onClick={() => handleCreate("todo")}>
+                <Button type="button" variant="ghost" onClick={() => handleCreate("todo")} className={textActionClass}>
                     <Plus className="w-4 h-4" />
                     New task
                 </Button>
             </motion.section>
 
             {error && (
-                <div className="border-2 border-red-300 bg-red-50 rounded-lg p-4 text-sm text-red-700">
-                    <p className="font-bold mb-1">Could not connect to TakeNote DB</p>
-                    <p>{error}</p>
-                    <button type="button" onClick={reload} className="mt-2 underline font-bold">
+                <section className="space-y-2">
+                    <h3 className="text-lg font-bold text-red-700">Could not connect to TakeNote DB</h3>
+                    <p className="text-base text-red-700">{error}</p>
+                    <button type="button" onClick={reload} className="text-sm font-medium text-zinc-700 underline">
                         Retry
                     </button>
-                </div>
+                </section>
             )}
 
-            <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_360px] gap-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] gap-10 items-start">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {columns.map((status) => (
-                        <div
-                            key={status}
-                            className="border-2 border-black rounded-lg bg-white overflow-hidden min-h-[320px]"
-                        >
-                            <div className="px-3 py-2 border-b-2 border-black bg-zinc-100 flex items-center justify-between">
-                                <span className="text-xs font-bold uppercase">{statusLabels[status]}</span>
+                        <section key={status} className="space-y-3 min-w-0">
+                            <div className="flex items-baseline justify-between gap-3">
+                                <h3 className="text-lg font-bold text-zinc-800">{statusLabels[status]}</h3>
                                 <button
                                     type="button"
                                     onClick={() => handleCreate(status)}
-                                    className="text-xs font-bold text-blue-600 hover:underline"
+                                    className="text-sm font-medium text-zinc-700 hover:underline"
                                 >
-                                    + Add
+                                    Add
                                 </button>
                             </div>
-                            <div className="p-2 space-y-2 max-h-[480px] overflow-y-auto">
-                                {grouped[status].length === 0 ? (
-                                    <p className="text-xs text-zinc-400 p-2">Empty</p>
-                                ) : (
-                                    grouped[status].map((item) => (
-                                        <button
-                                            key={item.id}
-                                            type="button"
-                                            onClick={() => openItem(item)}
-                                            className={`w-full text-left border border-zinc-200 rounded-lg p-2 hover:bg-blue-50 transition-colors ${
-                                                selectedId === item.id ? "bg-blue-100 border-blue-300" : "bg-white"
-                                            }`}
-                                        >
-                                            <p className="font-bold text-sm">{item.title || "Untitled task"}</p>
-                                            {item.dueDate && (
-                                                <p className="text-[11px] text-zinc-500 mt-1">Due: {item.dueDate}</p>
-                                            )}
-                                        </button>
-                                    ))
-                                )}
-                            </div>
-                        </div>
+                            {grouped[status].length === 0 ? (
+                                <p className="text-sm text-zinc-500">No tasks</p>
+                            ) : (
+                                <ul className="space-y-1">
+                                    {grouped[status].map((item) => {
+                                        const selected = selectedId === item.id;
+                                        const shown =
+                                            selected && draft && draft.id === item.id ? draft : item;
+                                        return (
+                                            <li key={item.id}>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => openItem(item)}
+                                                    className={`w-full text-left px-2 py-2.5 rounded-md text-base text-zinc-800 ${
+                                                        selected ? "bg-zinc-100 font-semibold" : "hover:bg-zinc-50"
+                                                    }`}
+                                                >
+                                                    <span className="block break-words">{taskName(shown)}</span>
+                                                    {shown.dueDate ? (
+                                                        <span className="block text-sm font-normal text-zinc-500 mt-0.5">
+                                                            {shown.dueDate.slice(0, 10)}
+                                                        </span>
+                                                    ) : null}
+                                                </button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </section>
                     ))}
                 </div>
 
-                <div className="border-2 border-black rounded-lg bg-white p-4 space-y-4 h-fit">
+                <section className="space-y-5 min-w-0">
+                    <h3 className="text-lg font-bold text-zinc-800">Task</h3>
                     {!draft ? (
-                        <p className="text-sm text-zinc-500 py-8 text-center">
-                            Select a task to edit.
-                        </p>
+                        <p className="text-base text-zinc-600">Select a task to edit.</p>
                     ) : (
-                        <>
+                        <div className="space-y-5">
                             <div>
-                                <label className="block text-xs font-semibold mb-1 uppercase text-zinc-600">
+                                <label htmlFor="planner-title" className="mb-1.5 block text-sm font-medium text-zinc-600">
                                     Title
                                 </label>
                                 <input
+                                    id="planner-title"
                                     type="text"
                                     value={draft.title}
                                     onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                                    className={inputClass}
+                                    className={fieldClass}
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-semibold mb-1 uppercase text-zinc-600">
+                                <label htmlFor="planner-description" className="mb-1.5 block text-sm font-medium text-zinc-600">
                                     Description
                                 </label>
                                 <textarea
+                                    id="planner-description"
                                     value={draft.description ?? ""}
                                     onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                                    className={`${inputClass} min-h-[120px]`}
+                                    rows={8}
+                                    className={`${fieldClass} min-h-56`}
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-xs font-semibold mb-1 uppercase text-zinc-600">
+                                    <label htmlFor="planner-due-date" className="mb-1.5 block text-sm font-medium text-zinc-600">
                                         Due date
                                     </label>
                                     <input
+                                        id="planner-due-date"
                                         type="date"
                                         value={draft.dueDate?.slice(0, 10) ?? ""}
                                         onChange={(e) => setDraft({ ...draft, dueDate: e.target.value })}
-                                        className={inputClass}
+                                        className={fieldClass}
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold mb-1 uppercase text-zinc-600">
+                                    <label htmlFor="planner-status" className="mb-1.5 block text-sm font-medium text-zinc-600">
                                         Status
                                     </label>
                                     <select
+                                        id="planner-status"
                                         value={draft.status}
                                         onChange={(e) =>
                                             setDraft({
@@ -220,7 +240,7 @@ export function AdminPlannerPage() {
                                                 status: e.target.value as PlannerItem["status"],
                                             })
                                         }
-                                        className={inputClass}
+                                        className={fieldClass}
                                     >
                                         <option value="todo">To do</option>
                                         <option value="doing">Doing</option>
@@ -230,7 +250,7 @@ export function AdminPlannerPage() {
                             </div>
 
                             <div className="flex items-center gap-3">
-                                <Button variant="action" size="sm" onClick={handleSave} disabled={saving}>
+                                <Button type="button" variant="ghost" onClick={handleSave} disabled={saving} className={saveButtonClass}>
                                     {saving ? (
                                         <Loader2 className="w-4 h-4 animate-spin" />
                                     ) : (
@@ -238,7 +258,7 @@ export function AdminPlannerPage() {
                                     )}
                                     Save
                                 </Button>
-                                <Button variant="secondary" size="sm" onClick={handleDelete}>
+                                <Button type="button" variant="ghost" onClick={handleDelete} className={deleteActionClass}>
                                     <Trash2 className="w-4 h-4" />
                                     Delete
                                 </Button>
@@ -256,9 +276,9 @@ export function AdminPlannerPage() {
                                     {message}
                                 </p>
                             )}
-                        </>
+                        </div>
                     )}
-                </div>
+                </section>
             </div>
         </div>
     );

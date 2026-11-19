@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
-import { motion } from "motion/react";
+import { useState, useEffect, type ReactNode } from "react";
 import { doc, getDoc } from "firebase/firestore/lite";
 import { db } from "@/lib/firebase";
 import {
     type ExploreData,
     type ExploreItem,
     type ExploreStory,
+    type ResumeGroup,
+    type ResumeVersion,
     defaultExploreData,
     saveExploreData,
 } from "@/hooks/useExploreData";
@@ -15,8 +16,21 @@ import { PdfUpload } from "@/components/ui/pdf-upload";
 import { Plus, Trash2, Save, Loader2, X, Eye, EyeOff } from "lucide-react";
 import { MoveButtons, swap } from "@/components/ui/move-buttons";
 
-const inputClass =
-    "w-full border border-zinc-300 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all";
+const fieldClass =
+    "w-full rounded-md bg-zinc-50 px-3 py-2.5 text-base text-zinc-700 placeholder:text-zinc-400 focus:bg-white focus:outline-none";
+const writingClass = `${fieldClass} min-h-[140px] resize-y`;
+const labelClass = "mb-1.5 block text-sm font-medium text-zinc-600";
+const entryClass =
+    "mt-6 min-w-0 space-y-4 border-t border-zinc-200 pt-6 first:mt-0 first:border-t-0 first:pt-0";
+const saveButtonClass =
+    "h-auto cursor-pointer gap-1.5 rounded-lg bg-blue-100 px-3 py-1.5 text-xs font-bold text-zinc-800 shadow-[1px_1px_0_#000] transition-all duration-200 hover:bg-blue-100 active:translate-x-px active:translate-y-px active:shadow-none sm:text-sm";
+const textActionClass =
+    "h-auto cursor-pointer gap-1.5 px-0 text-base font-medium text-zinc-700 hover:bg-transparent hover:underline";
+
+function blockTitle(primary?: string, secondary?: string) {
+    const title = primary?.trim() || secondary?.trim();
+    return title || "Chưa có tên";
+}
 
 function SaveButton({
     saving,
@@ -28,8 +42,8 @@ function SaveButton({
     onSave: () => void;
 }) {
     return (
-        <div className="flex items-center gap-3 pt-4">
-            <Button variant="action" onClick={onSave} disabled={saving} size="sm">
+        <div className="flex items-center gap-3">
+            <Button type="button" variant="ghost" onClick={onSave} disabled={saving} className={saveButtonClass}>
                 {saving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
@@ -48,6 +62,15 @@ function SaveButton({
     );
 }
 
+function Field({ label, children }: { label: string; children: ReactNode }) {
+    return (
+        <label className="block">
+            <span className={labelClass}>{label}</span>
+            {children}
+        </label>
+    );
+}
+
 function LanguageSwitch({
     value,
     onChange,
@@ -56,10 +79,10 @@ function LanguageSwitch({
     onChange: (value: "en" | "vi") => void;
 }) {
     const optionClass = (active: boolean) =>
-        `text-sm font-bold cursor-pointer ${active ? "text-black underline" : "text-zinc-400 hover:text-zinc-600"}`;
+        `text-base font-semibold cursor-pointer ${active ? "text-zinc-800 underline underline-offset-4" : "text-zinc-400 hover:text-zinc-700"}`;
 
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-5">
             <button
                 type="button"
                 aria-pressed={value === "en"}
@@ -80,12 +103,105 @@ function LanguageSwitch({
     );
 }
 
+function Entry({
+    title,
+    index,
+    total,
+    onMove,
+    onRemove,
+    children,
+}: {
+    title: string;
+    index: number;
+    total: number;
+    onMove: (from: number, to: number) => void;
+    onRemove: () => void;
+    children: ReactNode;
+}) {
+    return (
+        <div className={entryClass}>
+            <div className="flex items-start gap-3">
+                <div className="shrink-0">
+                    <MoveButtons index={index} total={total} onMove={onMove} />
+                </div>
+                <h3 className="min-w-0 flex-1 break-words pt-0.5 text-lg font-bold text-zinc-800">
+                    {title}
+                </h3>
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={onRemove}
+                    className="shrink-0"
+                    aria-label={`Xóa ${title}`}
+                >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                </Button>
+            </div>
+            {children}
+        </div>
+    );
+}
+
+function KeywordField({
+    label,
+    placeholder,
+    values,
+    format,
+    onRemove,
+    onAdd,
+}: {
+    label: string;
+    placeholder: string;
+    values: string[];
+    format?: (value: string) => string;
+    onRemove: (index: number) => void;
+    onAdd: (value: string) => void | false;
+}) {
+    return (
+        <div>
+            <div className={labelClass}>{label}</div>
+            {values.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                    {values.map((value, index) => (
+                        <span
+                            key={`${value}-${index}`}
+                            className="inline-flex items-center gap-1 rounded-md bg-zinc-100 px-2.5 py-1 text-sm font-medium text-zinc-800"
+                        >
+                            {format ? format(value) : value}
+                            <button
+                                type="button"
+                                onClick={() => onRemove(index)}
+                                className="inline-flex h-6 w-6 shrink-0 items-center justify-center text-zinc-500 hover:text-red-600"
+                                aria-label={`Xóa ${value}`}
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            )}
+            <input
+                type="text"
+                placeholder={placeholder}
+                className={fieldClass}
+                onKeyDown={(e) => {
+                    if (e.key !== "Enter") return;
+                    e.preventDefault();
+                    const val = e.currentTarget.value.trim();
+                    if (!val) return;
+                    if (onAdd(val) !== false) e.currentTarget.value = "";
+                }}
+            />
+        </div>
+    );
+}
+
 function ExploreItemCard({
     item,
     index,
     total,
     folder,
-    itemLabel,
     onUpdate,
     onMove,
     onRemove,
@@ -94,27 +210,20 @@ function ExploreItemCard({
     index: number;
     total: number;
     folder: string;
-    itemLabel: string;
     onUpdate: (updates: Partial<ExploreItem>) => void;
     onMove: (from: number, to: number) => void;
     onRemove: () => void;
 }) {
     const [lang, setLang] = useState<"en" | "vi">("en");
+    const heading =
+        lang === "vi"
+            ? blockTitle(item.titleVi, item.title)
+            : blockTitle(item.title, item.titleVi);
 
     return (
-        <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
-            <div className="flex justify-between items-center gap-2">
-                <MoveButtons index={index} total={total} onMove={onMove} />
-                <span className="font-bold text-sm">
-                    {itemLabel} {index + 1}
-                </span>
-                <Button variant="ghost" size="icon" onClick={onRemove}>
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-            </div>
-
+        <Entry title={heading} index={index} total={total} onMove={onMove} onRemove={onRemove}>
             <div>
-                <label className="block text-sm font-bold mb-1">Image (optional)</label>
+                <div className={labelClass}>Image (optional)</div>
                 <ImageUpload
                     value={item.imageUrl || ""}
                     onChange={(url) => onUpdate({ imageUrl: url })}
@@ -125,121 +234,85 @@ function ExploreItemCard({
             <LanguageSwitch value={lang} onChange={setLang} />
 
             {lang === "en" ? (
-                <div className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Title</label>
+                <div className="space-y-4">
+                    <Field label="Title">
                         <input
                             type="text"
                             value={item.title}
                             onChange={(e) => onUpdate({ title: e.target.value })}
-                            className={inputClass}
+                            className={fieldClass}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Summary</label>
+                    </Field>
+                    <Field label="Summary">
                         <input
                             type="text"
                             value={item.summary}
                             onChange={(e) => onUpdate({ summary: e.target.value })}
-                            className={inputClass}
+                            className={fieldClass}
                             placeholder="1 dòng tóm tắt"
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Story</label>
+                    </Field>
+                    <Field label="Story">
                         <textarea
                             value={item.story}
                             onChange={(e) => onUpdate({ story: e.target.value })}
-                            className={`${inputClass} min-h-[120px]`}
-                            rows={5}
+                            className={writingClass}
+                            rows={6}
                             placeholder="Câu chuyện đầy đủ..."
                         />
-                    </div>
+                    </Field>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Title</label>
+                <div className="space-y-4">
+                    <Field label="Title">
                         <input
                             type="text"
                             value={item.titleVi || ""}
                             onChange={(e) => onUpdate({ titleVi: e.target.value })}
-                            className={inputClass}
+                            className={fieldClass}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Summary</label>
+                    </Field>
+                    <Field label="Summary">
                         <input
                             type="text"
                             value={item.summaryVi || ""}
                             onChange={(e) => onUpdate({ summaryVi: e.target.value })}
-                            className={inputClass}
+                            className={fieldClass}
                             placeholder="1 dòng tóm tắt"
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Story</label>
+                    </Field>
+                    <Field label="Story">
                         <textarea
                             value={item.storyVi || ""}
                             onChange={(e) => onUpdate({ storyVi: e.target.value })}
-                            className={`${inputClass} min-h-[120px]`}
-                            rows={5}
+                            className={writingClass}
+                            rows={6}
                             placeholder="Câu chuyện đầy đủ..."
                         />
-                    </div>
+                    </Field>
                 </div>
             )}
 
-            <div>
-                <label className="block text-sm font-bold mb-1">Since (optional)</label>
+            <Field label="Since (optional)">
                 <input
                     type="text"
                     value={item.since || ""}
                     onChange={(e) => onUpdate({ since: e.target.value })}
-                    className={inputClass}
+                    className={fieldClass}
                     placeholder="2020, Grade 10..."
                 />
-            </div>
+            </Field>
 
-            <div>
-                <label className="block text-sm font-bold mb-1">Tags (optional)</label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                    {(item.tags || []).map((tag, tagIndex) => (
-                        <span
-                            key={tagIndex}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
-                        >
-                            {tag}
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    const newTags = (item.tags || []).filter((_, i) => i !== tagIndex);
-                                    onUpdate({ tags: newTags });
-                                }}
-                                className="hover:text-red-500 transition-colors"
-                            >
-                                <X className="w-3 h-3" />
-                            </button>
-                        </span>
-                    ))}
-                </div>
-                <input
-                    type="text"
-                    placeholder="Nhập tag rồi Enter"
-                    className={inputClass}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                            const val = e.currentTarget.value.trim();
-                            if (val) {
-                                onUpdate({ tags: [...(item.tags || []), val] });
-                                e.currentTarget.value = "";
-                            }
-                        }
-                    }}
-                />
-            </div>
-        </div>
+            <KeywordField
+                label="Tags (optional)"
+                placeholder="Nhập tag rồi Enter"
+                values={item.tags || []}
+                onRemove={(tagIndex) =>
+                    onUpdate({ tags: (item.tags || []).filter((_, i) => i !== tagIndex) })
+                }
+                onAdd={(val) => onUpdate({ tags: [...(item.tags || []), val] })}
+            />
+        </Entry>
     );
 }
 
@@ -261,29 +334,28 @@ function ExploreItemListEditor({
     };
 
     return (
-        <div>
-            <div className="space-y-3 sm:space-y-4">
-                {items.map((item, index) => (
-                    <ExploreItemCard
-                        key={index}
-                        item={item}
-                        index={index}
-                        total={items.length}
-                        folder={folder}
-                        itemLabel={itemLabel}
-                        onUpdate={(updates) => updateItem(index, updates)}
-                        onMove={(from, to) => onChange(swap(items, from, to))}
-                        onRemove={() => onChange(items.filter((_, i) => i !== index))}
-                    />
-                ))}
-            </div>
+        <div className="space-y-4">
+            {items.length > 0 && (
+                <div>
+                    {items.map((item, index) => (
+                        <ExploreItemCard
+                            key={index}
+                            item={item}
+                            index={index}
+                            total={items.length}
+                            folder={folder}
+                            onUpdate={(updates) => updateItem(index, updates)}
+                            onMove={(from, to) => onChange(swap(items, from, to))}
+                            onRemove={() => onChange(items.filter((_, i) => i !== index))}
+                        />
+                    ))}
+                </div>
+            )}
             <Button
-                variant="action"
-                size="sm"
-                className="mt-3"
-                onClick={() =>
-                    onChange([...items, { title: "", summary: "", story: "" }])
-                }
+                type="button"
+                variant="ghost"
+                className={textActionClass}
+                onClick={() => onChange([...items, { title: "", summary: "", story: "" }])}
             >
                 <Plus className="w-4 h-4" />
                 Thêm {itemLabel.toLowerCase()}
@@ -308,97 +380,70 @@ function ExploreStoryCard({
     onRemove: () => void;
 }) {
     const [lang, setLang] = useState<"en" | "vi">("en");
+    const heading =
+        lang === "vi"
+            ? blockTitle(item.titleVi, item.title)
+            : blockTitle(item.title, item.titleVi);
 
     return (
-        <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
-            <div className="flex justify-between items-center gap-2">
-                <MoveButtons index={index} total={total} onMove={onMove} />
-                <span className="font-bold text-sm">Story {index + 1}</span>
-                <Button variant="ghost" size="icon" onClick={onRemove}>
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-            </div>
+        <Entry title={heading} index={index} total={total} onMove={onMove} onRemove={onRemove}>
             <LanguageSwitch value={lang} onChange={setLang} />
             {lang === "en" ? (
-                <div className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Title</label>
+                <div className="space-y-4">
+                    <Field label="Title">
                         <input
                             type="text"
                             value={item.title}
                             onChange={(e) => onUpdate({ ...item, title: e.target.value })}
-                            className={inputClass}
+                            className={fieldClass}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Content</label>
+                    </Field>
+                    <Field label="Content">
                         <textarea
                             value={item.content}
                             onChange={(e) => onUpdate({ ...item, content: e.target.value })}
-                            className={`${inputClass} min-h-[100px]`}
+                            className={writingClass}
+                            rows={6}
                         />
-                    </div>
+                    </Field>
                 </div>
             ) : (
-                <div className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Title</label>
+                <div className="space-y-4">
+                    <Field label="Title">
                         <input
                             type="text"
                             value={item.titleVi || ""}
                             onChange={(e) => onUpdate({ ...item, titleVi: e.target.value })}
-                            className={inputClass}
+                            className={fieldClass}
                         />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-bold mb-1">Content</label>
+                    </Field>
+                    <Field label="Content">
                         <textarea
                             value={item.contentVi || ""}
                             onChange={(e) => onUpdate({ ...item, contentVi: e.target.value })}
-                            className={`${inputClass} min-h-[100px]`}
+                            className={writingClass}
+                            rows={6}
                         />
-                    </div>
+                    </Field>
                 </div>
             )}
-            <div>
-                <label className="block text-sm font-bold mb-1">Topics / Hashtags (optional)</label>
-                <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                    {(item.topics || []).map((topic, topicIndex) => (
-                        <span
-                            key={topicIndex}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
-                        >
-                            #{topic.toLowerCase().replace(/\s+/g, "-")}
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    onUpdate({
-                                        ...item,
-                                        topics: (item.topics || []).filter((_, i) => i !== topicIndex),
-                                    })
-                                }
-                                className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
-                            >
-                                ×
-                            </button>
-                        </span>
-                    ))}
-                </div>
-                <input
-                    type="text"
-                    placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
-                    className={inputClass}
-                    onKeyDown={(e) => {
-                        if (e.key !== "Enter") return;
-                        e.preventDefault();
-                        const val = e.currentTarget.value.trim();
-                        if (!val || (item.topics || []).includes(val)) return;
-                        onUpdate({ ...item, topics: [...(item.topics || []), val] });
-                        e.currentTarget.value = "";
-                    }}
-                />
-            </div>
-        </div>
+            <KeywordField
+                label="Topics / Hashtags (optional)"
+                placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
+                values={item.topics || []}
+                format={(topic) => `#${topic.toLowerCase().replace(/\s+/g, "-")}`}
+                onRemove={(topicIndex) =>
+                    onUpdate({
+                        ...item,
+                        topics: (item.topics || []).filter((_, i) => i !== topicIndex),
+                    })
+                }
+                onAdd={(val) => {
+                    if ((item.topics || []).includes(val)) return false;
+                    onUpdate({ ...item, topics: [...(item.topics || []), val] });
+                }}
+            />
+        </Entry>
     );
 }
 
@@ -416,30 +461,179 @@ function StoryListEditor({
     };
 
     return (
-        <div>
-            <div className="space-y-3 sm:space-y-4">
-                {items.map((item, index) => (
-                    <ExploreStoryCard
-                        key={index}
-                        item={item}
-                        index={index}
-                        total={items.length}
-                        onUpdate={(next) => update(index, next)}
-                        onMove={(from, to) => onChange(swap(items, from, to))}
-                        onRemove={() => onChange(items.filter((_, i) => i !== index))}
-                    />
-                ))}
-            </div>
+        <div className="space-y-4">
+            {items.length > 0 && (
+                <div>
+                    {items.map((item, index) => (
+                        <ExploreStoryCard
+                            key={index}
+                            item={item}
+                            index={index}
+                            total={items.length}
+                            onUpdate={(next) => update(index, next)}
+                            onMove={(from, to) => onChange(swap(items, from, to))}
+                            onRemove={() => onChange(items.filter((_, i) => i !== index))}
+                        />
+                    ))}
+                </div>
+            )}
             <Button
-                variant="action"
-                size="sm"
-                className="mt-3"
+                type="button"
+                variant="ghost"
+                className={textActionClass}
                 onClick={() => onChange([...items, { title: "", content: "", topics: [] }])}
             >
                 <Plus className="w-4 h-4" />
                 Thêm story
             </Button>
         </div>
+    );
+}
+
+function ResumeGroupEditor({
+    group,
+    index,
+    total,
+    onChange,
+    onMove,
+    onRemove,
+}: {
+    group: ResumeGroup;
+    index: number;
+    total: number;
+    onChange: (next: ResumeGroup) => void;
+    onMove: (from: number, to: number) => void;
+    onRemove: () => void;
+}) {
+    const versions = group.versions || [];
+
+    const updateVersion = (versionIndex: number, updates: Partial<ResumeVersion>) => {
+        const nextVersions = [...versions];
+        nextVersions[versionIndex] = { ...nextVersions[versionIndex], ...updates };
+        onChange({ ...group, versions: nextVersions });
+    };
+
+    return (
+        <Entry
+            title={blockTitle(group.name)}
+            index={index}
+            total={total}
+            onMove={onMove}
+            onRemove={onRemove}
+        >
+            <Field label="Tên nhóm CV (e.g. Software Developer CV)">
+                <input
+                    type="text"
+                    value={group.name}
+                    onChange={(e) => onChange({ ...group, name: e.target.value })}
+                    className={fieldClass}
+                    placeholder="Tên nhóm CV"
+                />
+            </Field>
+            <Field label="Mô tả (e.g. English version, Tiếng Việt...)">
+                <input
+                    type="text"
+                    value={group.description || ""}
+                    onChange={(e) => onChange({ ...group, description: e.target.value })}
+                    className={fieldClass}
+                    placeholder="Mô tả nhóm CV"
+                />
+            </Field>
+
+            <div className="space-y-4">
+                <h4 className="text-base font-semibold text-zinc-800">Các phiên bản CV</h4>
+                {versions.length > 0 && (
+                    <div>
+                        {versions.map((ver, verIndex) => (
+                            <Entry
+                                key={verIndex}
+                                title={blockTitle(ver.versionName)}
+                                index={verIndex}
+                                total={versions.length}
+                                onMove={(from, to) =>
+                                    onChange({ ...group, versions: swap(versions, from, to) })
+                                }
+                                onRemove={() =>
+                                    onChange({
+                                        ...group,
+                                        versions: versions.filter((_, i) => i !== verIndex),
+                                    })
+                                }
+                            >
+                                <Field label="Tên phiên bản (e.g. 07/2026)">
+                                    <input
+                                        type="text"
+                                        value={ver.versionName}
+                                        onChange={(e) =>
+                                            updateVersion(verIndex, { versionName: e.target.value })
+                                        }
+                                        className={fieldClass}
+                                        placeholder="e.g. 07/2026"
+                                    />
+                                </Field>
+                                <div>
+                                    <div className={labelClass}>File PDF (R2)</div>
+                                    <PdfUpload
+                                        value={ver.url}
+                                        onChange={(url) => updateVersion(verIndex, { url })}
+                                    />
+                                </div>
+                            </Entry>
+                        ))}
+                    </div>
+                )}
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
+                    onClick={() =>
+                        onChange({
+                            ...group,
+                            versions: [...versions, { versionName: "", url: "" }],
+                        })
+                    }
+                >
+                    <Plus className="w-4 h-4" />
+                    Thêm phiên bản
+                </Button>
+            </div>
+        </Entry>
+    );
+}
+
+function EditorSection({
+    title,
+    hidden = false,
+    onToggleHidden,
+    children,
+}: {
+    title: string;
+    hidden?: boolean;
+    onToggleHidden?: () => void;
+    children: ReactNode;
+}) {
+    return (
+        <section className="space-y-6 py-10 first:pt-0">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-xl font-bold text-zinc-800">{title}</h2>
+                {onToggleHidden && (
+                    <button
+                        type="button"
+                        onClick={onToggleHidden}
+                        title={
+                            hidden
+                                ? "Hiển thị phân mục này ngoài trang chủ"
+                                : "Tạm ẩn phân mục này khỏi trang chủ"
+                        }
+                        className="inline-flex items-center gap-2 text-sm font-medium text-zinc-600"
+                    >
+                        {hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {hidden ? "Đang ẩn phân mục" : "Ẩn khỏi trang"}
+                    </button>
+                )}
+            </div>
+            {children}
+        </section>
     );
 }
 
@@ -503,1087 +697,553 @@ export function AdminExplorePage() {
         );
     }
 
+    const favourites = data.favourites || [];
+    const resumes = data.resumes || [];
+    const whatsNext = data.whatsNext || [];
+
     return (
-        <div className="space-y-6 sm:space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                {/* Column 1: Intro, Favourites, Coding / Beyond Code / Personal Stories, Achievements */}
-                <div className="space-y-6 sm:space-y-8">
-                    {/* Intro Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                            Explore Editor
-                        </h2>
-                        <div className="border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary">
-                            {/* macOS Window Header */}
-                            <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-bold mb-1">
-                                    Title
-                                </label>
-                                <input
-                                    type="text"
-                                    value={data.intro.title}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            intro: {
-                                                ...data.intro,
-                                                title: e.target.value,
-                                            },
-                                        })
-                                    }
-                                    className={inputClass}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold mb-1">
-                                    Description
-                                </label>
-                                <textarea
-                                    value={data.intro.description}
-                                    onChange={(e) =>
-                                        setData({
-                                            ...data,
-                                            intro: {
-                                                ...data.intro,
-                                                description: e.target.value,
-                                            },
-                                        })
-                                    }
-                                    className={`${inputClass} min-h-[60px]`}
-                                    rows={2}
-                                />
-                            </div>
-                            <SaveButton
-                                saving={saving === "intro"}
-                                message={message.intro || ""}
-                                onSave={() => handleSave("intro")}
-                            />
-                        </div>
-                    </div>
-                    </motion.section>
+        <div data-tap-zone="plain" className="divide-y divide-zinc-200">
+            <EditorSection title="Explore Editor">
+                <Field label="Title">
+                    <input
+                        type="text"
+                        value={data.intro.title}
+                        onChange={(e) =>
+                            setData({
+                                ...data,
+                                intro: { ...data.intro, title: e.target.value },
+                            })
+                        }
+                        className={fieldClass}
+                    />
+                </Field>
+                <Field label="Description">
+                    <textarea
+                        value={data.intro.description}
+                        onChange={(e) =>
+                            setData({
+                                ...data,
+                                intro: { ...data.intro, description: e.target.value },
+                            })
+                        }
+                        className={writingClass}
+                        rows={6}
+                    />
+                </Field>
+                <SaveButton
+                    saving={saving === "intro"}
+                    message={message.intro || ""}
+                    onSave={() => handleSave("intro")}
+                />
+            </EditorSection>
 
-                    {/* Favourites Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.05 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Favourites</h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("favourites") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("favourites") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("favourites")}
-                                        title={isSectionHidden("favourites") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("favourites") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div className="space-y-2 sm:space-y-3">
-                                {(data.favourites || []).map((item, index) => (
-                                    <div key={index} className="flex gap-2 items-center border border-zinc-200 rounded-lg bg-zinc-50/50 p-2.5 sm:p-3">
-                                        <MoveButtons
-                                            index={index}
-                                            total={(data.favourites || []).length}
-                                            onMove={(from, to) => setData({ ...data, favourites: swap(data.favourites || [], from, to) })}
-                                        />
-                                        <div className="flex-1 grid grid-cols-2 gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Label"
-                                                value={item.label}
-                                                onChange={(e) => {
-                                                    const f = [...(data.favourites || [])];
-                                                    f[index] = { ...item, label: e.target.value };
-                                                    setData({ ...data, favourites: f });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder="Description (optional)"
-                                                value={item.description || ""}
-                                                onChange={(e) => {
-                                                    const f = [...(data.favourites || [])];
-                                                    f[index] = { ...item, description: e.target.value };
-                                                    setData({ ...data, favourites: f });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => setData({ ...data, favourites: (data.favourites || []).filter((_, i) => i !== index) })}
-                                        >
-                                            <Trash2 className="w-4 h-4 text-red-500" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                variant="action"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() => setData({ ...data, favourites: [...(data.favourites || []), { label: "", description: "" }] })}
+            <EditorSection
+                title="Favourites"
+                hidden={isSectionHidden("favourites")}
+                onToggleHidden={() => toggleSectionHidden("favourites")}
+            >
+                {favourites.length > 0 && (
+                    <div>
+                        {favourites.map((item, index) => (
+                            <Entry
+                                key={index}
+                                title={blockTitle(item.label)}
+                                index={index}
+                                total={favourites.length}
+                                onMove={(from, to) =>
+                                    setData({ ...data, favourites: swap(favourites, from, to) })
+                                }
+                                onRemove={() =>
+                                    setData({
+                                        ...data,
+                                        favourites: favourites.filter((_, i) => i !== index),
+                                    })
+                                }
                             >
-                                <Plus className="w-4 h-4" />
-                                Thêm favourite
-                            </Button>
-                            <SaveButton saving={saving === "favourites"} message={message.favourites || ""} onSave={() => handleSave("favourites")} />
-                        </div>
+                                <Field label="Label">
+                                    <input
+                                        type="text"
+                                        value={item.label}
+                                        onChange={(e) => {
+                                            const next = [...favourites];
+                                            next[index] = { ...item, label: e.target.value };
+                                            setData({ ...data, favourites: next });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                                <Field label="Description (optional)">
+                                    <input
+                                        type="text"
+                                        value={item.description || ""}
+                                        onChange={(e) => {
+                                            const next = [...favourites];
+                                            next[index] = { ...item, description: e.target.value };
+                                            setData({ ...data, favourites: next });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                            </Entry>
+                        ))}
                     </div>
-                    </motion.section>
+                )}
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
+                    onClick={() =>
+                        setData({
+                            ...data,
+                            favourites: [...favourites, { label: "", description: "" }],
+                        })
+                    }
+                >
+                    <Plus className="w-4 h-4" />
+                    Thêm favourite
+                </Button>
+                <SaveButton
+                    saving={saving === "favourites"}
+                    message={message.favourites || ""}
+                    onSave={() => handleSave("favourites")}
+                />
+            </EditorSection>
 
-                    {/* Stories Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Coding Stories</h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("stories") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("stories") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("stories")}
-                                        title={isSectionHidden("stories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("stories") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <StoryListEditor
-                                items={data.stories || []}
-                                onChange={(items) => setData({ ...data, stories: items })}
-                            />
-                            <SaveButton saving={saving === "stories"} message={message.stories || ""} onSave={() => handleSave("stories")} />
-                        </div>
-                    </div>
-                    </motion.section>
+            <EditorSection
+                title="Coding Stories"
+                hidden={isSectionHidden("stories")}
+                onToggleHidden={() => toggleSectionHidden("stories")}
+            >
+                <StoryListEditor
+                    items={data.stories || []}
+                    onChange={(items) => setData({ ...data, stories: items })}
+                />
+                <SaveButton
+                    saving={saving === "stories"}
+                    message={message.stories || ""}
+                    onSave={() => handleSave("stories")}
+                />
+            </EditorSection>
 
-                    {/* Beyond Code Stories */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.15 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                            Beyond Code Stories
-                        </h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("beyondCode") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("beyondCode") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("beyondCode")}
-                                        title={isSectionHidden("beyondCode") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("beyondCode") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-bold mb-1">
-                                    Description
-                                </label>
-                                <textarea
-                                    value={data.beyondCodeIntro || ""}
-                                    onChange={(e) => setData({ ...data, beyondCodeIntro: e.target.value })}
-                                    className={`${inputClass} min-h-[60px]`}
-                                    rows={2}
-                                />
-                            </div>
-                            <ExploreItemListEditor
-                                items={data.beyondCode || []}
-                                onChange={(items) => setData({ ...data, beyondCode: items })}
-                                folder="beyond-code"
-                                itemLabel="Item"
-                            />
-                            <SaveButton
-                                saving={saving === "beyondCode"}
-                                message={message.beyondCode || ""}
-                                onSave={() => handleSave("beyondCode")}
-                            />
-                        </div>
-                    </div>
-                    </motion.section>
+            <EditorSection
+                title="Beyond Code Stories"
+                hidden={isSectionHidden("beyondCode")}
+                onToggleHidden={() => toggleSectionHidden("beyondCode")}
+            >
+                <Field label="Description">
+                    <textarea
+                        value={data.beyondCodeIntro || ""}
+                        onChange={(e) => setData({ ...data, beyondCodeIntro: e.target.value })}
+                        className={writingClass}
+                        rows={6}
+                    />
+                </Field>
+                <ExploreItemListEditor
+                    items={data.beyondCode || []}
+                    onChange={(items) => setData({ ...data, beyondCode: items })}
+                    folder="beyond-code"
+                    itemLabel="Item"
+                />
+                <SaveButton
+                    saving={saving === "beyondCode"}
+                    message={message.beyondCode || ""}
+                    onSave={() => handleSave("beyondCode")}
+                />
+            </EditorSection>
 
-                    {/* Personal Stories */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                            Personal Stories
-                        </h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("personalStories") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("personalStories") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("personalStories")}
-                                        title={isSectionHidden("personalStories") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("personalStories") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
+            <EditorSection
+                title="Personal Stories"
+                hidden={isSectionHidden("personalStories")}
+                onToggleHidden={() => toggleSectionHidden("personalStories")}
+            >
+                <Field label="Description">
+                    <textarea
+                        value={data.personalStoriesIntro || ""}
+                        onChange={(e) => setData({ ...data, personalStoriesIntro: e.target.value })}
+                        className={writingClass}
+                        rows={6}
+                    />
+                </Field>
+                <StoryListEditor
+                    items={data.personalStories || []}
+                    onChange={(items) => setData({ ...data, personalStories: items })}
+                />
+                <SaveButton
+                    saving={saving === "personalStories"}
+                    message={message.personalStories || ""}
+                    onSave={() => handleSave("personalStories")}
+                />
+            </EditorSection>
+
+            <EditorSection
+                title="Achievements"
+                hidden={isSectionHidden("achievements")}
+                onToggleHidden={() => toggleSectionHidden("achievements")}
+            >
+                {data.achievements.length > 0 && (
+                    <div>
+                        {data.achievements.map((item, index) => (
+                            <Entry
+                                key={index}
+                                title={blockTitle(item.title)}
+                                index={index}
+                                total={data.achievements.length}
+                                onMove={(from, to) =>
+                                    setData({
+                                        ...data,
+                                        achievements: swap(data.achievements, from, to),
+                                    })
+                                }
+                                onRemove={() =>
+                                    setData({
+                                        ...data,
+                                        achievements: data.achievements.filter((_, i) => i !== index),
+                                    })
+                                }
+                            >
                                 <div>
-                                    <label className="block text-sm font-bold mb-1">
-                                        Description
-                                    </label>
-                                    <textarea
-                                        value={data.personalStoriesIntro || ""}
-                                        onChange={(e) => setData({ ...data, personalStoriesIntro: e.target.value })}
-                                        className={`${inputClass} min-h-[60px]`}
-                                        rows={2}
+                                    <div className={labelClass}>Image</div>
+                                    <ImageUpload
+                                        value={item.imageUrl || ""}
+                                        onChange={(url) => {
+                                            const achievements = [...data.achievements];
+                                            achievements[index] = { ...item, imageUrl: url };
+                                            setData({ ...data, achievements });
+                                        }}
+                                        folder="achievements"
                                     />
                                 </div>
-                                <StoryListEditor
-                                    items={data.personalStories || []}
-                                    onChange={(items) => setData({ ...data, personalStories: items })}
-                                />
-                                <SaveButton
-                                    saving={saving === "personalStories"}
-                                    message={message.personalStories || ""}
-                                    onSave={() => handleSave("personalStories")}
-                                />
-                            </div>
-                        </div>
-                    </motion.section>
-                    {/* Achievements Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                            Achievements
-                        </h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("achievements") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("achievements") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("achievements")}
-                                        title={isSectionHidden("achievements") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("achievements") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div className="space-y-3 sm:space-y-4">
-                                {data.achievements.map((item, index) => (
-                                    <div
-                                        key={index}
-                                        className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3"
-                                    >
-                                        <div className="flex justify-between items-center gap-2">
-                                            <MoveButtons
-                                                index={index}
-                                                total={data.achievements.length}
-                                                onMove={(from, to) => setData({ ...data, achievements: swap(data.achievements, from, to) })}
-                                            />
-                                            <span className="font-bold text-sm">
-                                                Achievement {index + 1}
-                                            </span>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() =>
-                                                    setData({
-                                                        ...data,
-                                                        achievements:
-                                                            data.achievements.filter(
-                                                                (_, i) => i !== index
-                                                            ),
-                                                    })
-                                                }
-                                            >
-                                                <Trash2 className="w-4 h-4 text-red-500" />
-                                            </Button>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">
-                                                Image
-                                            </label>
-                                            <ImageUpload
-                                                value={item.imageUrl || ""}
-                                                onChange={(url) => {
-                                                    const a = [...data.achievements];
-                                                    a[index] = {
-                                                        ...item,
-                                                        imageUrl: url,
-                                                    };
-                                                    setData({
-                                                        ...data,
-                                                        achievements: a,
-                                                    });
-                                                }}
-                                                folder="achievements"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">
-                                                Title
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={item.title}
-                                                onChange={(e) => {
-                                                    const a = [...data.achievements];
-                                                    a[index] = {
-                                                        ...item,
-                                                        title: e.target.value,
-                                                    };
-                                                    setData({
-                                                        ...data,
-                                                        achievements: a,
-                                                    });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3">
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">
-                                                    Issuer
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={item.issuer}
-                                                    onChange={(e) => {
-                                                        const a = [
-                                                            ...data.achievements,
-                                                        ];
-                                                        a[index] = {
-                                                            ...item,
-                                                            issuer: e.target.value,
-                                                        };
-                                                        setData({
-                                                            ...data,
-                                                            achievements: a,
-                                                        });
-                                                    }}
-                                                    className={inputClass}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-bold mb-1">
-                                                    Date
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={item.date}
-                                                    onChange={(e) => {
-                                                        const a = [
-                                                            ...data.achievements,
-                                                        ];
-                                                        a[index] = {
-                                                            ...item,
-                                                            date: e.target.value,
-                                                        };
-                                                        setData({
-                                                            ...data,
-                                                            achievements: a,
-                                                        });
-                                                    }}
-                                                    className={inputClass}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">
-                                                Description (optional)
-                                            </label>
-                                            <textarea
-                                                value={item.description || ""}
-                                                onChange={(e) => {
-                                                    const a = [...data.achievements];
-                                                    a[index] = {
-                                                        ...item,
-                                                        description: e.target.value,
-                                                    };
-                                                    setData({
-                                                        ...data,
-                                                        achievements: a,
-                                                    });
-                                                }}
-                                                className={`${inputClass} min-h-[60px]`}
-                                                rows={2}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-bold mb-1">
-                                                URL (optional)
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={item.url || ""}
-                                                onChange={(e) => {
-                                                    const a = [...data.achievements];
-                                                    a[index] = {
-                                                        ...item,
-                                                        url: e.target.value,
-                                                    };
-                                                    setData({
-                                                        ...data,
-                                                        achievements: a,
-                                                    });
-                                                }}
-                                                className={inputClass}
-                                                placeholder="https://..."
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                variant="action"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() =>
-                                    setData({
-                                        ...data,
-                                        achievements: [
-                                            ...data.achievements,
-                                            {
-                                                title: "",
-                                                issuer: "",
-                                                date: "",
-                                                description: "",
-                                            },
-                                        ],
-                                    })
-                                }
-                            >
-                                <Plus className="w-4 h-4" />
-                                Thêm achievement
-                            </Button>
-                            <SaveButton
-                                saving={saving === "achievements"}
-                                message={message.achievements || ""}
-                                onSave={() => handleSave("achievements")}
-                            />
-                        </div>
+                                <Field label="Title">
+                                    <input
+                                        type="text"
+                                        value={item.title}
+                                        onChange={(e) => {
+                                            const achievements = [...data.achievements];
+                                            achievements[index] = { ...item, title: e.target.value };
+                                            setData({ ...data, achievements });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                                <Field label="Issuer">
+                                    <input
+                                        type="text"
+                                        value={item.issuer}
+                                        onChange={(e) => {
+                                            const achievements = [...data.achievements];
+                                            achievements[index] = { ...item, issuer: e.target.value };
+                                            setData({ ...data, achievements });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                                <Field label="Date">
+                                    <input
+                                        type="text"
+                                        value={item.date}
+                                        onChange={(e) => {
+                                            const achievements = [...data.achievements];
+                                            achievements[index] = { ...item, date: e.target.value };
+                                            setData({ ...data, achievements });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                                <Field label="Description (optional)">
+                                    <textarea
+                                        value={item.description || ""}
+                                        onChange={(e) => {
+                                            const achievements = [...data.achievements];
+                                            achievements[index] = {
+                                                ...item,
+                                                description: e.target.value,
+                                            };
+                                            setData({ ...data, achievements });
+                                        }}
+                                        className={writingClass}
+                                        rows={6}
+                                    />
+                                </Field>
+                                <Field label="URL (optional)">
+                                    <input
+                                        type="text"
+                                        value={item.url || ""}
+                                        onChange={(e) => {
+                                            const achievements = [...data.achievements];
+                                            achievements[index] = { ...item, url: e.target.value };
+                                            setData({ ...data, achievements });
+                                        }}
+                                        className={fieldClass}
+                                        placeholder="https://..."
+                                    />
+                                </Field>
+                            </Entry>
+                        ))}
                     </div>
-                    </motion.section>
+                )}
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
+                    onClick={() =>
+                        setData({
+                            ...data,
+                            achievements: [
+                                ...data.achievements,
+                                { title: "", issuer: "", date: "", description: "" },
+                            ],
+                        })
+                    }
+                >
+                    <Plus className="w-4 h-4" />
+                    Thêm achievement
+                </Button>
+                <SaveButton
+                    saving={saving === "achievements"}
+                    message={message.achievements || ""}
+                    onSave={() => handleSave("achievements")}
+                />
+            </EditorSection>
 
-                </div>
-
-                {/* Column 2: Currently, More & More, What's Next */}
-                <div className="space-y-6 sm:space-y-8">
-                    {/* Currently Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                            Currently
-                        </h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("currently") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("currently") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("currently")}
-                                        title={isSectionHidden("currently") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("currently") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div className="space-y-2 sm:space-y-3">
-                                {data.currently.map((item, index) => (
-                                    <div
-                                        key={index}
-                                        className="flex gap-2 items-center border border-zinc-200 rounded-lg bg-zinc-50/50 p-2.5 sm:p-3"
-                                    >
-                                        <MoveButtons
-                                            index={index}
-                                            total={data.currently.length}
-                                            onMove={(from, to) => setData({ ...data, currently: swap(data.currently, from, to) })}
-                                        />                                <div className="flex-1 grid grid-cols-2 gap-2">
-                                            <input
-                                                type="text"
-                                                placeholder="Label (e.g. Learning)"
-                                                value={item.label}
-                                                onChange={(e) => {
-                                                    const c = [...data.currently];
-                                                    c[index] = {
-                                                        ...item,
-                                                        label: e.target.value,
-                                                    };
-                                                    setData({
-                                                        ...data,
-                                                        currently: c,
-                                                    });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                            <input
-                                                type="text"
-                                                placeholder="Value"
-                                                value={item.value}
-                                                onChange={(e) => {
-                                                    const c = [...data.currently];
-                                                    c[index] = {
-                                                        ...item,
-                                                        value: e.target.value,
-                                                    };
-                                                    setData({
-                                                        ...data,
-                                                        currently: c,
-                                                    });
-                                                }}
-                                                className={inputClass}
-                                            />
-                                        </div>
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() =>
-                                                setData({
-                                                    ...data,
-                                                    currently: data.currently.filter(
-                                                        (_, i) => i !== index
-                                                    ),
-                                                })
-                                            }
-                                        >
-                                            <Trash2 className="w-4 h-4 text-red-500" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                variant="action"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() =>
-                                    setData({
-                                        ...data,
-                                        currently: [
-                                            ...data.currently,
-                                            { label: "", value: "" },
-                                        ],
-                                    })
-                                }
-                            >
-                                <Plus className="w-4 h-4" />
-                                Thêm mục
-                            </Button>
-                            <SaveButton
-                                saving={saving === "currently"}
-                                message={message.currently || ""}
-                                onSave={() => handleSave("currently")}
-                            />
-                        </div>
-                    </div>
-                    </motion.section>
-
-                    {/* More & More Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.5 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">My Resumés</h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("moreAndMore") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("moreAndMore") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("moreAndMore")}
-                                        title={isSectionHidden("moreAndMore") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("moreAndMore") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-6">
-                            <div className="space-y-4 sm:space-y-6">
-                                {(data.resumes || []).map((group, groupIndex) => (
-                                    <div key={groupIndex} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-4">
-                                        <div className="flex justify-between items-center gap-2">
-                                            <MoveButtons
-                                                index={groupIndex}
-                                                total={(data.resumes || []).length}
-                                                onMove={(from, to) => setData({ ...data, resumes: swap(data.resumes || [], from, to) })}
-                                            />
-                                            <span className="font-bold text-sm">
-                                                Nhóm CV {groupIndex + 1}
-                                            </span>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => setData({ ...data, resumes: (data.resumes || []).filter((_, i) => i !== groupIndex) })}
-                                            >
-                                                <Trash2 className="w-4 h-4 text-red-500" />
-                                            </Button>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                            <div>
-                                                <label className="block text-xs font-bold mb-1">Tên nhóm CV (e.g. Software Developer CV)</label>
-                                                <input
-                                                    type="text"
-                                                    value={group.name}
-                                                    onChange={(e) => {
-                                                        const r = [...(data.resumes || [])];
-                                                        r[groupIndex] = { ...group, name: e.target.value };
-                                                        setData({ ...data, resumes: r });
-                                                    }}
-                                                    className={inputClass}
-                                                    placeholder="Tên nhóm CV"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-bold mb-1">Mô tả (e.g. English version, Tiếng Việt...)</label>
-                                                <input
-                                                    type="text"
-                                                    value={group.description || ""}
-                                                    onChange={(e) => {
-                                                        const r = [...(data.resumes || [])];
-                                                        r[groupIndex] = { ...group, description: e.target.value };
-                                                        setData({ ...data, resumes: r });
-                                                    }}
-                                                    className={inputClass}
-                                                    placeholder="Mô tả nhóm CV"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* Versions list */}
-                                        <div className="space-y-3 pt-2 pl-4 border-l-2 border-zinc-200">
-                                            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Các phiên bản CV</h4>
-                                            
-                                            <div className="space-y-3">
-                                                {(group.versions || []).map((ver, verIndex) => (
-                                                    <div key={verIndex} className="flex gap-2 items-start border border-zinc-200 rounded bg-white p-2.5 min-w-0">
-                                                        <div className="shrink-0 pt-5">
-                                                            <MoveButtons
-                                                                index={verIndex}
-                                                                total={(group.versions || []).length}
-                                                                onMove={(from, to) => {
-                                                                    const r = [...(data.resumes || [])];
-                                                                    r[groupIndex] = {
-                                                                        ...group,
-                                                                        versions: swap(group.versions || [], from, to)
-                                                                    };
-                                                                    setData({ ...data, resumes: r });
-                                                                }}
-                                                            />
-                                                        </div>
-                                                        <div className="min-w-0 flex-1 flex flex-wrap items-end gap-3">
-                                                            <div className="min-w-[8rem] flex-1 basis-[10rem]">
-                                                                <label className="block text-[10px] font-bold text-zinc-500 mb-1">Tên phiên bản (e.g. 07/2026)</label>
-                                                                <input
-                                                                    type="text"
-                                                                    value={ver.versionName}
-                                                                    onChange={(e) => {
-                                                                        const r = [...(data.resumes || [])];
-                                                                        const versions = [...(group.versions || [])];
-                                                                        versions[verIndex] = { ...ver, versionName: e.target.value };
-                                                                        r[groupIndex] = { ...group, versions };
-                                                                        setData({ ...data, resumes: r });
-                                                                    }}
-                                                                    className={`${inputClass} min-w-0`}
-                                                                    placeholder="e.g. 07/2026"
-                                                                />
-                                                            </div>
-                                                            <div className="min-w-0 w-full basis-full">
-                                                                <label className="block text-[10px] font-bold text-zinc-500 mb-1">File PDF (R2)</label>
-                                                                <PdfUpload
-                                                                    value={ver.url}
-                                                                    onChange={(url) => {
-                                                                        const r = [...(data.resumes || [])];
-                                                                        const versions = [...(group.versions || [])];
-                                                                        versions[verIndex] = { ...ver, url };
-                                                                        r[groupIndex] = { ...group, versions };
-                                                                        setData({ ...data, resumes: r });
-                                                                    }}
-                                                                    className="max-w-full"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="shrink-0 mt-5"
-                                                            onClick={() => {
-                                                                const r = [...(data.resumes || [])];
-                                                                r[groupIndex] = {
-                                                                    ...group,
-                                                                    versions: (group.versions || []).filter((_, i) => i !== verIndex)
-                                                                };
-                                                                setData({ ...data, resumes: r });
-                                                            }}
-                                                        >
-                                                            <Trash2 className="w-4 h-4 text-red-500" />
-                                                        </Button>
-                                                    </div>
-                                                ))}
-                                            </div>
-
-                                            <Button
-                                                variant="action"
-                                                size="sm"
-                                                onClick={() => {
-                                                    const r = [...(data.resumes || [])];
-                                                    r[groupIndex] = {
-                                                        ...group,
-                                                        versions: [...(group.versions || []), { versionName: "", url: "" }]
-                                                    };
-                                                    setData({ ...data, resumes: r });
-                                                }}
-                                            >
-                                                <Plus className="w-3.5 h-3.5" />
-                                                Thêm phiên bản
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                variant="action"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() => setData({ ...data, resumes: [...(data.resumes || []), { name: "", description: "", versions: [] }] })}
-                            >
-                                <Plus className="w-4 h-4" />
-                                Thêm nhóm CV
-                            </Button>
-                            <SaveButton saving={saving === "moreAndMore"} message={message.moreAndMore || ""} onSave={() => handleSave("moreAndMore")} />
-                        </div>
-                    </div>
-                    </motion.section>
-
-                    {/* What's Next Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                    >
-                        <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">What's Next</h2>
-                        <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("whatsNext") ? "opacity-75 bg-zinc-50" : ""}`}>
-                            {/* macOS Window Header */}
-                            <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                                    <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    {isSectionHidden("whatsNext") && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                            <EyeOff className="w-3 h-3" />
-                                            Đang ẩn phân mục
-                                        </span>
-                                    )}
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                        onClick={() => toggleSectionHidden("whatsNext")}
-                                        title={isSectionHidden("whatsNext") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                                    >
-                                        {isSectionHidden("whatsNext") ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
-                                </div>
-                            </div>
-                            <div className="p-4 sm:p-6 space-y-4">
-                            <div className="space-y-3 sm:space-y-4">
-                                {(data.whatsNext || []).map((item, index) => (
-                                    <div key={index} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
-                                        <div className="flex justify-between items-center gap-2">
-                                            <MoveButtons
-                                                index={index}
-                                                total={(data.whatsNext || []).length}
-                                                onMove={(from, to) => setData({ ...data, whatsNext: swap(data.whatsNext || [], from, to) })}
-                                            />
-                                            <div className="flex-1">
-                                                <input
-                                                    type="text"
-                                                    placeholder="Title"
-                                                    value={item.title}
-                                                    onChange={(e) => {
-                                                        const w = [...(data.whatsNext || [])];
-                                                        w[index] = { ...item, title: e.target.value };
-                                                        setData({ ...data, whatsNext: w });
-                                                    }}
-                                                    className={inputClass}
-                                                />
-                                            </div>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => setData({ ...data, whatsNext: (data.whatsNext || []).filter((_, i) => i !== index) })}
-                                            >
-                                                <Trash2 className="w-4 h-4 text-red-500" />
-                                            </Button>
-                                        </div>
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                            <div>
-                                                <label className="block text-xs font-bold mb-1 text-zinc-500">Status</label>
-                                                <select
-                                                    value={item.status}
-                                                    onChange={(e) => {
-                                                        const w = [...(data.whatsNext || [])];
-                                                        w[index] = { ...item, status: e.target.value as any };
-                                                        setData({ ...data, whatsNext: w });
-                                                    }}
-                                                    className={inputClass}
-                                                >
-                                                    <option value="Planning">Planning</option>
-                                                    <option value="In Progress">In Progress</option>
-                                                    <option value="Done">Done</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label className="block text-xs font-bold mb-1 text-zinc-500">Description (optional)</label>
-                                                <input
-                                                    type="text"
-                                                    value={item.description || ""}
-                                                    onChange={(e) => {
-                                                        const w = [...(data.whatsNext || [])];
-                                                        w[index] = { ...item, description: e.target.value };
-                                                        setData({ ...data, whatsNext: w });
-                                                    }}
-                                                    className={inputClass}
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <Button
-                                variant="action"
-                                size="sm"
-                                className="mt-3"
-                                onClick={() => setData({ ...data, whatsNext: [...(data.whatsNext || []), { title: "", status: "Planning", description: "" }] })}
-                            >
-                                <Plus className="w-4 h-4" />
-                                Thêm kế hoạch
-                            </Button>
-                            <SaveButton saving={saving === "whatsNext"} message={message.whatsNext || ""} onSave={() => handleSave("whatsNext")} />
-                        </div>
-                    </div>
-                    </motion.section>
-                </div>
-            </div>
-
-            {/* If You're Reading Closely Section */}
-            <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.45 }}
-                className="border-t-2 border-black/20 pt-6 sm:pt-8"
+            <EditorSection
+                title="Currently"
+                hidden={isSectionHidden("currently")}
+                onToggleHidden={() => toggleSectionHidden("currently")}
             >
-                <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">
-                    If You're Reading Closely
-                </h2>
-                <div className={`border-2 border-black rounded-lg bg-white overflow-hidden shadow-secondary transition-all duration-200 ${isSectionHidden("readingClosely") ? "opacity-75 bg-zinc-50" : ""}`}>
-                    {/* macOS Window Header */}
-                    <div className="flex items-center justify-between gap-2 px-3 sm:px-4 py-2 sm:py-3 bg-zinc-100 border-b-2 border-black">
-                        <div className="flex items-center gap-2">
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-red-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-yellow-500 border border-black"></div>
-                            <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 border border-black"></div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            {isSectionHidden("readingClosely") && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold border border-zinc-300 bg-zinc-100 text-zinc-500 rounded">
-                                    <EyeOff className="w-3 h-3" />
-                                    Đang ẩn phân mục
-                                </span>
-                            )}
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="w-6 h-6 p-0 hover:bg-zinc-200"
-                                onClick={() => toggleSectionHidden("readingClosely")}
-                                title={isSectionHidden("readingClosely") ? "Hiển thị phân mục này ngoài trang chủ" : "Tạm ẩn phân mục này khỏi trang chủ"}
-                            >
-                                {isSectionHidden("readingClosely") ? (
-                                    <EyeOff className="w-4 h-4 text-zinc-400" />
-                                ) : (
-                                    <Eye className="w-4 h-4 text-zinc-700" />
-                                )}
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="p-4 sm:p-6 space-y-5 sm:space-y-6">
+                {data.currently.length > 0 && (
                     <div>
-                        <label className="block text-sm font-bold mb-1">
-                            Lead paragraph (optional)
-                        </label>
-                        <textarea
-                            value={data.readingCloselyIntro || ""}
-                            onChange={(e) =>
-                                setData({ ...data, readingCloselyIntro: e.target.value })
-                            }
-                            className={`${inputClass} min-h-[80px]`}
-                            rows={3}
-                            placeholder="2-3 câu giới thiệu cho người đọc kỹ..."
-                        />
+                        {data.currently.map((item, index) => (
+                            <Entry
+                                key={index}
+                                title={blockTitle(item.label)}
+                                index={index}
+                                total={data.currently.length}
+                                onMove={(from, to) =>
+                                    setData({ ...data, currently: swap(data.currently, from, to) })
+                                }
+                                onRemove={() =>
+                                    setData({
+                                        ...data,
+                                        currently: data.currently.filter((_, i) => i !== index),
+                                    })
+                                }
+                            >
+                                <Field label="Label">
+                                    <input
+                                        type="text"
+                                        placeholder="e.g. Learning"
+                                        value={item.label}
+                                        onChange={(e) => {
+                                            const currently = [...data.currently];
+                                            currently[index] = { ...item, label: e.target.value };
+                                            setData({ ...data, currently });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                                <Field label="Value">
+                                    <input
+                                        type="text"
+                                        value={item.value}
+                                        onChange={(e) => {
+                                            const currently = [...data.currently];
+                                            currently[index] = { ...item, value: e.target.value };
+                                            setData({ ...data, currently });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                            </Entry>
+                        ))}
                     </div>
+                )}
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
+                    onClick={() =>
+                        setData({
+                            ...data,
+                            currently: [...data.currently, { label: "", value: "" }],
+                        })
+                    }
+                >
+                    <Plus className="w-4 h-4" />
+                    Thêm mục
+                </Button>
+                <SaveButton
+                    saving={saving === "currently"}
+                    message={message.currently || ""}
+                    onSave={() => handleSave("currently")}
+                />
+            </EditorSection>
 
-                    <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4">
-                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
-                            Impact / People
-                        </h3>
+            <EditorSection
+                title="My Resumés"
+                hidden={isSectionHidden("moreAndMore")}
+                onToggleHidden={() => toggleSectionHidden("moreAndMore")}
+            >
+                {resumes.length > 0 && (
+                    <div>
+                        {resumes.map((group, groupIndex) => (
+                            <ResumeGroupEditor
+                                key={groupIndex}
+                                group={group}
+                                index={groupIndex}
+                                total={resumes.length}
+                                onChange={(next) => {
+                                    const nextResumes = [...resumes];
+                                    nextResumes[groupIndex] = next;
+                                    setData({ ...data, resumes: nextResumes });
+                                }}
+                                onMove={(from, to) =>
+                                    setData({ ...data, resumes: swap(resumes, from, to) })
+                                }
+                                onRemove={() =>
+                                    setData({
+                                        ...data,
+                                        resumes: resumes.filter((_, i) => i !== groupIndex),
+                                    })
+                                }
+                            />
+                        ))}
+                    </div>
+                )}
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
+                    onClick={() =>
+                        setData({
+                            ...data,
+                            resumes: [...resumes, { name: "", description: "", versions: [] }],
+                        })
+                    }
+                >
+                    <Plus className="w-4 h-4" />
+                    Thêm nhóm CV
+                </Button>
+                <SaveButton
+                    saving={saving === "moreAndMore"}
+                    message={message.moreAndMore || ""}
+                    onSave={() => handleSave("moreAndMore")}
+                />
+            </EditorSection>
+
+            <EditorSection
+                title="What's Next"
+                hidden={isSectionHidden("whatsNext")}
+                onToggleHidden={() => toggleSectionHidden("whatsNext")}
+            >
+                {whatsNext.length > 0 && (
+                    <div>
+                        {whatsNext.map((item, index) => (
+                            <Entry
+                                key={index}
+                                title={blockTitle(item.title)}
+                                index={index}
+                                total={whatsNext.length}
+                                onMove={(from, to) =>
+                                    setData({ ...data, whatsNext: swap(whatsNext, from, to) })
+                                }
+                                onRemove={() =>
+                                    setData({
+                                        ...data,
+                                        whatsNext: whatsNext.filter((_, i) => i !== index),
+                                    })
+                                }
+                            >
+                                <Field label="Title">
+                                    <input
+                                        type="text"
+                                        value={item.title}
+                                        onChange={(e) => {
+                                            const next = [...whatsNext];
+                                            next[index] = { ...item, title: e.target.value };
+                                            setData({ ...data, whatsNext: next });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                                <Field label="Status">
+                                    <select
+                                        value={item.status}
+                                        onChange={(e) => {
+                                            const next = [...whatsNext];
+                                            next[index] = {
+                                                ...item,
+                                                status: e.target.value as ExploreData["whatsNext"][number]["status"],
+                                            };
+                                            setData({ ...data, whatsNext: next });
+                                        }}
+                                        className={fieldClass}
+                                    >
+                                        <option value="Planning">Planning</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Done">Done</option>
+                                    </select>
+                                </Field>
+                                <Field label="Description (optional)">
+                                    <input
+                                        type="text"
+                                        value={item.description || ""}
+                                        onChange={(e) => {
+                                            const next = [...whatsNext];
+                                            next[index] = { ...item, description: e.target.value };
+                                            setData({ ...data, whatsNext: next });
+                                        }}
+                                        className={fieldClass}
+                                    />
+                                </Field>
+                            </Entry>
+                        ))}
+                    </div>
+                )}
+                <Button
+                    type="button"
+                    variant="ghost"
+                    className={textActionClass}
+                    onClick={() =>
+                        setData({
+                            ...data,
+                            whatsNext: [
+                                ...whatsNext,
+                                { title: "", status: "Planning", description: "" },
+                            ],
+                        })
+                    }
+                >
+                    <Plus className="w-4 h-4" />
+                    Thêm kế hoạch
+                </Button>
+                <SaveButton
+                    saving={saving === "whatsNext"}
+                    message={message.whatsNext || ""}
+                    onSave={() => handleSave("whatsNext")}
+                />
+            </EditorSection>
+
+            <EditorSection
+                title="If You're Reading Closely"
+                hidden={isSectionHidden("readingClosely")}
+                onToggleHidden={() => toggleSectionHidden("readingClosely")}
+            >
+                <div className="divide-y divide-zinc-200">
+                    <div className="pb-8">
+                        <Field label="Lead paragraph (optional)">
+                            <textarea
+                                value={data.readingCloselyIntro || ""}
+                                onChange={(e) =>
+                                    setData({ ...data, readingCloselyIntro: e.target.value })
+                                }
+                                className={writingClass}
+                                rows={6}
+                                placeholder="2-3 câu giới thiệu cho người đọc kỹ..."
+                            />
+                        </Field>
+                    </div>
+                    <div className="space-y-5 py-8">
+                        <h3 className="text-xl font-bold text-zinc-800">Impact / People</h3>
                         <ExploreItemListEditor
                             items={data.impactPeople || []}
                             onChange={(items) => setData({ ...data, impactPeople: items })}
@@ -1591,11 +1251,8 @@ export function AdminExplorePage() {
                             itemLabel="Story"
                         />
                     </div>
-
-                    <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4">
-                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
-                            Lessons / Failed
-                        </h3>
+                    <div className="space-y-5 py-8">
+                        <h3 className="text-xl font-bold text-zinc-800">Lessons / Failed</h3>
                         <ExploreItemListEditor
                             items={data.lessonsFailed || []}
                             onChange={(items) => setData({ ...data, lessonsFailed: items })}
@@ -1603,11 +1260,8 @@ export function AdminExplorePage() {
                             itemLabel="Lesson"
                         />
                     </div>
-
-                    <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4">
-                        <h3 className="text-sm sm:text-base font-bold text-blue-600 mb-3">
-                            Off the Record
-                        </h3>
+                    <div className="space-y-5 pt-8">
+                        <h3 className="text-xl font-bold text-zinc-800">Off the Record</h3>
                         <ExploreItemListEditor
                             items={data.offTheRecord || []}
                             onChange={(items) => setData({ ...data, offTheRecord: items })}
@@ -1615,15 +1269,13 @@ export function AdminExplorePage() {
                             itemLabel="Note"
                         />
                     </div>
-
-                    <SaveButton
-                        saving={saving === "readingClosely"}
-                        message={message.readingClosely || ""}
-                        onSave={() => handleSave("readingClosely")}
-                    />
                 </div>
-            </div>
-            </motion.section>
+                <SaveButton
+                    saving={saving === "readingClosely"}
+                    message={message.readingClosely || ""}
+                    onSave={() => handleSave("readingClosely")}
+                />
+            </EditorSection>
         </div>
     );
 }

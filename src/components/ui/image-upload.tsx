@@ -54,12 +54,12 @@ export function ImageUpload({
                     <img
                         src={value}
                         alt="Uploaded"
-                        className="w-24 h-24 object-cover rounded-lg border-2 border-black"
+                        className="h-24 w-24 rounded-lg bg-zinc-50 object-cover"
                     />
                     <button
                         type="button"
                         onClick={() => onChange("")}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-black"
+                        className="absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white"
                     >
                         <X className="w-3 h-3" />
                     </button>
@@ -68,9 +68,9 @@ export function ImageUpload({
                 <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
                     onClick={() => inputRef.current?.click()}
                     disabled={uploading}
+                    className="h-auto cursor-pointer gap-1.5 px-0 text-base font-medium text-zinc-700 hover:bg-transparent hover:underline"
                 >
                     {uploading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
