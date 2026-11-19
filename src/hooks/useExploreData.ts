@@ -10,12 +10,17 @@ export interface ExploreItem {
     since?: string;
     imageUrl?: string;
     tags?: string[];
+    titleVi?: string;
+    summaryVi?: string;
+    storyVi?: string;
 }
 
 export interface ExploreStory {
     title: string;
     content: string;
     topics?: string[];
+    titleVi?: string;
+    contentVi?: string;
 }
 
 export interface ResumeVersion {

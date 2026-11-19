@@ -48,6 +48,201 @@ function SaveButton({
     );
 }
 
+function LanguageSwitch({
+    value,
+    onChange,
+}: {
+    value: "en" | "vi";
+    onChange: (value: "en" | "vi") => void;
+}) {
+    const optionClass = (active: boolean) =>
+        `text-sm font-bold cursor-pointer ${active ? "text-black underline" : "text-zinc-400 hover:text-zinc-600"}`;
+
+    return (
+        <div className="flex items-center gap-4">
+            <button
+                type="button"
+                aria-pressed={value === "en"}
+                onClick={() => onChange("en")}
+                className={optionClass(value === "en")}
+            >
+                English
+            </button>
+            <button
+                type="button"
+                aria-pressed={value === "vi"}
+                onClick={() => onChange("vi")}
+                className={optionClass(value === "vi")}
+            >
+                Tiếng Việt
+            </button>
+        </div>
+    );
+}
+
+function ExploreItemCard({
+    item,
+    index,
+    total,
+    folder,
+    itemLabel,
+    onUpdate,
+    onMove,
+    onRemove,
+}: {
+    item: ExploreItem;
+    index: number;
+    total: number;
+    folder: string;
+    itemLabel: string;
+    onUpdate: (updates: Partial<ExploreItem>) => void;
+    onMove: (from: number, to: number) => void;
+    onRemove: () => void;
+}) {
+    const [lang, setLang] = useState<"en" | "vi">("en");
+
+    return (
+        <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
+            <div className="flex justify-between items-center gap-2">
+                <MoveButtons index={index} total={total} onMove={onMove} />
+                <span className="font-bold text-sm">
+                    {itemLabel} {index + 1}
+                </span>
+                <Button variant="ghost" size="icon" onClick={onRemove}>
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                </Button>
+            </div>
+
+            <div>
+                <label className="block text-sm font-bold mb-1">Image (optional)</label>
+                <ImageUpload
+                    value={item.imageUrl || ""}
+                    onChange={(url) => onUpdate({ imageUrl: url })}
+                    folder={folder}
+                />
+            </div>
+
+            <LanguageSwitch value={lang} onChange={setLang} />
+
+            {lang === "en" ? (
+                <div className="space-y-3">
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Title</label>
+                        <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => onUpdate({ title: e.target.value })}
+                            className={inputClass}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Summary</label>
+                        <input
+                            type="text"
+                            value={item.summary}
+                            onChange={(e) => onUpdate({ summary: e.target.value })}
+                            className={inputClass}
+                            placeholder="1 dòng tóm tắt"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Story</label>
+                        <textarea
+                            value={item.story}
+                            onChange={(e) => onUpdate({ story: e.target.value })}
+                            className={`${inputClass} min-h-[120px]`}
+                            rows={5}
+                            placeholder="Câu chuyện đầy đủ..."
+                        />
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Title</label>
+                        <input
+                            type="text"
+                            value={item.titleVi || ""}
+                            onChange={(e) => onUpdate({ titleVi: e.target.value })}
+                            className={inputClass}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Summary</label>
+                        <input
+                            type="text"
+                            value={item.summaryVi || ""}
+                            onChange={(e) => onUpdate({ summaryVi: e.target.value })}
+                            className={inputClass}
+                            placeholder="1 dòng tóm tắt"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Story</label>
+                        <textarea
+                            value={item.storyVi || ""}
+                            onChange={(e) => onUpdate({ storyVi: e.target.value })}
+                            className={`${inputClass} min-h-[120px]`}
+                            rows={5}
+                            placeholder="Câu chuyện đầy đủ..."
+                        />
+                    </div>
+                </div>
+            )}
+
+            <div>
+                <label className="block text-sm font-bold mb-1">Since (optional)</label>
+                <input
+                    type="text"
+                    value={item.since || ""}
+                    onChange={(e) => onUpdate({ since: e.target.value })}
+                    className={inputClass}
+                    placeholder="2020, Grade 10..."
+                />
+            </div>
+
+            <div>
+                <label className="block text-sm font-bold mb-1">Tags (optional)</label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                    {(item.tags || []).map((tag, tagIndex) => (
+                        <span
+                            key={tagIndex}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
+                        >
+                            {tag}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    const newTags = (item.tags || []).filter((_, i) => i !== tagIndex);
+                                    onUpdate({ tags: newTags });
+                                }}
+                                className="hover:text-red-500 transition-colors"
+                            >
+                                <X className="w-3 h-3" />
+                            </button>
+                        </span>
+                    ))}
+                </div>
+                <input
+                    type="text"
+                    placeholder="Nhập tag rồi Enter"
+                    className={inputClass}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                            const val = e.currentTarget.value.trim();
+                            if (val) {
+                                onUpdate({ tags: [...(item.tags || []), val] });
+                                e.currentTarget.value = "";
+                            }
+                        }
+                    }}
+                />
+            </div>
+        </div>
+    );
+}
+
 function ExploreItemListEditor({
     items,
     onChange,
@@ -69,126 +264,17 @@ function ExploreItemListEditor({
         <div>
             <div className="space-y-3 sm:space-y-4">
                 {items.map((item, index) => (
-                    <div
+                    <ExploreItemCard
                         key={index}
-                        className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3"
-                    >
-                        <div className="flex justify-between items-center gap-2">
-                            <MoveButtons
-                                index={index}
-                                total={items.length}
-                                onMove={(from, to) => onChange(swap(items, from, to))}
-                            />
-                            <span className="font-bold text-sm">
-                                {itemLabel} {index + 1}
-                            </span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => onChange(items.filter((_, i) => i !== index))}
-                            >
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                            </Button>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Image (optional)</label>
-                            <ImageUpload
-                                value={item.imageUrl || ""}
-                                onChange={(url) => updateItem(index, { imageUrl: url })}
-                                folder={folder}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Title</label>
-                            <input
-                                type="text"
-                                value={item.title}
-                                onChange={(e) => updateItem(index, { title: e.target.value })}
-                                className={inputClass}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            <div>
-                                <label className="block text-sm font-bold mb-1">Summary</label>
-                                <input
-                                    type="text"
-                                    value={item.summary}
-                                    onChange={(e) => updateItem(index, { summary: e.target.value })}
-                                    className={inputClass}
-                                    placeholder="1 dòng tóm tắt"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-bold mb-1">
-                                    Since (optional)
-                                </label>
-                                <input
-                                    type="text"
-                                    value={item.since || ""}
-                                    onChange={(e) => updateItem(index, { since: e.target.value })}
-                                    className={inputClass}
-                                    placeholder="2020, Grade 10..."
-                                />
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Story</label>
-                            <textarea
-                                value={item.story}
-                                onChange={(e) => updateItem(index, { story: e.target.value })}
-                                className={`${inputClass} min-h-[120px]`}
-                                rows={5}
-                                placeholder="Câu chuyện đầy đủ..."
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Tags (optional)</label>
-                            <div className="flex flex-wrap gap-1.5 mb-2">
-                                {(item.tags || []).map((tag, tagIndex) => (
-                                    <span
-                                        key={tagIndex}
-                                        className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
-                                    >
-                                        {tag}
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                const newTags = (item.tags || []).filter(
-                                                    (_, i) => i !== tagIndex
-                                                );
-                                                updateItem(index, { tags: newTags });
-                                            }}
-                                            className="hover:text-red-500 transition-colors"
-                                        >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Nhập tag rồi Enter"
-                                className={inputClass}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        e.preventDefault();
-                                        const val = e.currentTarget.value.trim();
-                                        if (val) {
-                                            updateItem(index, {
-                                                tags: [...(item.tags || []), val],
-                                            });
-                                            e.currentTarget.value = "";
-                                        }
-                                    }
-                                }}
-                            />
-                        </div>
-                    </div>
+                        item={item}
+                        index={index}
+                        total={items.length}
+                        folder={folder}
+                        itemLabel={itemLabel}
+                        onUpdate={(updates) => updateItem(index, updates)}
+                        onMove={(from, to) => onChange(swap(items, from, to))}
+                        onRemove={() => onChange(items.filter((_, i) => i !== index))}
+                    />
                 ))}
             </div>
             <Button
@@ -196,15 +282,122 @@ function ExploreItemListEditor({
                 size="sm"
                 className="mt-3"
                 onClick={() =>
-                    onChange([
-                        ...items,
-                        { title: "", summary: "", story: "" },
-                    ])
+                    onChange([...items, { title: "", summary: "", story: "" }])
                 }
             >
                 <Plus className="w-4 h-4" />
                 Thêm {itemLabel.toLowerCase()}
             </Button>
+        </div>
+    );
+}
+
+function ExploreStoryCard({
+    item,
+    index,
+    total,
+    onUpdate,
+    onMove,
+    onRemove,
+}: {
+    item: ExploreStory;
+    index: number;
+    total: number;
+    onUpdate: (next: ExploreStory) => void;
+    onMove: (from: number, to: number) => void;
+    onRemove: () => void;
+}) {
+    const [lang, setLang] = useState<"en" | "vi">("en");
+
+    return (
+        <div className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
+            <div className="flex justify-between items-center gap-2">
+                <MoveButtons index={index} total={total} onMove={onMove} />
+                <span className="font-bold text-sm">Story {index + 1}</span>
+                <Button variant="ghost" size="icon" onClick={onRemove}>
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                </Button>
+            </div>
+            <LanguageSwitch value={lang} onChange={setLang} />
+            {lang === "en" ? (
+                <div className="space-y-3">
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Title</label>
+                        <input
+                            type="text"
+                            value={item.title}
+                            onChange={(e) => onUpdate({ ...item, title: e.target.value })}
+                            className={inputClass}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Content</label>
+                        <textarea
+                            value={item.content}
+                            onChange={(e) => onUpdate({ ...item, content: e.target.value })}
+                            className={`${inputClass} min-h-[100px]`}
+                        />
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Title</label>
+                        <input
+                            type="text"
+                            value={item.titleVi || ""}
+                            onChange={(e) => onUpdate({ ...item, titleVi: e.target.value })}
+                            className={inputClass}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-bold mb-1">Content</label>
+                        <textarea
+                            value={item.contentVi || ""}
+                            onChange={(e) => onUpdate({ ...item, contentVi: e.target.value })}
+                            className={`${inputClass} min-h-[100px]`}
+                        />
+                    </div>
+                </div>
+            )}
+            <div>
+                <label className="block text-sm font-bold mb-1">Topics / Hashtags (optional)</label>
+                <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
+                    {(item.topics || []).map((topic, topicIndex) => (
+                        <span
+                            key={topicIndex}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
+                        >
+                            #{topic.toLowerCase().replace(/\s+/g, "-")}
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    onUpdate({
+                                        ...item,
+                                        topics: (item.topics || []).filter((_, i) => i !== topicIndex),
+                                    })
+                                }
+                                className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
+                            >
+                                ×
+                            </button>
+                        </span>
+                    ))}
+                </div>
+                <input
+                    type="text"
+                    placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
+                    className={inputClass}
+                    onKeyDown={(e) => {
+                        if (e.key !== "Enter") return;
+                        e.preventDefault();
+                        const val = e.currentTarget.value.trim();
+                        if (!val || (item.topics || []).includes(val)) return;
+                        onUpdate({ ...item, topics: [...(item.topics || []), val] });
+                        e.currentTarget.value = "";
+                    }}
+                />
+            </div>
         </div>
     );
 }
@@ -226,78 +419,15 @@ function StoryListEditor({
         <div>
             <div className="space-y-3 sm:space-y-4">
                 {items.map((item, index) => (
-                    <div key={index} className="border border-zinc-200 rounded-lg bg-zinc-50/50 p-3 sm:p-4 space-y-3">
-                        <div className="flex justify-between items-center gap-2">
-                            <MoveButtons
-                                index={index}
-                                total={items.length}
-                                onMove={(from, to) => onChange(swap(items, from, to))}
-                            />
-                            <span className="font-bold text-sm">Story {index + 1}</span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => onChange(items.filter((_, i) => i !== index))}
-                            >
-                                <Trash2 className="w-4 h-4 text-red-500" />
-                            </Button>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Title</label>
-                            <input
-                                type="text"
-                                value={item.title}
-                                onChange={(e) => update(index, { ...item, title: e.target.value })}
-                                className={inputClass}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Content</label>
-                            <textarea
-                                value={item.content}
-                                onChange={(e) => update(index, { ...item, content: e.target.value })}
-                                className={`${inputClass} min-h-[100px]`}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-bold mb-1">Topics / Hashtags (optional)</label>
-                            <div className="flex flex-wrap gap-1.5 mb-2 min-h-[28px]">
-                                {(item.topics || []).map((topic, topicIndex) => (
-                                    <span
-                                        key={topicIndex}
-                                        className="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-medium bg-zinc-100 border border-zinc-200 text-zinc-600 rounded-lg"
-                                    >
-                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
-                                        <button
-                                            type="button"
-                                            onClick={() =>
-                                                update(index, {
-                                                    ...item,
-                                                    topics: (item.topics || []).filter((_, i) => i !== topicIndex),
-                                                })
-                                            }
-                                            className="hover:text-red-500 font-bold cursor-pointer text-zinc-400"
-                                        >
-                                            ×
-                                        </button>
-                                    </span>
-                                ))}
-                            </div>
-                            <input
-                                type="text"
-                                placeholder="Enter new topic and press Enter (e.g. growth, lessons)..."
-                                className={inputClass}
-                                onKeyDown={(e) => {
-                                    if (e.key !== "Enter") return;
-                                    e.preventDefault();
-                                    const val = e.currentTarget.value.trim();
-                                    if (!val || (item.topics || []).includes(val)) return;
-                                    update(index, { ...item, topics: [...(item.topics || []), val] });
-                                    e.currentTarget.value = "";
-                                }}
-                            />
-                        </div>
-                    </div>
+                    <ExploreStoryCard
+                        key={index}
+                        item={item}
+                        index={index}
+                        total={items.length}
+                        onUpdate={(next) => update(index, next)}
+                        onMove={(from, to) => onChange(swap(items, from, to))}
+                        onRemove={() => onChange(items.filter((_, i) => i !== index))}
+                    />
                 ))}
             </div>
             <Button
@@ -1177,21 +1307,23 @@ export function AdminExplorePage() {
                                             
                                             <div className="space-y-3">
                                                 {(group.versions || []).map((ver, verIndex) => (
-                                                    <div key={verIndex} className="flex gap-2 items-center border border-zinc-200 rounded bg-white p-2.5">
-                                                        <MoveButtons
-                                                            index={verIndex}
-                                                            total={(group.versions || []).length}
-                                                            onMove={(from, to) => {
-                                                                const r = [...(data.resumes || [])];
-                                                                r[groupIndex] = {
-                                                                    ...group,
-                                                                    versions: swap(group.versions || [], from, to)
-                                                                };
-                                                                setData({ ...data, resumes: r });
-                                                            }}
-                                                        />
-                                                        <div className="flex-grow grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
-                                                            <div>
+                                                    <div key={verIndex} className="flex gap-2 items-start border border-zinc-200 rounded bg-white p-2.5 min-w-0">
+                                                        <div className="shrink-0 pt-5">
+                                                            <MoveButtons
+                                                                index={verIndex}
+                                                                total={(group.versions || []).length}
+                                                                onMove={(from, to) => {
+                                                                    const r = [...(data.resumes || [])];
+                                                                    r[groupIndex] = {
+                                                                        ...group,
+                                                                        versions: swap(group.versions || [], from, to)
+                                                                    };
+                                                                    setData({ ...data, resumes: r });
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <div className="min-w-0 flex-1 flex flex-wrap items-end gap-3">
+                                                            <div className="min-w-[8rem] flex-1 basis-[10rem]">
                                                                 <label className="block text-[10px] font-bold text-zinc-500 mb-1">Tên phiên bản (e.g. 07/2026)</label>
                                                                 <input
                                                                     type="text"
@@ -1203,11 +1335,11 @@ export function AdminExplorePage() {
                                                                         r[groupIndex] = { ...group, versions };
                                                                         setData({ ...data, resumes: r });
                                                                     }}
-                                                                    className={inputClass}
+                                                                    className={`${inputClass} min-w-0`}
                                                                     placeholder="e.g. 07/2026"
                                                                 />
                                                             </div>
-                                                            <div>
+                                                            <div className="min-w-0 w-full basis-full">
                                                                 <label className="block text-[10px] font-bold text-zinc-500 mb-1">File PDF (R2)</label>
                                                                 <PdfUpload
                                                                     value={ver.url}
@@ -1218,12 +1350,14 @@ export function AdminExplorePage() {
                                                                         r[groupIndex] = { ...group, versions };
                                                                         setData({ ...data, resumes: r });
                                                                     }}
+                                                                    className="max-w-full"
                                                                 />
                                                             </div>
                                                         </div>
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
+                                                            className="shrink-0 mt-5"
                                                             onClick={() => {
                                                                 const r = [...(data.resumes || [])];
                                                                 r[groupIndex] = {

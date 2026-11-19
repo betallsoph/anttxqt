@@ -393,6 +393,47 @@ function ResumeGroupRow({
     );
 }
 
+type StoryCopy = Story & {
+    titleVi?: string;
+    contentVi?: string;
+};
+
+type ExploreItemCopy = ExploreItem & {
+    titleVi?: string;
+    summaryVi?: string;
+    storyVi?: string;
+};
+
+function hasCopy(value?: string) {
+    return !!value?.trim();
+}
+
+function StoryLanguageLine({
+    language,
+    onSwitch,
+}: {
+    language: "en" | "vi";
+    onSwitch: () => void;
+}) {
+    const vietnamese = language === "en";
+    return (
+        <p
+            dir="ltr"
+            onClick={onSwitch}
+            onKeyDown={(event) => {
+                if (event.key !== "Enter" && event.key !== " ") return;
+                event.preventDefault();
+                onSwitch();
+            }}
+            tabIndex={0}
+            className={`-mx-3 w-fit cursor-pointer px-3 py-2 text-[11px] sm:text-xs font-bold leading-none text-zinc-400 hover:text-zinc-600 ${vietnamese ? "font-vietnamese" : ""}`}
+            style={vietnamese ? undefined : { fontFamily: '"Outfit", sans-serif' }}
+        >
+            {vietnamese ? "xem bằng tiếng Việt" : "view in English"}
+        </p>
+    );
+}
+
 function ExploreItemModal({
     item,
     onClose,
@@ -400,6 +441,16 @@ function ExploreItemModal({
     item: ExploreItem;
     onClose: () => void;
 }) {
+    const copy = item as ExploreItemCopy;
+    const hasEnglish = hasCopy(copy.title) || hasCopy(copy.summary) || hasCopy(copy.story);
+    const hasVietnamese = hasCopy(copy.titleVi) || hasCopy(copy.summaryVi) || hasCopy(copy.storyVi);
+    const [language, setLanguage] = useState<"en" | "vi">(hasEnglish ? "en" : "vi");
+    const vietnamese = language === "vi";
+    const title = vietnamese ? (copy.titleVi ?? "") : copy.title;
+    const summary = vietnamese ? (copy.summaryVi ?? "") : copy.summary;
+    const storyBody = vietnamese ? (copy.storyVi ?? "") : copy.story;
+    const copyClass = vietnamese ? "font-vietnamese" : "";
+
     return (
         <AnimatePresence>
             <motion.div
@@ -423,7 +474,7 @@ function ExploreItemModal({
                             <div className="flex w-full items-center justify-center border-b-2 border-black bg-white">
                                 <ImageWithLoader
                                     src={item.imageUrl}
-                                    alt={item.title}
+                                    alt={title.trim() || item.title}
                                     className="h-full max-h-[70vh] w-full"
                                     imgClassName="object-contain"
                                 />
@@ -431,10 +482,29 @@ function ExploreItemModal({
                         )}
 
                         <div className="w-full space-y-3 p-4 sm:p-6">
+                            {item.tags && item.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5">
+                                    {item.tags.map((tag, i) => (
+                                        <span
+                                            key={i}
+                                            className="px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+
                             <div className="min-w-0">
-                                <h3 className="font-bold text-lg sm:text-2xl">
-                                    {item.title}
+                                <h3 className={`font-bold text-lg sm:text-2xl ${copyClass}`}>
+                                    {title}
                                 </h3>
+                                {hasEnglish && hasVietnamese && (
+                                    <StoryLanguageLine
+                                        language={language}
+                                        onSwitch={() => setLanguage(language === "en" ? "vi" : "en")}
+                                    />
+                                )}
                                 {item.since && (
                                     <div className="mt-1.5">
                                         <span className="inline-block text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
@@ -442,20 +512,20 @@ function ExploreItemModal({
                                         </span>
                                     </div>
                                 )}
-                                {item.summary && (
-                                    <p className="text-sm sm:text-base text-zinc-500 mt-1">
-                                        {item.summary}
+                                {summary && (
+                                    <p className={`text-sm sm:text-base text-zinc-500 mt-1 ${copyClass}`}>
+                                        {summary}
                                     </p>
                                 )}
                             </div>
 
-                            {item.story && (
+                            {storyBody && (
                                 <div className="space-y-2 pt-1">
                                     <h4 className="text-xs sm:text-sm font-bold text-blue-600">
                                         The Backstory
                                     </h4>
-                                    <div className="space-y-3">
-                                        {item.story.split("\n").map((paragraph, idx) => {
+                                    <div className={`space-y-3 ${copyClass}`}>
+                                        {storyBody.split("\n").map((paragraph, idx) => {
                                             if (!paragraph.trim()) {
                                                 return <div key={idx} className="h-2" />;
                                             }
@@ -466,19 +536,6 @@ function ExploreItemModal({
                                             );
                                         })}
                                     </div>
-                                </div>
-                            )}
-
-                            {item.tags && item.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 pt-1">
-                                    {item.tags.map((tag, i) => (
-                                        <span
-                                            key={i}
-                                            className="px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
-                                        >
-                                            {tag}
-                                        </span>
-                                    ))}
                                 </div>
                             )}
                         </div>
@@ -504,6 +561,15 @@ function StoryModal({
     story: Story;
     onClose: () => void;
 }) {
+    const copy = story as StoryCopy;
+    const hasEnglish = hasCopy(copy.title) || hasCopy(copy.content);
+    const hasVietnamese = hasCopy(copy.titleVi) || hasCopy(copy.contentVi);
+    const [language, setLanguage] = useState<"en" | "vi">(hasEnglish ? "en" : "vi");
+    const vietnamese = language === "vi";
+    const title = vietnamese ? (copy.titleVi ?? "") : copy.title;
+    const content = vietnamese ? (copy.contentVi ?? "") : copy.content;
+    const copyClass = vietnamese ? "font-vietnamese" : "";
+
     return (
         <AnimatePresence>
             <motion.div
@@ -523,13 +589,34 @@ function StoryModal({
                     className="relative z-10 flex w-full max-w-4xl flex-col items-center"
                 >
                     <div className="custom-scrollbar w-full max-h-[calc(90vh-4.5rem)] space-y-3 overflow-y-auto rounded-lg border-2 border-black bg-white p-4 sm:p-6">
-                        <h3 className="font-bold text-lg sm:text-2xl">
-                            {story.title}
-                        </h3>
+                        {story.topics && story.topics.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                {story.topics.map((topic) => (
+                                    <span
+                                        key={topic}
+                                        className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200 break-words"
+                                    >
+                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
 
-                        {story.content && (
-                            <div className="space-y-3 pt-1">
-                                {story.content.split("\n").map((paragraph, idx) => {
+                        <div className="min-w-0">
+                            <h3 className={`font-bold text-lg sm:text-2xl ${copyClass}`}>
+                                {title}
+                            </h3>
+                            {hasEnglish && hasVietnamese && (
+                                <StoryLanguageLine
+                                    language={language}
+                                    onSwitch={() => setLanguage(language === "en" ? "vi" : "en")}
+                                />
+                            )}
+                        </div>
+
+                        {content && (
+                            <div className={`space-y-3 pt-1 ${copyClass}`}>
+                                {content.split("\n").map((paragraph, idx) => {
                                     if (!paragraph.trim()) {
                                         return <div key={idx} className="h-2" />;
                                     }
@@ -539,19 +626,6 @@ function StoryModal({
                                         </p>
                                     );
                                 })}
-                            </div>
-                        )}
-
-                        {story.topics && story.topics.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-2">
-                                {story.topics.map((topic) => (
-                                    <span
-                                        key={topic}
-                                        className="text-[10px] sm:text-xs font-medium text-zinc-500 hover:text-black transition-colors duration-200 break-words"
-                                    >
-                                        #{topic.toLowerCase().replace(/\s+/g, "-")}
-                                    </span>
-                                ))}
                             </div>
                         )}
                     </div>

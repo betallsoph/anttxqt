@@ -61,17 +61,18 @@ export function PdfUpload({
     };
 
     return (
-        <div className={className}>
+        <div className={`min-w-0 max-w-full ${className}`}>
             {value ? (
-                <div className="relative inline-flex items-center gap-2 px-3 py-2 border-2 border-black rounded-lg bg-zinc-50 pr-8">
-                    <FileText className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <span className="text-sm font-medium max-w-[200px] truncate" title={getFileName(value)}>
+                <div className="flex w-full min-w-0 items-start gap-2 px-3 py-2 border-2 border-black rounded-lg bg-zinc-50">
+                    <FileText className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+                    <span className="min-w-0 flex-1 text-sm font-medium break-words [overflow-wrap:anywhere]" title={getFileName(value)}>
                         {getFileName(value)}
                     </span>
                     <button
                         type="button"
                         onClick={() => onChange("")}
-                        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-black cursor-pointer"
+                        className="shrink-0 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center border-2 border-black cursor-pointer"
+                        aria-label="Xóa file PDF"
                     >
                         <X className="w-3 h-3" />
                     </button>
