@@ -20,9 +20,11 @@ export interface ExploreItem {
 export interface ExploreStory {
     title: string;
     content: string;
+    summary?: string;
     topics?: string[];
     titleVi?: string;
     contentVi?: string;
+    summaryVi?: string;
     showEn?: boolean;
     showVi?: boolean;
 }

@@ -24,7 +24,7 @@ function StoryList({
     action,
     onOpen,
 }: {
-    items: { title: string; vietnamese?: boolean }[];
+    items: { title: string; subtitle?: string; vietnamese?: boolean }[];
     action: string;
     onOpen: (index: number) => void;
 }) {
@@ -38,13 +38,20 @@ function StoryList({
                     onClick={() => onOpen(index)}
                     className="w-full flex items-center justify-between py-3.5 sm:py-4 border-b-2 border-black/10 hover:border-black transition-colors duration-200 group text-left cursor-pointer"
                 >
-                    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-                        <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
+                    <div className={`flex min-w-0 gap-3 sm:gap-4 ${item.subtitle ? "items-start" : "items-center"}`}>
+                        <span className={`w-6 flex-shrink-0 text-xs font-bold font-mono text-zinc-400 sm:text-sm ${item.subtitle ? "pt-0.5" : ""}`}>
                             {(index + 1).toString().padStart(2, "0")}
                         </span>
-                        <h3 className={`font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors ${item.vietnamese ? "font-vietnamese" : ""}`}>
-                            {item.title}
-                        </h3>
+                        <div className="min-w-0">
+                            <h3 className={`font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors ${item.vietnamese ? "font-vietnamese" : ""}`}>
+                                {item.title}
+                            </h3>
+                            {item.subtitle && (
+                                <p className={`text-xs text-zinc-400 mt-0.5 truncate ${item.vietnamese ? "font-vietnamese" : ""}`}>
+                                    {item.subtitle}
+                                </p>
+                            )}
+                        </div>
                     </div>
                     <div className="relative flex items-center justify-end text-xs font-bold text-zinc-400 ml-3 flex-shrink-0 w-36 h-5 overflow-hidden">
                         <ArrowRight className="absolute right-[114px] w-4 h-4 text-zinc-400 transition-all duration-300 ease-out group-hover:text-blue-500 group-hover:translate-x-[114px]" />
@@ -416,13 +423,25 @@ function languageOffered(
     return storyLanguageVisible(item, lang) && parts.some(hasCopy);
 }
 
-function publicListLabel(item: { title: string; titleVi?: string; showEn?: boolean; showVi?: boolean }) {
+function publicListLabel(
+    item: {
+        title: string;
+        titleVi?: string;
+        summary?: string;
+        summaryVi?: string;
+        showEn?: boolean;
+        showVi?: boolean;
+    },
+    withSubtitle = false,
+) {
     const english = storyLanguageVisible(item, "en") && hasCopy(item.title);
     const vietnamese = storyLanguageVisible(item, "vi") && hasCopy(item.titleVi);
-    if (english) return { title: item.title, vietnamese: false };
-    if (vietnamese) return { title: item.titleVi || "", vietnamese: true };
+    const subtitleFor = (value?: string) => (withSubtitle ? value?.trim() || "" : "");
+    if (english) return { title: item.title, subtitle: subtitleFor(item.summary), vietnamese: false };
+    if (vietnamese) return { title: item.titleVi || "", subtitle: subtitleFor(item.summaryVi), vietnamese: true };
     const title = item.title?.trim() || item.titleVi?.trim() || "";
-    return { title, vietnamese: !item.title?.trim() && !!item.titleVi?.trim() };
+    const subtitle = subtitleFor(item.title?.trim() ? item.summary : item.summaryVi);
+    return { title, subtitle, vietnamese: !item.title?.trim() && !!item.titleVi?.trim() };
 }
 
 function StoryLanguageLine({
@@ -1144,8 +1163,8 @@ export function ExplorePage() {
                         Coding Stories
                     </h2>
                     <StoryList
-                        items={(data.stories || []).map(publicListLabel)}
-                        action="read the story"
+                        items={(data.stories || []).map((item) => publicListLabel(item))}
+                        action="dive into my story"
                         onOpen={(index) => setSelectedStory(data.stories[index])}
                     />
                 </motion.section>
@@ -1167,7 +1186,7 @@ export function ExplorePage() {
                         </p>
                     )}
                     <StoryList
-                        items={(data.beyondCode || []).map(publicListLabel)}
+                        items={(data.beyondCode || []).map((item) => publicListLabel(item))}
                         action="dive into my story"
                         onOpen={(index) => setSelectedExploreItem(data.beyondCode[index])}
                     />
@@ -1190,8 +1209,8 @@ export function ExplorePage() {
                         </p>
                     )}
                     <StoryList
-                        items={(data.personalStories || []).map(publicListLabel)}
-                        action="read the story"
+                        items={(data.personalStories || []).map((item) => publicListLabel(item, true))}
+                        action="dive into my story"
                         onOpen={(index) => setSelectedStory(data.personalStories[index])}
                     />
                 </motion.section>

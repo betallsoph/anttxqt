@@ -409,6 +409,7 @@ function ExploreStoryCard({
     item,
     index,
     total,
+    summary = false,
     onUpdate,
     onMove,
     onRemove,
@@ -416,6 +417,7 @@ function ExploreStoryCard({
     item: ExploreStory;
     index: number;
     total: number;
+    summary?: boolean;
     onUpdate: (next: ExploreStory) => void;
     onMove: (from: number, to: number) => void;
     onRemove: () => void;
@@ -452,6 +454,17 @@ function ExploreStoryCard({
                             className={fieldClass}
                         />
                     </Field>
+                    {summary && (
+                        <Field label="Summary">
+                            <input
+                                type="text"
+                                value={item.summary || ""}
+                                onChange={(e) => onUpdate({ ...item, summary: e.target.value })}
+                                className={fieldClass}
+                                placeholder="1 dòng tóm tắt"
+                            />
+                        </Field>
+                    )}
                     <Field label="Content">
                         <textarea
                             value={item.content}
@@ -471,6 +484,17 @@ function ExploreStoryCard({
                             className={fieldClass}
                         />
                     </Field>
+                    {summary && (
+                        <Field label="Summary">
+                            <input
+                                type="text"
+                                value={item.summaryVi || ""}
+                                onChange={(e) => onUpdate({ ...item, summaryVi: e.target.value })}
+                                className={fieldClass}
+                                placeholder="1 dòng tóm tắt"
+                            />
+                        </Field>
+                    )}
                     <Field label="Content">
                         <textarea
                             value={item.contentVi || ""}
@@ -504,9 +528,11 @@ function ExploreStoryCard({
 function StoryListEditor({
     items,
     onChange,
+    summary = false,
 }: {
     items: ExploreStory[];
     onChange: (items: ExploreStory[]) => void;
+    summary?: boolean;
 }) {
     const update = (index: number, next: ExploreStory) => {
         const copy = [...items];
@@ -524,6 +550,7 @@ function StoryListEditor({
                             item={item}
                             index={index}
                             total={items.length}
+                            summary={summary}
                             onUpdate={(next) => update(index, next)}
                             onMove={(from, to) => onChange(swap(items, from, to))}
                             onRemove={() => onChange(items.filter((_, i) => i !== index))}
@@ -921,6 +948,7 @@ export function AdminExplorePage() {
                 <StoryListEditor
                     items={data.personalStories || []}
                     onChange={(items) => setData({ ...data, personalStories: items })}
+                    summary
                 />
                 <SaveButton
                     saving={saving === "personalStories"}
