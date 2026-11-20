@@ -13,6 +13,8 @@ export interface ExploreItem {
     titleVi?: string;
     summaryVi?: string;
     storyVi?: string;
+    showEn?: boolean;
+    showVi?: boolean;
 }
 
 export interface ExploreStory {
@@ -21,6 +23,15 @@ export interface ExploreStory {
     topics?: string[];
     titleVi?: string;
     contentVi?: string;
+    showEn?: boolean;
+    showVi?: boolean;
+}
+
+export function storyLanguageVisible(
+    item: { showEn?: boolean; showVi?: boolean },
+    lang: "en" | "vi",
+) {
+    return lang === "en" ? item.showEn !== false : item.showVi !== false;
 }
 
 export interface ResumeVersion {

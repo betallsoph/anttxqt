@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useInView } from "motion/react";
 import { X, ExternalLink, ArrowRight, ChevronDown } from "lucide-react";
 import { LoadingScreen, ImageWithLoader } from "@/components/ui/LoadingScreen";
 import { ErrorScreen } from "@/components/ui/ErrorScreen";
-import { useExploreData, type ExploreData, type ExploreItem, type ResumeGroup, type ResumeVersion } from "@/hooks/useExploreData";
+import { useExploreData, storyLanguageVisible, type ExploreData, type ExploreItem, type ResumeGroup, type ResumeVersion } from "@/hooks/useExploreData";
 import { formatExternalUrl } from "@/hooks/useProjectsData";
 
 type Achievement = ExploreData["achievements"][number];
@@ -24,7 +24,7 @@ function StoryList({
     action,
     onOpen,
 }: {
-    items: { title: string }[];
+    items: { title: string; vietnamese?: boolean }[];
     action: string;
     onOpen: (index: number) => void;
 }) {
@@ -42,7 +42,7 @@ function StoryList({
                         <span className="text-xs sm:text-sm font-mono text-zinc-400 font-bold flex-shrink-0 w-6">
                             {(index + 1).toString().padStart(2, "0")}
                         </span>
-                        <h3 className="font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors">
+                        <h3 className={`font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors ${item.vietnamese ? "font-vietnamese" : ""}`}>
                             {item.title}
                         </h3>
                     </div>
@@ -408,6 +408,23 @@ function hasCopy(value?: string) {
     return !!value?.trim();
 }
 
+function languageOffered(
+    item: { showEn?: boolean; showVi?: boolean },
+    lang: "en" | "vi",
+    ...parts: (string | undefined)[]
+) {
+    return storyLanguageVisible(item, lang) && parts.some(hasCopy);
+}
+
+function publicListLabel(item: { title: string; titleVi?: string; showEn?: boolean; showVi?: boolean }) {
+    const english = storyLanguageVisible(item, "en") && hasCopy(item.title);
+    const vietnamese = storyLanguageVisible(item, "vi") && hasCopy(item.titleVi);
+    if (english) return { title: item.title, vietnamese: false };
+    if (vietnamese) return { title: item.titleVi || "", vietnamese: true };
+    const title = item.title?.trim() || item.titleVi?.trim() || "";
+    return { title, vietnamese: !item.title?.trim() && !!item.titleVi?.trim() };
+}
+
 function StoryLanguageLine({
     language,
     onSwitch,
@@ -442,13 +459,14 @@ function ExploreItemModal({
     onClose: () => void;
 }) {
     const copy = item as ExploreItemCopy;
-    const hasEnglish = hasCopy(copy.title) || hasCopy(copy.summary) || hasCopy(copy.story);
-    const hasVietnamese = hasCopy(copy.titleVi) || hasCopy(copy.summaryVi) || hasCopy(copy.storyVi);
+    const hasEnglish = languageOffered(copy, "en", copy.title, copy.summary, copy.story);
+    const hasVietnamese = languageOffered(copy, "vi", copy.titleVi, copy.summaryVi, copy.storyVi);
     const [language, setLanguage] = useState<"en" | "vi">(hasEnglish ? "en" : "vi");
-    const vietnamese = language === "vi";
-    const title = vietnamese ? (copy.titleVi ?? "") : copy.title;
-    const summary = vietnamese ? (copy.summaryVi ?? "") : copy.summary;
-    const storyBody = vietnamese ? (copy.storyVi ?? "") : copy.story;
+    const vietnamese = language === "vi" && hasVietnamese;
+    const showing = vietnamese || (language === "en" && hasEnglish);
+    const title = !showing ? "" : vietnamese ? (copy.titleVi ?? "") : copy.title;
+    const summary = !showing ? "" : vietnamese ? (copy.summaryVi ?? "") : copy.summary;
+    const storyBody = !showing ? "" : vietnamese ? (copy.storyVi ?? "") : copy.story;
     const copyClass = vietnamese ? "font-vietnamese" : "";
 
     return (
@@ -560,12 +578,13 @@ function StoryModal({
     onClose: () => void;
 }) {
     const copy = story as StoryCopy;
-    const hasEnglish = hasCopy(copy.title) || hasCopy(copy.content);
-    const hasVietnamese = hasCopy(copy.titleVi) || hasCopy(copy.contentVi);
+    const hasEnglish = languageOffered(copy, "en", copy.title, copy.content);
+    const hasVietnamese = languageOffered(copy, "vi", copy.titleVi, copy.contentVi);
     const [language, setLanguage] = useState<"en" | "vi">(hasEnglish ? "en" : "vi");
-    const vietnamese = language === "vi";
-    const title = vietnamese ? (copy.titleVi ?? "") : copy.title;
-    const content = vietnamese ? (copy.contentVi ?? "") : copy.content;
+    const vietnamese = language === "vi" && hasVietnamese;
+    const showing = vietnamese || (language === "en" && hasEnglish);
+    const title = !showing ? "" : vietnamese ? (copy.titleVi ?? "") : copy.title;
+    const content = !showing ? "" : vietnamese ? (copy.contentVi ?? "") : copy.content;
     const copyClass = vietnamese ? "font-vietnamese" : "";
 
     return (
@@ -650,18 +669,23 @@ function ExploreGrid({
 }) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 sm:gap-3">
-            {items.map((item, index) => (
+            {items.map((item, index) => {
+                const label = publicListLabel(item);
+                const englishSummary = storyLanguageVisible(item, "en") ? item.summary?.trim() : "";
+                const vietnameseSummary = storyLanguageVisible(item, "vi") ? item.summaryVi?.trim() : "";
+                const summary = englishSummary || vietnameseSummary || "";
+                return (
                 <button
                     key={index}
                     onClick={() => onSelect(item)}
                     className="text-left border-2 border-black rounded-lg bg-white p-3 sm:p-4 hover:bg-blue-50 transition-all duration-200 cursor-pointer flex flex-col"
                 >
-                    <h3 className="font-bold text-sm sm:text-base mb-1 line-clamp-1">
-                        {item.title}
+                    <h3 className={`font-bold text-sm sm:text-base mb-1 line-clamp-1 ${label.vietnamese ? "font-vietnamese" : ""}`}>
+                        {label.title}
                     </h3>
-                    {item.summary && (
-                        <p className="text-xs sm:text-sm text-zinc-500 line-clamp-2 mb-2 flex-1">
-                            {item.summary}
+                    {summary && (
+                        <p className={`text-xs sm:text-sm text-zinc-500 line-clamp-2 mb-2 flex-1 ${!englishSummary && vietnameseSummary ? "font-vietnamese" : ""}`}>
+                            {summary}
                         </p>
                     )}
                     {item.since && (
@@ -670,7 +694,8 @@ function ExploreGrid({
                         </span>
                     )}
                 </button>
-            ))}
+                );
+            })}
         </div>
     );
 }
@@ -1119,7 +1144,7 @@ export function ExplorePage() {
                         Coding Stories
                     </h2>
                     <StoryList
-                        items={data.stories || []}
+                        items={(data.stories || []).map(publicListLabel)}
                         action="read the story"
                         onOpen={(index) => setSelectedStory(data.stories[index])}
                     />
@@ -1142,7 +1167,7 @@ export function ExplorePage() {
                         </p>
                     )}
                     <StoryList
-                        items={data.beyondCode || []}
+                        items={(data.beyondCode || []).map(publicListLabel)}
                         action="dive into my story"
                         onOpen={(index) => setSelectedExploreItem(data.beyondCode[index])}
                     />
@@ -1165,7 +1190,7 @@ export function ExplorePage() {
                         </p>
                     )}
                     <StoryList
-                        items={data.personalStories || []}
+                        items={(data.personalStories || []).map(publicListLabel)}
                         action="read the story"
                         onOpen={(index) => setSelectedStory(data.personalStories[index])}
                     />

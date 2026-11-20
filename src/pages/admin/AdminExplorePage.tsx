@@ -9,6 +9,7 @@ import {
     type ResumeVersion,
     defaultExploreData,
     saveExploreData,
+    storyLanguageVisible,
 } from "@/hooks/useExploreData";
 import { Button } from "@/components/ui/button";
 import { ImageUpload } from "@/components/ui/image-upload";
@@ -100,6 +101,34 @@ function LanguageSwitch({
                 Tiếng Việt
             </button>
         </div>
+    );
+}
+
+function LanguageVisibility({
+    on,
+    onToggle,
+}: {
+    on: boolean;
+    onToggle: () => void;
+}) {
+    return (
+        <span className="inline-flex items-center gap-2">
+            <span className="text-sm text-zinc-600">{on ? "On site" : "Off site"}</span>
+            <button
+                type="button"
+                onClick={onToggle}
+                aria-pressed={on}
+                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-zinc-300 ${
+                    on ? "bg-green-500" : "bg-zinc-300"
+                }`}
+            >
+                <span
+                    className={`pointer-events-none mt-0.5 inline-block h-6 w-6 transform rounded-full bg-white transition duration-200 ease-in-out ${
+                        on ? "translate-x-[22px]" : "translate-x-0.5"
+                    }`}
+                />
+            </button>
+        </span>
     );
 }
 
@@ -231,7 +260,19 @@ function ExploreItemCard({
                 />
             </div>
 
-            <LanguageSwitch value={lang} onChange={setLang} />
+            <div className="flex items-center justify-between gap-4">
+                <LanguageSwitch value={lang} onChange={setLang} />
+                <LanguageVisibility
+                    on={storyLanguageVisible(item, lang)}
+                    onToggle={() =>
+                        onUpdate(
+                            lang === "en"
+                                ? { showEn: !storyLanguageVisible(item, "en") }
+                                : { showVi: !storyLanguageVisible(item, "vi") },
+                        )
+                    }
+                />
+            </div>
 
             {lang === "en" ? (
                 <div className="space-y-4">
@@ -387,7 +428,20 @@ function ExploreStoryCard({
 
     return (
         <Entry title={heading} index={index} total={total} onMove={onMove} onRemove={onRemove}>
-            <LanguageSwitch value={lang} onChange={setLang} />
+            <div className="flex items-center justify-between gap-4">
+                <LanguageSwitch value={lang} onChange={setLang} />
+                <LanguageVisibility
+                    on={storyLanguageVisible(item, lang)}
+                    onToggle={() =>
+                        onUpdate({
+                            ...item,
+                            ...(lang === "en"
+                                ? { showEn: !storyLanguageVisible(item, "en") }
+                                : { showVi: !storyLanguageVisible(item, "vi") }),
+                        })
+                    }
+                />
+            </div>
             {lang === "en" ? (
                 <div className="space-y-4">
                     <Field label="Title">
