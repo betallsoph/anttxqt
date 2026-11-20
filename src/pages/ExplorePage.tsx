@@ -482,16 +482,21 @@ function ExploreItemModal({
                         )}
 
                         <div className="w-full space-y-3 p-4 sm:p-6">
-                            {item.tags && item.tags.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5">
-                                    {item.tags.map((tag, i) => (
+                            {(!!item.tags?.length || !!item.since) && (
+                                <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                    {item.tags?.map((tag, i) => (
                                         <span
                                             key={i}
-                                            className="px-2 py-0.5 text-xs font-semibold bg-zinc-100 border border-zinc-300 rounded"
+                                            className="text-[10px] sm:text-xs font-medium text-zinc-500 break-words"
                                         >
-                                            {tag}
+                                            #{tag.trim().replace(/^#+/, "").toLowerCase().replace(/\s+/g, "-")}
                                         </span>
                                     ))}
+                                    {item.since && (
+                                        <span className="inline-block text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
+                                            since {item.since}
+                                        </span>
+                                    )}
                                 </div>
                             )}
 
@@ -504,13 +509,6 @@ function ExploreItemModal({
                                         language={language}
                                         onSwitch={() => setLanguage(language === "en" ? "vi" : "en")}
                                     />
-                                )}
-                                {item.since && (
-                                    <div className="mt-1.5">
-                                        <span className="inline-block text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
-                                            since {item.since}
-                                        </span>
-                                    </div>
                                 )}
                                 {summary && (
                                     <p className={`text-sm sm:text-base text-zinc-500 mt-1 ${copyClass}`}>
