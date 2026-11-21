@@ -101,7 +101,7 @@ export function HomePage() {
 
 
             {/* Experience Section */}
-            {data.experiences && data.experiences.length > 0 && (
+            {!data.experiencesHidden && (data.experiences || []).some((exp) => !exp.hidden) && (
                 <motion.section
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -112,7 +112,7 @@ export function HomePage() {
                         Experience
                     </h2>
                     <div className="space-y-5 mt-4 sm:mt-5">
-                        {data.experiences
+                        {(data.experiences || [])
                             .filter((exp) => !exp.hidden)
                             .map((exp, index, arr) => (
                                 <div key={index} className="space-y-4">

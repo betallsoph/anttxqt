@@ -169,7 +169,17 @@ export function AdminHomePage() {
             </section>
 
             <section className="space-y-8">
-                <h2 className="text-xl font-semibold text-zinc-800">Experience</h2>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h2 className="text-xl font-semibold text-zinc-800">Experience</h2>
+                    <button
+                        type="button"
+                        onClick={() => setData({ ...data, experiencesHidden: !data.experiencesHidden })}
+                        className="inline-flex items-center gap-2 text-sm font-medium text-zinc-600"
+                    >
+                        {data.experiencesHidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        {data.experiencesHidden ? "Đang ẩn phân mục" : "Ẩn khỏi trang"}
+                    </button>
+                </div>
                 <div className="space-y-12">
                     {(data.experiences || []).map((exp, index) => (
                         <div key={index} className={`space-y-4 ${exp.hidden ? "opacity-60" : ""}`}>
@@ -189,23 +199,19 @@ export function AdminHomePage() {
                                         Kinh nghiệm {index + 1}
                                     </span>
                                 </div>
-                                <div className="flex items-center">
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        type="button"
                                         onClick={() => {
                                             const list = [...(data.experiences || [])];
                                             list[index] = { ...exp, hidden: !exp.hidden };
                                             setData({ ...data, experiences: list });
                                         }}
-                                        title={exp.hidden ? "Hiển thị công việc này" : "Tạm ẩn công việc này"}
+                                        className="inline-flex items-center gap-1.5 text-sm font-medium text-zinc-600"
                                     >
-                                        {exp.hidden ? (
-                                            <EyeOff className="w-4 h-4 text-zinc-400" />
-                                        ) : (
-                                            <Eye className="w-4 h-4 text-zinc-700" />
-                                        )}
-                                    </Button>
+                                        {exp.hidden ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        {exp.hidden ? "Đang ẩn mục" : "Ẩn mục này"}
+                                    </button>
                                     <Button
                                         variant="ghost"
                                         size="icon"

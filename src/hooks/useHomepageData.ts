@@ -30,6 +30,7 @@ export interface HomepageData {
         iconUrl?: string;
     }[];
     experiences?: Experience[];
+    experiencesHidden?: boolean;
 }
 
 // Intentionally empty. This only guarantees the shape when a Firestore doc is
