@@ -9,6 +9,7 @@ import { useExploreData, storyLanguageVisible, type ExploreData, type ExploreIte
 import { formatExternalUrl } from "@/hooks/useProjectsData";
 
 type Achievement = ExploreData["achievements"][number];
+type Favourite = ExploreData["favourites"][number];
 type Story = ExploreData["stories"][number];
 
 function ComingSoon() {
@@ -43,7 +44,7 @@ function StoryList({
                             {(index + 1).toString().padStart(2, "0")}
                         </span>
                         <div className="min-w-0">
-                            <h3 className={`font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors ${item.vietnamese ? "font-vietnamese" : ""}`}>
+                            <h3 className={`!font-bold text-sm sm:text-base truncate group-hover:text-blue-500 transition-colors ${item.vietnamese ? "font-vietnamese" : ""}`}>
                                 {item.title}
                             </h3>
                             {item.subtitle && (
@@ -484,7 +485,6 @@ function ExploreItemModal({
     const vietnamese = language === "vi" && hasVietnamese;
     const showing = vietnamese || (language === "en" && hasEnglish);
     const title = !showing ? "" : vietnamese ? (copy.titleVi ?? "") : copy.title;
-    const summary = !showing ? "" : vietnamese ? (copy.summaryVi ?? "") : copy.summary;
     const storyBody = !showing ? "" : vietnamese ? (copy.storyVi ?? "") : copy.story;
     const copyClass = vietnamese ? "font-vietnamese" : "";
 
@@ -521,6 +521,11 @@ function ExploreItemModal({
                         <div className="w-full space-y-3 p-4 sm:p-6">
                             {(!!item.tags?.length || !!item.since) && (
                                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                    {item.since && (
+                                        <span className="inline-block text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
+                                            since {item.since}
+                                        </span>
+                                    )}
                                     {item.tags?.map((tag, i) => (
                                         <span
                                             key={i}
@@ -529,16 +534,11 @@ function ExploreItemModal({
                                             #{tag.trim().replace(/^#+/, "").toLowerCase().replace(/\s+/g, "-")}
                                         </span>
                                     ))}
-                                    {item.since && (
-                                        <span className="inline-block text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded border border-blue-300 font-medium">
-                                            since {item.since}
-                                        </span>
-                                    )}
                                 </div>
                             )}
 
                             <div className="min-w-0">
-                                <h3 className={`font-bold text-lg sm:text-2xl ${copyClass}`}>
+                                <h3 className={`!font-bold text-lg sm:text-2xl ${copyClass}`}>
                                     {title}
                                 </h3>
                                 {hasEnglish && hasVietnamese && (
@@ -547,20 +547,11 @@ function ExploreItemModal({
                                         onSwitch={() => setLanguage(language === "en" ? "vi" : "en")}
                                     />
                                 )}
-                                {summary && (
-                                    <p className={`text-sm sm:text-base text-zinc-500 mt-1 ${copyClass}`}>
-                                        {summary}
-                                    </p>
-                                )}
                             </div>
 
                             {storyBody && (
-                                <div className="space-y-2 pt-1">
-                                    <h4 className="text-xs sm:text-sm font-bold text-blue-600">
-                                        The Backstory
-                                    </h4>
-                                    <div className={`space-y-3 ${copyClass}`}>
-                                        {storyBody.split("\n").map((paragraph, idx) => {
+                                <div className={`space-y-3 pt-1 ${copyClass}`}>
+                                    {storyBody.split("\n").map((paragraph, idx) => {
                                             if (!paragraph.trim()) {
                                                 return <div key={idx} className="h-2" />;
                                             }
@@ -570,7 +561,6 @@ function ExploreItemModal({
                                                 </p>
                                             );
                                         })}
-                                    </div>
                                 </div>
                             )}
                         </div>
@@ -639,7 +629,7 @@ function StoryModal({
                         )}
 
                         <div className="min-w-0">
-                            <h3 className={`font-bold text-lg sm:text-2xl ${copyClass}`}>
+                            <h3 className={`!font-bold text-lg sm:text-2xl ${copyClass}`}>
                                 {title}
                             </h3>
                             {hasEnglish && hasVietnamese && (
@@ -699,7 +689,7 @@ function ExploreGrid({
                     onClick={() => onSelect(item)}
                     className="text-left border-2 border-black rounded-lg bg-white p-3 sm:p-4 hover:bg-blue-50 transition-all duration-200 cursor-pointer flex flex-col"
                 >
-                    <h3 className={`font-bold text-sm sm:text-base mb-1 line-clamp-1 ${label.vietnamese ? "font-vietnamese" : ""}`}>
+                    <h3 className={`!font-bold text-sm sm:text-base mb-1 line-clamp-1 ${label.vietnamese ? "font-vietnamese" : ""}`}>
                         {label.title}
                     </h3>
                     {summary && (
@@ -807,6 +797,57 @@ function AchievementModal({
     );
 }
 
+function FavouriteModal({
+    item,
+    onClose,
+}: {
+    item: Favourite;
+    onClose: () => void;
+}) {
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                onClick={onClose}
+            >
+                <div className="absolute inset-0 bg-black/40" />
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                    transition={{ duration: 0.2 }}
+                    onClick={(e) => e.stopPropagation()}
+                    className="relative w-auto max-w-3xl min-w-[300px] sm:min-w-[500px] max-h-[90vh] flex flex-col bg-white border-2 border-black rounded-lg shadow-secondary overflow-hidden"
+                >
+                    <div className="w-full overflow-y-auto custom-scrollbar p-4 sm:p-6 space-y-3">
+                        <div className="flex items-start justify-between gap-3">
+                            <h3 className="font-bold text-lg sm:text-2xl min-w-0">
+                                {item.label}
+                            </h3>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                aria-label="Close"
+                                className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border-2 border-black bg-white hover:bg-zinc-100 transition-colors cursor-pointer"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+                        {item.description && (
+                            <p className="text-sm sm:text-base text-zinc-700 leading-relaxed whitespace-pre-wrap">
+                                {item.description}
+                            </p>
+                        )}
+                    </div>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    );
+}
+
 function CollapsibleMoreSection({
     data,
     isSectionHidden,
@@ -818,6 +859,7 @@ function CollapsibleMoreSection({
 }) {
     const [isMoreExpanded, setIsMoreExpanded] = useState(false);
     const [isButtonHovered, setIsButtonHovered] = useState(false);
+    const [selectedFavourite, setSelectedFavourite] = useState<Favourite | null>(null);
     const containerRef = useRef<HTMLButtonElement>(null);
     const isInView = useInView(containerRef, {
         once: false,
@@ -924,24 +966,19 @@ function CollapsibleMoreSection({
                         <div className="space-y-3 pt-6 first:pt-0">
                             <h3 className="text-base sm:text-lg font-bold text-zinc-900">Favourites</h3>
                             {data.favourites && data.favourites.length > 0 ? (
-                                <div className="space-y-1.5">
+                                <div className="space-y-2 sm:space-y-3">
                                     {data.favourites.map((item, index) => (
-                                        <div
+                                        <button
                                             key={index}
-                                            className="flex items-center gap-2 sm:gap-3 py-1"
+                                            type="button"
+                                            onClick={() => setSelectedFavourite(item)}
+                                            className="w-full flex items-center justify-between p-2.5 sm:p-3 border-2 border-black rounded-lg bg-white transition-all duration-200 group text-left cursor-pointer"
                                         >
-                                            <div className="w-1.5 h-1.5 bg-blue-500 rounded-full flex-shrink-0"></div>
-                                            <div className="min-w-0">
-                                                <span className="font-medium text-sm sm:text-base text-zinc-900">
-                                                    {item.label}
-                                                </span>
-                                                {item.description && (
-                                                    <span className="text-zinc-500 text-xs sm:text-sm hidden sm:inline">
-                                                        {" "}— {item.description}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
+                                            <h3 className="font-bold text-sm sm:text-base truncate min-w-0 group-hover:text-blue-500 transition-colors">
+                                                {item.label}
+                                            </h3>
+                                            <ArrowRight className="w-4 h-4 shrink-0 ml-3 text-zinc-400 group-hover:text-blue-500" />
+                                        </button>
                                     ))}
                                 </div>
                             ) : (
@@ -1038,6 +1075,13 @@ function CollapsibleMoreSection({
                     )}
                 </div>
             </motion.div>
+            {selectedFavourite && createPortal(
+                <FavouriteModal
+                    item={selectedFavourite}
+                    onClose={() => setSelectedFavourite(null)}
+                />,
+                document.body,
+            )}
         </motion.section>
     );
 }
