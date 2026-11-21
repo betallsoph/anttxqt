@@ -493,7 +493,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {storyLangs.length > 0 && (
                         <div id="detail-section-story" className={`mb-6 sm:mb-8 ${storyLang === "vi" ? "font-vietnamese" : ""}`} dir={storyItem.dir || "ltr"}>
                             <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
-                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("story", storyLang)}</h3>
+                                <h3 className={`text-lg sm:text-xl font-bold text-blue-600 ${storyLang === "vi" ? "[-webkit-text-stroke:0.4px_currentColor]" : ""}`}>{getLabel("story", storyLang)}</h3>
                                 <SectionLangChips
                                     languages={storyLangs}
                                     value={storyLang}
@@ -507,7 +507,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 readMore={getLabel("readMore", storyLang)}
                                 collapsedClass="max-h-72"
                             >
-                                <div className="space-y-3 sm:space-y-4 font-normal">
+                                <div className={`space-y-3 sm:space-y-4 ${storyLang === "vi" ? "font-medium" : "font-normal"}`}>
                                     {storyBehindText.split(/\n\s*\n/).map((para: string, i: number) => (
                                         <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                             {parseBoldText(para.trim())}
@@ -522,7 +522,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {builtLangs.length > 0 && (
                         <div id="detail-section-built" className={`mb-6 sm:mb-8 ${builtLang === "vi" ? "font-vietnamese" : ""}`} dir={builtItem.dir || "ltr"}>
                             <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
-                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("howIBuilt", builtLang)}</h3>
+                                <h3 className={`text-lg sm:text-xl font-bold text-blue-600 ${builtLang === "vi" ? "[-webkit-text-stroke:0.4px_currentColor]" : ""}`}>{getLabel("howIBuilt", builtLang)}</h3>
                                 <SectionLangChips
                                     languages={builtLangs}
                                     value={builtLang}
@@ -535,7 +535,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", builtLang)}
                             >
-                                <div className="space-y-3 sm:space-y-4 font-normal">
+                                <div className={`space-y-3 sm:space-y-4 ${builtLang === "vi" ? "font-medium" : "font-normal"}`}>
                                     {howIBuiltText.split(/\n\s*\n/).map((para: string, i: number) => (
                                         <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                             {parseBoldText(para.trim())}
@@ -550,7 +550,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {featureLangs.length > 0 && (
                         <div id="detail-section-features" className={`mb-6 sm:mb-8 ${featureLang === "vi" ? "font-vietnamese" : ""}`} dir={featureItem.dir || "ltr"}>
                             <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
-                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("features", featureLang)}</h3>
+                                <h3 className={`text-lg sm:text-xl font-bold text-blue-600 ${featureLang === "vi" ? "[-webkit-text-stroke:0.4px_currentColor]" : ""}`}>{getLabel("features", featureLang)}</h3>
                                 <SectionLangChips
                                     languages={featureLangs}
                                     value={featureLang}
@@ -563,7 +563,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", featureLang)}
                             >
-                                <div className="space-y-2 sm:space-y-3 font-normal">
+                                <div className={`space-y-2 sm:space-y-3 ${featureLang === "vi" ? "font-medium" : "font-normal"}`}>
                                     {keyFeaturesList.map((feature: string, index: number) => (
                                         <div key={index} className="flex items-start gap-3">
                                             <div className="w-2 h-2 mt-2.5 bg-blue-600 rounded-sm flex-shrink-0 border border-black"></div>
@@ -579,7 +579,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                     {descriptionLangs.length > 0 && (
                         <div id="detail-section-description" className={`mb-6 sm:mb-8 ${descriptionLang === "vi" ? "font-vietnamese" : ""}`} dir={descriptionItem.dir || "ltr"}>
                             <div className="mb-3 sm:mb-4 flex items-center justify-between gap-3">
-                                <h3 className="text-lg sm:text-xl font-bold text-blue-600">{getLabel("description", descriptionLang)}</h3>
+                                <h3 className={`text-lg sm:text-xl font-bold text-blue-600 ${descriptionLang === "vi" ? "[-webkit-text-stroke:0.4px_currentColor]" : ""}`}>{getLabel("description", descriptionLang)}</h3>
                                 <SectionLangChips
                                     languages={descriptionLangs}
                                     value={descriptionLang}
@@ -592,7 +592,7 @@ export function ProjectDetailPage({ type }: { type: CollectionType }) {
                                 onToggle={toggleSection}
                                 readMore={getLabel("readMore", descriptionLang)}
                             >
-                                <div className="space-y-3 sm:space-y-4 font-normal">
+                                <div className={`space-y-3 sm:space-y-4 ${descriptionLang === "vi" ? "font-medium" : "font-normal"}`}>
                                     {fullDescriptionText.split(/\n\s*\n/).map((para: string, i: number) => (
                                         <p key={i} className="text-base sm:text-lg text-zinc-700 leading-relaxed whitespace-pre-wrap">
                                             {parseBoldText(para.trim())}
